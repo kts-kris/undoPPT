@@ -7,7 +7,37 @@
 
 > **“解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**
 
-`undoPPT` 是为 Google Antigravity 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、人机交互单向割裂”** 的核心痛点。
+`undoPPT` 是为 Google Antigravity、Claude Code、Cursor 等全生态 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、人机交互单向割裂”** 的核心痛点。
+
+---
+
+## ⚡ 30 秒开始 (Quickstart)
+
+```bash
+npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
+```
+
+也可以直接把这段话发给有 shell 权限的 AI Agent：
+
+```text
+帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到 ~/.gemini/config/skills/undo-ppt（如果是 Claude Code 则克隆到 ~/.claude/skills/undo-ppt）
+```
+
+已经安装过的话，用这段话更新：
+
+```text
+帮我更新 undo-ppt。请进入 ~/.gemini/config/skills/undo-ppt 执行 git pull，然后告诉我当前最新提交
+```
+
+**安装后直接对 Agent 说：**
+
+> “帮我基于这个模板做一份企业级 AI 战略规划汇报，控制在 6 页左右，包含产品技术架构图和关键 KPI 数据。”
+
+**也可以试这些高阶请求：**
+- *“学习我给的这个公司 PPT 模板的设计规范，提取色板与版式，后续页面全部严格遵循它。”*
+- *“帮我把这份微服务设计文档做成高保真产品技术堆叠架构图 PPT。”*
+- *“我在本地修改了刚才生成的 PPT 第 3 页，请检查我的修改并保持一致继续生成后续页面。”*
+- *“生成一份高动效单文件 HTML 演示文稿，方便我在大会上全屏演讲。”*
 
 ---
 
