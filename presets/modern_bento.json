@@ -1,0 +1,34 @@
+{
+  "theme": "modern_bento",
+  "name": "现代企业 Bento 网格 (Modern Bento)",
+  "canvas": {
+    "width_inches": 13.333,
+    "height_inches": 7.5,
+    "aspect_ratio": "16:9",
+    "margin_left_inches": 0.8,
+    "margin_top_inches": 0.75
+  },
+  "palette": {
+    "primary": "#2563EB",
+    "secondary": "#38BDF8",
+    "accent": "#F59E0B",
+    "background": "#F8FAFC",
+    "surface": "#FFFFFF",
+    "surface_subtle": "#F1F5F9",
+    "text_primary": "#0F172A",
+    "text_secondary": "#475569",
+    "border": "#E2E8F0"
+  },
+  "typography": {
+    "title": { "font": "PingFang SC, Inter, sans-serif", "size": 34, "weight": "bold", "color": "#0F172A" },
+    "subtitle": { "font": "PingFang SC, Inter, sans-serif", "size": 18, "weight": "medium", "color": "#475569" },
+    "body": { "font": "PingFang SC, Inter, sans-serif", "size": 14, "weight": "normal", "color": "#475569" },
+    "kpi_number": { "font": "DIN Alternate, Arial, sans-serif", "size": 52, "weight": "bold", "color": "#2563EB" }
+  },
+  "card_style": {
+    "border_radius": 12,
+    "border_color": "#E2E8F0",
+    "background": "#FFFFFF",
+    "shadow": "0 4px 6px -1px rgba(0,0,0,0.05)"
+  }
+}

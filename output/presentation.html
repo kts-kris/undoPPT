@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>undoPPT - Editable Presentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#2563EB',
+              secondary: '#38BDF8',
+              accent: '#F59E0B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'PingFang SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      user-select: none;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    /* Aspect Ratio 16:9 canvas container */
+    .aspect-16-9 {
+      aspect-ratio: 16 / 9;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col items-center justify-center overflow-hidden bg-slate-900 text-slate-800">
+
+  <!-- Main Presentation Canvas Frame -->
+  <main id="presentation-frame" class="relative w-full max-w-[1340px] aspect-16-9 max-h-[92vh] bg-[#F8FAFC] shadow-2xl rounded-2xl overflow-hidden border border-slate-800/60">
+    
+        <!-- Slide 1 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="0">
+          
+    <div class="h-full flex flex-col justify-center px-12 py-10 relative">
+      <div class="bg-white border border-slate-200/80 rounded-2xl shadow-xl p-12 relative overflow-hidden border-l-[10px]" style="border-left-color: #2563EB;">
+        <div class="inline-block px-3 py-1 rounded-md text-xs font-bold tracking-wider uppercase mb-5" style="background-color: #F1F5F9; color: #2563EB;">
+          ENTERPRISE STRATEGY & ARCHITECTURE 2026
+        </div>
+        <h1 class="text-5xl font-extrabold tracking-tight mb-4 text-slate-900 leading-tight">
+          新一代企业级 Agentic AI 业务与架构全景方案
+        </h1>
+        <p class="text-xl text-slate-600 font-medium mb-8 max-w-3xl leading-relaxed">
+          从单一认知对话到多智能体自主协同的工业化演进之路
+        </p>
+        <div class="flex items-center text-sm font-semibold text-slate-400 gap-4 pt-4 border-t border-slate-100">
+          <span>undoPPT Super Skill 联合出品 · 架构评审专供</span>
+          <span>•</span>
+          <span>100% Editable Presentation</span>
+        </div>
+      </div>
+    </div>
+    
+        </section>
+        
+
+        <!-- Slide 2 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="1">
+          
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-5">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ANALYSIS</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">传统 AI 方案 vs Agentic AI 核心维度对比</h2>
+        <p class="text-sm text-slate-500 mt-1">打破单点工具局限，迈向具备长程规划与工具调用能力的自主智能体系统</p>
+      </div>
+      <div class="flex-1 flex gap-5 pb-2">
+        
+        <div class="flex-1 flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">TRADITIONAL LLM</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">被动对话型方案</h3>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">以单轮或短程问答为主，缺乏环境感知与外部工具执行能力，无法闭环复杂业务。</p>
+          <ul class="mt-auto space-y-2 pt-3 border-t border-slate-100">
+            <li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>单向文本输出为主</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>无状态上下文易丢失</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>人工介入成本高达 80%</span></li>
+          </ul>
+        </div>
+        
+        <div class="flex-1 flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">WORKFLOW RPA</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">固定规则编排</h3>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">严格依赖预设硬编码流程，面对不确定性与非结构化长尾场景极其脆弱。</p>
+          <ul class="mt-auto space-y-2 pt-3 border-t border-slate-100">
+            <li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>维护成本高昂</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>对突发异常容错率为零</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>无法自主学习与演进</span></li>
+          </ul>
+        </div>
+        
+        <div class="flex-1 flex flex-col bg-white border border-blue-500 ring-2 ring-blue-500/20 shadow-md rounded-xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">AGENTIC SYSTEM</div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">新一代自主协同集群</h3>
+          <p class="text-xs text-slate-500 mb-4 leading-relaxed">基于动态意图推理、多子智能体拓扑与沙箱工具链，实现全自主端到端闭环交付。</p>
+          <ul class="mt-auto space-y-2 pt-3 border-t border-slate-100">
+            <li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>动态规划与自我反思</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>毫秒级双向感知同步</span></li><li class="flex items-start text-xs text-slate-600 gap-1.5"><span class="text-blue-600 font-bold">•</span><span>综合效率提升 400%+</span></li>
+          </ul>
+        </div>
+        
+      </div>
+    </div>
+    
+        </section>
+        
+
+        <!-- Slide 3 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="2">
+          
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-5">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ARCHITECTURE</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">新一代企业级 Agentic AI 平台三层技术架构</h2>
+        <p class="text-sm text-slate-500 mt-1">构建高可用、多租户、安全可信赖的智能体全生命周期运行时中枢</p>
+      </div>
+      <div class="flex-1 flex flex-col justify-between gap-3.5 pb-2">
+        
+        <div class="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-44 flex-shrink-0 bg-blue-50/80 border border-blue-200 rounded-lg p-3 text-center">
+            <div class="text-sm font-bold text-blue-700">业务交互与场景层</div>
+            <div class="text-xs text-slate-500 font-normal mt-0.5">统一多模交互与接入</div>
+          </div>
+          <div class="flex-1 flex gap-3 flex-wrap items-center">
+            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">协同工作区</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">企业微信/飞书</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">OpenAPI 网关</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">低代码控制台</div>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-44 flex-shrink-0 bg-blue-50/80 border border-blue-200 rounded-lg p-3 text-center">
+            <div class="text-sm font-bold text-blue-700">智能体中枢调度层</div>
+            <div class="text-xs text-slate-500 font-normal mt-0.5">意图与长程规划核心</div>
+          </div>
+          <div class="flex-1 flex gap-3 flex-wrap items-center">
+            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">意图研判探针</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">双模逆向引擎</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">协同感知哨兵</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">质量规约审计员</div>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow">
+          <div class="w-44 flex-shrink-0 bg-blue-50/80 border border-blue-200 rounded-lg p-3 text-center">
+            <div class="text-sm font-bold text-blue-700">工具底座与沙箱层</div>
+            <div class="text-xs text-slate-500 font-normal mt-0.5">安全受控执行环境</div>
+          </div>
+          <div class="flex-1 flex gap-3 flex-wrap items-center">
+            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">MCP 服务器集群</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">Python 代码执行沙箱</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">向量知识库</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">模型网关</div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+        </section>
+        
+
+        <!-- Slide 4 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="3">
+          
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-5">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">KPI DASHBOARD</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">核心效能与业务价值度量指标</h2>
+        <p class="text-sm text-slate-500 mt-1">全链路数据可观测性与工业级商业成效交付衡量</p>
+      </div>
+      <div class="flex-1 flex gap-5 pb-2">
+        
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">端到端自动化完成率</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">94.8%</div>
+            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 38.2% 同比提升</div>
+          </div>
+          <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
+            长程复杂任务中自主规划与工具调用的无人工干预达成比率。
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">母版风格还原准确率</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">99.2%</div>
+            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 双模逆向穿透</div>
+          </div>
+          <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
+            企业专属字体、配色方案与网格母版的 100% 矢量级忠实复刻。
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">协同修改感知延迟</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2"><8ms</div>
+            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ SHA-256 毫秒级</div>
+          </div>
+          <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
+            用户本地手动调整文件后，智能体无感捕获并对齐意图的速度。
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+          <div>
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">单次综合交付耗时</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">45s</div>
+            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 缩减 90% 工时</div>
+          </div>
+          <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
+            从原始需求录入到 PPTX 与单文件 HTML 双格式产出的全流程耗时。
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+        </section>
+        
+
+        <!-- Slide 5 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="4">
+          
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-5">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ROADMAP</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">企业落地推行路线与关键里程碑</h2>
+        <p class="text-sm text-slate-500 mt-1">分阶段稳步推进智能体在核心业务线的全场景渗透与规模化应用</p>
+      </div>
+      <div class="flex-1 relative flex gap-5 pt-3 pb-2">
+        <!-- Connecting Line -->
+        <div class="absolute top-[32px] left-12 right-12 h-1 bg-blue-200 rounded"></div>
+        
+        <div class="flex-1 flex flex-col items-center relative">
+          <!-- Step Node -->
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-white shadow z-10 mb-4">
+            1
+          </div>
+          <!-- Card -->
+          <div class="w-full flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col">
+            <span class="text-xs font-bold text-blue-600 uppercase mb-1">2026 Q1 · 试点破局</span>
+            <h4 class="text-base font-bold text-slate-900 mb-3">场景原型验证</h4>
+            <div class="space-y-1.5 mt-auto pt-3 border-t border-slate-100">
+              <div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>核心业务场景 POC</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>模板逆向标准库搭建</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>研发环境私有化联调</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center relative">
+          <!-- Step Node -->
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-white shadow z-10 mb-4">
+            2
+          </div>
+          <!-- Card -->
+          <div class="w-full flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col">
+            <span class="text-xs font-bold text-blue-600 uppercase mb-1">2026 Q2 · 平台建设</span>
+            <h4 class="text-base font-bold text-slate-900 mb-3">中枢能力就绪</h4>
+            <div class="space-y-1.5 mt-auto pt-3 border-t border-slate-100">
+              <div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>多智能体调度集群上线</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>MCP 核心工具链集成</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>灰度放量 30% 核心团队</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center relative">
+          <!-- Step Node -->
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-white shadow z-10 mb-4">
+            3
+          </div>
+          <!-- Card -->
+          <div class="w-full flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col">
+            <span class="text-xs font-bold text-blue-600 uppercase mb-1">2026 Q3 · 规模推广</span>
+            <h4 class="text-base font-bold text-slate-900 mb-3">业务全域覆盖</h4>
+            <div class="space-y-1.5 mt-auto pt-3 border-t border-slate-100">
+              <div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>全公司级统一规范推广</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>知识库实时双向同步</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>效能分析仪表板运行</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center relative">
+          <!-- Step Node -->
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center justify-center ring-4 ring-white shadow z-10 mb-4">
+            4
+          </div>
+          <!-- Card -->
+          <div class="w-full flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col">
+            <span class="text-xs font-bold text-blue-600 uppercase mb-1">2026 Q4 · 生态赋能</span>
+            <h4 class="text-base font-bold text-slate-900 mb-3">自主进化闭环</h4>
+            <div class="space-y-1.5 mt-auto pt-3 border-t border-slate-100">
+              <div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>智能体自学习演进机制</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>开放生态开发者支持</span></div><div class="flex items-center text-xs text-slate-600 gap-1.5"><span class="text-emerald-500 font-bold">✓</span><span>商业回报全面兑现</span></div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+        </section>
+        
+
+        <!-- Slide 6 -->
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="5">
+          
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-5">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">SUMMARY</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">战略实施建议与收官结论</h2>
+        <p class="text-sm text-slate-500 mt-1">以信息充分性为牵引，坚守安全合规与人机并肩双向协同原则</p>
+      </div>
+      <div class="flex-1 flex flex-col justify-between gap-3 pb-2">
+        
+        <div class="flex items-center gap-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-300 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold text-lg flex items-center justify-center flex-shrink-0">
+            1
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-slate-900">恪守信息充分性第一准则</h4>
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">在方案设计前坚决完成深度需求探针与企业内部素材注水，杜绝信息贫血时仓促决策。</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-300 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold text-lg flex items-center justify-center flex-shrink-0">
+            2
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-slate-900">推行母版规范强穿透机制</h4>
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">以统一 Design Tokens 统领全局，保障全生命周期在跨团队、跨工具间视觉与语义一致性。</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-300 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold text-lg flex items-center justify-center flex-shrink-0">
+            3
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-slate-900">坚持极简无摩擦的双模交付</h4>
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">PPTX 原生矢量对象保障可二次编辑，单文件 HTML 解决大屏与无依赖跨平台极速分发。</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-5 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-300 transition-colors">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold text-lg flex items-center justify-center flex-shrink-0">
+            4
+          </div>
+          <div class="flex-1">
+            <h4 class="text-base font-bold text-slate-900">构建 Always-in-Sync 协同飞轮</h4>
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">依托毫秒级指纹与语义 AST 感知，随时理解并尊重人类专家的每一步手动调整，保持同频。</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+        </section>
+        
+  </main>
+
+  <!-- Interactive Controls Bar -->
+  <footer class="fixed bottom-3 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur border border-slate-700 text-slate-200 px-5 py-2 rounded-full shadow-lg flex items-center gap-4 text-xs z-50">
+    <button id="prev-btn" class="hover:text-blue-400 transition-colors px-1" title="Previous Slide (← / PageUp)">◀</button>
+    <span id="slide-indicator" class="font-mono font-medium text-slate-300">1 / 6</span>
+    <button id="next-btn" class="hover:text-blue-400 transition-colors px-1" title="Next Slide (→ / Space / PageDown)">▶</button>
+    <div class="h-3 w-[1px] bg-slate-600"></div>
+    <button id="overview-btn" class="hover:text-blue-400 transition-colors" title="Overview (O)">Overview</button>
+    <button id="fs-btn" class="hover:text-blue-400 transition-colors" title="Toggle Fullscreen (F)">Fullscreen</button>
+  </footer>
+
+  <!-- Top Progress Bar -->
+  <div class="fixed top-0 left-0 right-0 h-1 bg-slate-800 z-50">
+    <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: 16.666666666666664%;"></div>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const total = 6;
+    const slides = document.querySelectorAll('.slide');
+    const indicator = document.getElementById('slide-indicator');
+    const progress = document.getElementById('progress-bar');
+
+    function showSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= total) index = total - 1;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        if (idx === currentSlide) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      indicator.textContent = `${currentSlide + 1} / ${total}`;
+      progress.style.width = `${((currentSlide + 1) / total) * 100}%`;
+    }
+
+    // Navigation events
+    document.getElementById('prev-btn').addEventListener('click', () => showSlide(currentSlide - 1));
+    document.getElementById('next-btn').addEventListener('click', () => showSlide(currentSlide + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        showSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+        e.preventDefault();
+        showSlide(currentSlide - 1);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.getElementById('fs-btn').addEventListener('click', toggleFullscreen);
+
+    // Initial render
+    showSlide(0);
+  </script>
+</body>
+</html>

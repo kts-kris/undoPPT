@@ -1,0 +1,34 @@
+{
+  "theme": "tech_keynote",
+  "name": "科技暗黑展演风 (Tech Keynote)",
+  "canvas": {
+    "width_inches": 13.333,
+    "height_inches": 7.5,
+    "aspect_ratio": "16:9",
+    "margin_left_inches": 0.8,
+    "margin_top_inches": 0.8
+  },
+  "palette": {
+    "primary": "#38BDF8",
+    "secondary": "#818CF8",
+    "accent": "#F43F5E",
+    "background": "#0B0F19",
+    "surface": "#131B2E",
+    "surface_subtle": "#1E293B",
+    "text_primary": "#F8FAFC",
+    "text_secondary": "#94A3B8",
+    "border": "#1E293B"
+  },
+  "typography": {
+    "title": { "font": "Inter, PingFang SC, sans-serif", "size": 36, "weight": "bold", "color": "#F8FAFC" },
+    "subtitle": { "font": "Inter, PingFang SC, sans-serif", "size": 18, "weight": "medium", "color": "#94A3B8" },
+    "body": { "font": "Inter, PingFang SC, sans-serif", "size": 14, "weight": "normal", "color": "#94A3B8" },
+    "kpi_number": { "font": "DIN Alternate, Inter, sans-serif", "size": 56, "weight": "bold", "color": "#38BDF8" }
+  },
+  "card_style": {
+    "border_radius": 14,
+    "border_color": "#2D3748",
+    "background": "#131B2E",
+    "shadow": "0 10px 25px -5px rgba(0, 0, 0, 0.4)"
+  }
+}

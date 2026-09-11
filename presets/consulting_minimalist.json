@@ -1,0 +1,34 @@
+{
+  "theme": "consulting_minimalist",
+  "name": "顶级战略咨询风 (Consulting Minimalist)",
+  "canvas": {
+    "width_inches": 13.333,
+    "height_inches": 7.5,
+    "aspect_ratio": "16:9",
+    "margin_left_inches": 0.9,
+    "margin_top_inches": 0.8
+  },
+  "palette": {
+    "primary": "#0F2942",
+    "secondary": "#2A5298",
+    "accent": "#C93B2B",
+    "background": "#FAFAFA",
+    "surface": "#FFFFFF",
+    "surface_subtle": "#F3F4F6",
+    "text_primary": "#111827",
+    "text_secondary": "#4B5563",
+    "border": "#D1D5DB"
+  },
+  "typography": {
+    "title": { "font": "Georgia, PingFang SC, serif", "size": 32, "weight": "bold", "color": "#0F2942" },
+    "subtitle": { "font": "Helvetica Neue, Arial, sans-serif", "size": 17, "weight": "medium", "color": "#4B5563" },
+    "body": { "font": "Helvetica Neue, Arial, sans-serif", "size": 13, "weight": "normal", "color": "#4B5563" },
+    "kpi_number": { "font": "Georgia, serif", "size": 50, "weight": "bold", "color": "#0F2942" }
+  },
+  "card_style": {
+    "border_radius": 4,
+    "border_color": "#D1D5DB",
+    "background": "#FFFFFF",
+    "shadow": "none"
+  }
+}
