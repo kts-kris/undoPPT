@@ -9,6 +9,7 @@ Features:
   - Full parity with the 6 Infographic layout primitives.
 """
 
+import html
 import json
 import os
 from typing import Any, Dict, List
@@ -16,7 +17,7 @@ from typing import Any, Dict, List
 
 def _render_cover_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
     category = slide.get("category", "ENTERPRISE ARCHITECTURE")
-    title = slide.get("title", "Presentation Title")
+    title = slide.get("action_title") or slide.get("title", "Presentation Title")
     subtitle = slide.get("subtitle", "")
     meta = slide.get("meta", "undoPPT Engine · 2026")
     p = tokens.get("palette", {})
@@ -44,10 +45,11 @@ def _render_cover_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
 
 
 def _render_architecture_stack_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
-    title = slide.get("title", "系统架构全景")
+    title = slide.get("action_title") or slide.get("title", "系统架构全景")
     subtitle = slide.get("subtitle", "")
     layers = slide.get("layers", [])
     p = tokens.get("palette", {})
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "ARCHITECTURE")
 
     layers_html = []
     for idx, layer in enumerate(layers[:4]):
@@ -76,7 +78,7 @@ def _render_architecture_stack_html(slide: Dict[str, Any], tokens: Dict[str, Any
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
       <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ARCHITECTURE</span>
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
         <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
         <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
       </div>
@@ -88,14 +90,15 @@ def _render_architecture_stack_html(slide: Dict[str, Any], tokens: Dict[str, Any
 
 
 def _render_bento_cards_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
-    title = slide.get("title", "核心维度对比")
+    title = slide.get("action_title") or slide.get("title", "核心维度对比")
     subtitle = slide.get("subtitle", "")
     cards = slide.get("cards", [])
     p = tokens.get("palette", {})
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "ANALYSIS")
 
     cards_html = []
     for idx, c in enumerate(cards[:4]):
-        tag = c.get("tag", f"0{idx+1}")
+        c_tag = c.get("tag", f"0{idx+1}")
         c_title = c.get("title", f"方案 {idx+1}")
         desc = c.get("desc", "")
         bullets = c.get("bullets", [])
@@ -109,7 +112,7 @@ def _render_bento_cards_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> s
 
         cards_html.append(f"""
         <div class="flex-1 flex flex-col bg-white border {border_cls} rounded-xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
-          <div class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">{tag}</div>
+          <div class="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">{c_tag}</div>
           <h3 class="text-lg font-bold text-slate-900 mb-2">{c_title}</h3>
           <p class="text-xs text-slate-500 mb-4 leading-relaxed">{desc}</p>
           <ul class="mt-auto space-y-2 pt-3 border-t border-slate-100">
@@ -121,7 +124,7 @@ def _render_bento_cards_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> s
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
       <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ANALYSIS</span>
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
         <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
         <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
       </div>
@@ -133,10 +136,11 @@ def _render_bento_cards_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> s
 
 
 def _render_metric_spotlight_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
-    title = slide.get("title", "核心业绩指标衡量")
+    title = slide.get("action_title") or slide.get("title", "核心业绩指标衡量")
     subtitle = slide.get("subtitle", "")
     metrics = slide.get("metrics", [])
     p = tokens.get("palette", {})
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "KPI DASHBOARD")
 
     metrics_html = []
     for m in metrics[:4]:
@@ -163,7 +167,7 @@ def _render_metric_spotlight_html(slide: Dict[str, Any], tokens: Dict[str, Any])
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
       <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">KPI DASHBOARD</span>
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
         <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
         <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
       </div>
@@ -175,10 +179,11 @@ def _render_metric_spotlight_html(slide: Dict[str, Any], tokens: Dict[str, Any])
 
 
 def _render_timeline_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
-    title = slide.get("title", "演进路线与关键里程碑")
+    title = slide.get("action_title") or slide.get("title", "演进路线与关键里程碑")
     subtitle = slide.get("subtitle", "")
     steps = slide.get("steps", [])
     p = tokens.get("palette", {})
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "ROADMAP")
 
     steps_html = []
     for idx, s in enumerate(steps[:4]):
@@ -210,7 +215,7 @@ def _render_timeline_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
       <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">ROADMAP</span>
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
         <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
         <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
       </div>
@@ -224,10 +229,11 @@ def _render_timeline_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
 
 
 def _render_summary_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
-    title = slide.get("title", "核心总结与实施建议")
+    title = slide.get("action_title") or slide.get("title", "核心总结与实施建议")
     subtitle = slide.get("subtitle", "")
     points = slide.get("points", [])
     p = tokens.get("palette", {})
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "SUMMARY")
 
     points_html = []
     for idx, pt in enumerate(points[:4]):
@@ -249,7 +255,7 @@ def _render_summary_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
       <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">SUMMARY</span>
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
         <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
         <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
       </div>
@@ -270,24 +276,43 @@ HTML_RENDERERS = {
 }
 
 
-def build_standalone_html(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any], output_path: str) -> str:
+def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str) -> str:
     """Generate a single-file standalone HTML presentation with zero external dependencies."""
     p = tokens.get("palette", {})
     slides_content_list = []
 
-    for idx, slide_data in enumerate(blueprint):
+    contract = None
+    slides = []
+    if isinstance(blueprint, dict):
+        contract = blueprint.get("contract")
+        slides = blueprint.get("slides", [])
+    elif isinstance(blueprint, list):
+        slides = blueprint
+
+    for idx, slide_data in enumerate(slides):
         l_type = slide_data.get("layout_type", "bento_cards")
         renderer = HTML_RENDERERS.get(l_type, _render_bento_cards_html)
         inner_html = renderer(slide_data, tokens)
+
+        arc_attr = html.escape(str(slide_data.get("narrative_arc", "")), quote=True)
+        mission_attr = html.escape(str(slide_data.get("mission", "")), quote=True)
+        transition_attr = html.escape(str(slide_data.get("transition", "")), quote=True)
+        evidence_attr = html.escape(str(slide_data.get("core_evidence", "")), quote=True)
+
         slides_content_list.append(f"""
         <!-- Slide {idx+1} -->
-        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col" data-slide="{idx}">
+        <section class="slide absolute inset-0 transition-opacity duration-300 pointer-events-none opacity-0 flex flex-col"
+                 data-slide="{idx}"
+                 data-arc="{arc_attr}"
+                 data-mission="{mission_attr}"
+                 data-transition="{transition_attr}"
+                 data-evidence="{evidence_attr}">
           {inner_html}
         </section>
         """)
 
     slides_blob = "\n".join(slides_content_list)
-    total_slides = len(blueprint)
+    total_slides = len(slides)
 
     # Compile entire HTML bundle
     html_content = f"""<!DOCTYPE html>
@@ -336,19 +361,49 @@ def build_standalone_html(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any
     {slides_blob}
   </main>
 
+  <!-- Cognitive Inspector Drawer (N) -->
+  <aside id="cognitive-drawer" class="fixed top-5 right-5 w-84 max-w-[340px] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-slate-200 rounded-2xl p-4 shadow-2xl z-50 text-xs hidden transition-all duration-300">
+    <div class="flex items-center justify-between pb-2 border-b border-slate-700/80 mb-3">
+      <span class="font-bold text-blue-400 flex items-center gap-1.5">
+        <span>🧠</span>
+        <span>认知动力学 (Cognitive Notes)</span>
+      </span>
+      <button id="close-drawer-btn" class="text-slate-400 hover:text-white px-1.5 py-0.5 rounded hover:bg-slate-800 transition-colors">✕</button>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">叙事节奏 (Arc)</div>
+        <div id="note-arc" class="text-amber-400 font-mono font-bold text-sm">HOOK</div>
+      </div>
+      <div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">单页使命 (Mission)</div>
+        <div id="note-mission" class="text-slate-200 leading-relaxed"></div>
+      </div>
+      <div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">承上启下逻辑 (Transition)</div>
+        <div id="note-transition" class="text-slate-300 italic leading-relaxed"></div>
+      </div>
+      <div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">核心论据 (Evidence)</div>
+        <div id="note-evidence" class="text-emerald-400 font-medium leading-relaxed"></div>
+      </div>
+    </div>
+  </aside>
+
   <!-- Interactive Controls Bar -->
   <footer class="fixed bottom-3 left-1/2 -translate-x-1/2 bg-slate-800/90 backdrop-blur border border-slate-700 text-slate-200 px-5 py-2 rounded-full shadow-lg flex items-center gap-4 text-xs z-50">
     <button id="prev-btn" class="hover:text-blue-400 transition-colors px-1" title="Previous Slide (← / PageUp)">◀</button>
     <span id="slide-indicator" class="font-mono font-medium text-slate-300">1 / {total_slides}</span>
     <button id="next-btn" class="hover:text-blue-400 transition-colors px-1" title="Next Slide (→ / Space / PageDown)">▶</button>
     <div class="h-3 w-[1px] bg-slate-600"></div>
+    <button id="notes-btn" class="hover:text-blue-400 transition-colors" title="Toggle Cognitive Notes (N)">Notes (N)</button>
     <button id="overview-btn" class="hover:text-blue-400 transition-colors" title="Overview (O)">Overview</button>
     <button id="fs-btn" class="hover:text-blue-400 transition-colors" title="Toggle Fullscreen (F)">Fullscreen</button>
   </footer>
 
   <!-- Top Progress Bar -->
   <div class="fixed top-0 left-0 right-0 h-1 bg-slate-800 z-50">
-    <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: {(1/total_slides)*100}%;"></div>
+    <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300" style="width: {(1/total_slides)*100 if total_slides else 100}%;"></div>
   </div>
 
   <script>
@@ -357,6 +412,23 @@ def build_standalone_html(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any
     const slides = document.querySelectorAll('.slide');
     const indicator = document.getElementById('slide-indicator');
     const progress = document.getElementById('progress-bar');
+    const drawer = document.getElementById('cognitive-drawer');
+    const noteArc = document.getElementById('note-arc');
+    const noteMission = document.getElementById('note-mission');
+    const noteTransition = document.getElementById('note-transition');
+    const noteEvidence = document.getElementById('note-evidence');
+
+    function toggleNotes() {{
+      drawer.classList.toggle('hidden');
+    }}
+
+    function updateCognitiveNotes(slideEl) {{
+      if (!slideEl) return;
+      noteArc.textContent = (slideEl.dataset.arc || 'N/A').toUpperCase();
+      noteMission.textContent = slideEl.dataset.mission || '（本页未指定具体使命）';
+      noteTransition.textContent = slideEl.dataset.transition || '（开篇立论 / 无前序转折）';
+      noteEvidence.textContent = slideEl.dataset.evidence || '（未单独分级核心论据）';
+    }}
 
     function showSlide(index) {{
       if (index < 0) index = 0;
@@ -373,11 +445,14 @@ def build_standalone_html(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any
 
       indicator.textContent = `${{currentSlide + 1}} / ${{total}}`;
       progress.style.width = `${{((currentSlide + 1) / total) * 100}}%`;
+      updateCognitiveNotes(slides[currentSlide]);
     }}
 
     // Navigation events
     document.getElementById('prev-btn').addEventListener('click', () => showSlide(currentSlide - 1));
     document.getElementById('next-btn').addEventListener('click', () => showSlide(currentSlide + 1));
+    document.getElementById('notes-btn').addEventListener('click', toggleNotes);
+    document.getElementById('close-drawer-btn').addEventListener('click', () => drawer.classList.add('hidden'));
 
     document.addEventListener('keydown', (e) => {{
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {{
@@ -388,6 +463,8 @@ def build_standalone_html(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any
         showSlide(currentSlide - 1);
       }} else if (e.key === 'f' || e.key === 'F') {{
         toggleFullscreen();
+      }} else if (e.key === 'n' || e.key === 'N') {{
+        toggleNotes();
       }}
     }});
 

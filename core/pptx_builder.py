@@ -58,8 +58,9 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
 
     # Optional Tag Badge
     if tag:
+        badge_w = max(1.8, len(tag) * 0.11 + 0.4)
         tag_box = slide.shapes.add_shape(
-            MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(1.8), Inches(0.32)
+            MSO_SHAPE.ROUNDED_RECTANGLE, left, top, Inches(badge_w), Inches(0.32)
         )
         tag_box.fill.solid()
         tag_box.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF"))
@@ -181,7 +182,9 @@ def render_architecture_stack_slide(prs, slide_data: Dict[str, Any], tokens: Dic
     typo = tokens.get("typography", {})
 
     _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
-    _add_header(slide, slide_data.get("title", "系统架构全景"), slide_data.get("subtitle", ""), tokens, tag="ARCHITECTURE")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "ARCHITECTURE")
+    title = slide_data.get("action_title") or slide_data.get("title", "系统架构全景")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     layers = slide_data.get("layers", [])
     if not layers:
@@ -289,7 +292,9 @@ def render_bento_cards_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, 
     typo = tokens.get("typography", {})
 
     _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
-    _add_header(slide, slide_data.get("title", "核心维度对比"), slide_data.get("subtitle", ""), tokens, tag="ANALYSIS")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "ANALYSIS")
+    title = slide_data.get("action_title") or slide_data.get("title", "核心维度对比")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     cards = slide_data.get("cards", [])
     if not cards:
@@ -374,7 +379,9 @@ def render_metric_spotlight_slide(prs, slide_data: Dict[str, Any], tokens: Dict[
     typo = tokens.get("typography", {})
 
     _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
-    _add_header(slide, slide_data.get("title", "核心业绩指标衡量"), slide_data.get("subtitle", ""), tokens, tag="KPI DASHBOARD")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "KPI DASHBOARD")
+    title = slide_data.get("action_title") or slide_data.get("title", "核心业绩指标衡量")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     metrics = slide_data.get("metrics", [])
     if not metrics:
@@ -455,7 +462,9 @@ def render_timeline_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any
     typo = tokens.get("typography", {})
 
     _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
-    _add_header(slide, slide_data.get("title", "演进路线与关键里程碑"), slide_data.get("subtitle", ""), tokens, tag="ROADMAP")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "ROADMAP")
+    title = slide_data.get("action_title") or slide_data.get("title", "演进路线与关键里程碑")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     steps = slide_data.get("steps", [])
     if not steps:
@@ -562,7 +571,9 @@ def render_summary_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]
     typo = tokens.get("typography", {})
 
     _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
-    _add_header(slide, slide_data.get("title", "核心总结与实施建议"), slide_data.get("subtitle", ""), tokens, tag="SUMMARY")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "SUMMARY")
+    title = slide_data.get("action_title") or slide_data.get("title", "核心总结与实施建议")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     points = slide_data.get("points", [])
     if not points:
@@ -644,17 +655,78 @@ RENDERERS = {
 }
 
 
-def build_presentation(blueprint: List[Dict[str, Any]], tokens: Dict[str, Any], output_path: str) -> str:
+def _inject_cognitive_notes(slide, slide_data: Dict[str, Any], contract: Optional[Dict[str, Any]] = None):
+    """Inject cognitive metadata into native PowerPoint speaker notes."""
+    notes_lines = []
+
+    # If first slide and contract exists, record Cognitive Contract
+    if contract:
+        notes_lines.append("【认知契约 / Cognitive Contract】")
+        if contract.get("core_thesis"):
+            notes_lines.append(f"• 核心主旨: {contract.get('core_thesis')}")
+        aud = contract.get("audience", {})
+        if aud:
+            role = aud.get("role", "")
+            stance = aud.get("stance", "")
+            notes_lines.append(f"• 目标受众: {role} ({stance})" if stance else f"• 目标受众: {role}")
+        delta = contract.get("knowledge_delta", {})
+        if delta.get("blindspots_and_pains"):
+            pains = ", ".join(delta["blindspots_and_pains"]) if isinstance(delta["blindspots_and_pains"], list) else delta["blindspots_and_pains"]
+            notes_lines.append(f"• 认知差/痛点: {pains}")
+        outcomes = contract.get("target_outcomes", {})
+        if outcomes.get("act"):
+            notes_lines.append(f"• 目标行动(Act): {outcomes.get('act')}")
+        notes_lines.append("-" * 36)
+
+    narrative_arc = slide_data.get("narrative_arc")
+    mission = slide_data.get("mission")
+    transition = slide_data.get("transition")
+    core_evidence = slide_data.get("core_evidence")
+    notes_custom = slide_data.get("notes") or slide_data.get("speaker_notes")
+
+    if narrative_arc:
+        notes_lines.append(f"【叙事阶段 / Arc】{str(narrative_arc).upper()}")
+    if mission:
+        notes_lines.append(f"【单页使命 / Mission】{mission}")
+    if transition:
+        notes_lines.append(f"【承上启下 / Transition】{transition}")
+    if core_evidence:
+        notes_lines.append(f"【核心论据 / Evidence】{core_evidence}")
+    if notes_custom:
+        notes_lines.append(f"【演讲备注 / Notes】\n{notes_custom}")
+
+    if notes_lines:
+        try:
+            notes_slide = slide.notes_slide
+            tf = notes_slide.notes_text_frame
+            tf.text = "\n".join(notes_lines)
+        except Exception:
+            pass
+
+
+def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str) -> str:
     """Compile blueprint into a clean vector PowerPoint presentation."""
     prs = Presentation()
     # 16:9 standard dimensions
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
 
-    for slide_data in blueprint:
+    contract = None
+    slides = []
+    if isinstance(blueprint, dict):
+        contract = blueprint.get("contract")
+        slides = blueprint.get("slides", [])
+    elif isinstance(blueprint, list):
+        slides = blueprint
+
+    for idx, slide_data in enumerate(slides):
         layout_type = slide_data.get("layout_type", "bento_cards")
         renderer = RENDERERS.get(layout_type, render_bento_cards_slide)
         renderer(prs, slide_data, tokens)
+
+        current_slide = prs.slides[-1]
+        slide_contract = contract if idx == 0 else None
+        _inject_cognitive_notes(current_slide, slide_data, contract=slide_contract)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     prs.save(output_path)

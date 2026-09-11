@@ -30,5 +30,13 @@
     "border_color": "#DFE1E6",
     "background": "#FFFFFF",
     "shadow": "0 2px 4px rgba(9, 30, 66, 0.08)"
+  },
+  "content_budget": {
+    "density_tier": "structured",
+    "max_cards": 4,
+    "max_layers": 4,
+    "max_title_words": 18,
+    "max_bullet_points": 4,
+    "max_desc_words": 45
   }
 }
