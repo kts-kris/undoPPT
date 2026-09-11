@@ -7,7 +7,7 @@
 
 > **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**
 
-`undoPPT` 是为 Google Antigravity、Claude Code、Cursor 等全生态 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
+`undoPPT` 是为 **Google Antigravity、Claude Code、Cursor、OpenAI Codex、WorkBuddy、Windsurf、Trae、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
 
 ---
 
@@ -47,10 +47,10 @@
 npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```
 
-也可以直接把这段话发给有 shell 权限的 AI Agent：
+也可以直接把这段话发给有 shell 权限的 AI Agent（Google Antigravity、Claude Code、Cursor、OpenAI Codex、WorkBuddy、Windsurf、Trae 等）：
 
 ```text
-帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到 ~/.gemini/config/skills/undo-ppt（如果是 Claude Code 则克隆到 ~/.claude/skills/undo-ppt）
+帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到你的 skills 目录（如 Antigravity 对应 ~/.gemini/config/skills/undo-ppt，Claude Code / Codex / Cursor / WorkBuddy 等对应 ~/.claude/skills/undo-ppt 或项目 .agents/skills/undo-ppt）
 ```
 
 已经安装过的话，用这段话更新：
@@ -202,21 +202,23 @@ python3 cli.py sync --target output/presentation.pptx
 
 ---
 
-## 🤖 在 Antigravity 中使用 undoPPT 超级 Skill
+## 🤖 在各大 AI Agent（Antigravity、Claude Code、Cursor、Codex、WorkBuddy 等）中使用
 
-本项目已在以下两个层级完成 Skill 自动注册：
-1. **工作区层级**：`.agents/skills/undo-ppt/SKILL.md`
-2. **全局用户层级**：`~/.gemini/config/skills/undo-ppt/SKILL.md`
+本项目支持在多平台 AI Agent 环境中无缝挂载使用：
+1. **Google Antigravity**：支持工作区 `.agents/skills/undo-ppt/SKILL.md` 与全局 `~/.gemini/config/skills/undo-ppt/SKILL.md` 双重感知；
+2. **Claude Code / OpenAI Codex / Cursor**：克隆到对应 Agent 的 skills 路径（如 `~/.claude/skills/undo-ppt`）；
+3. **腾讯 WorkBuddy / 办公智能体平台**：直接作为自定义工作流 Skill 挂载到工作区 `.agents/skills/undo-ppt/`；
+4. **Windsurf / Trae / OpenCode**：在项目根目录或全局技能配置中直接挂载。
 
 在任意对话中，只需自然表达您的 PPT 诉求即可触发：
 > *“帮我准备一份面向管理层的企业级 AI 战略规划汇报，我有一个公司的模板 PPT。”*
 
 Skill 会自动进入 **Rhythm A 深度引导流程**：
-1. **深度探针**：主动询问核心业务痛点、受众层级，并提醒提供关键数据；
-2. **模板解构**：接收您的模板并输出色彩与版面规范；
-3. **蓝图确认**：展示每页的图表化元语规划（如哪一页用架构图、哪一页用 KPI 大字报）；
-4. **双模交付**：交付 PPTX + 单文件 HTML；
-5. **实时同步**：感知您的每一次本地手动调整并持续保持同频！
+1. **认知契约与深度探针**：主动澄清核心论题、受众立场偏好、认知差与终局行动目标；
+2. **模板解构与规范学习**：接收并解析您的模板，提炼色彩与版式规范；
+3. **蓝图编排与质量审计**：规划每页的图表化元语并执行 10 维内容质量动力学审核；
+4. **双模交付**：交付内置演讲备注的 PPTX + 内置认知动力学抽屉的单文件 HTML；
+5. **实时协同**：感知您的每一次本地手动调整并持续保持同频！
 
 ---
 
