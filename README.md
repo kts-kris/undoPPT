@@ -1,4 +1,4 @@
-# undoPPT (逆向重构演示文稿超级智能体)
+# undoPPT (演示文稿智能解构与重构超级智能体)
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
@@ -13,9 +13,9 @@
 
 ## 🌟 四大超级能力 (Super Capabilities)
 
-### 1. 模板逆向解构引擎 (Dual-Mode Undo Engine)
-- **模式 A（原生母版 AST 提取）**：基于 `python-pptx` 深度遍历 Slide Masters、版式槽位、配色方案、字体阶梯与安全边距，将用户的 PPTX 模板逆向提取为强一致性的 `design_tokens.json`。
-- **模式 B（视觉启发式提取）**：针对散装样张或风格参考图，通过视觉启发式规则将色彩配比、阴影、卡片圆角标准化为统一协议。
+### 1. 模板智能解构引擎 (Dual-Mode Deconstruction Engine)
+- **模式 A（原生母版 AST 解析）**：基于 `python-pptx` 深度遍历 Slide Masters、版式槽位、配色方案、字体阶梯与安全边距，将用户的 PPTX 模板精准提取为强一致性的 `design_tokens.json`，确保输出完全符合用户预期的演示文稿。
+- **模式 B（视觉启发式解析）**：针对散装样张或风格参考图，通过视觉启发式规则将色彩配比、阴影、卡片圆角标准化为统一协议。
 - **规范绝对穿透**：一旦标准确立，全任务周期不可篡改地统领所有页面的生成排版。
 
 ### 2. 六大原生图元组件库 (Infographic Primitives)
@@ -46,7 +46,7 @@ graph TD
     Probe -- 否 --> Guide
     Probe -- 是 --> UndoDecision{是否提供企业模板?}
     
-    UndoDecision -- 是 --> UndoEngine[2. 模板逆向解构引擎 Mode A/B]
+    UndoDecision -- 是 --> UndoEngine[2. 模板智能解构引擎 Mode A/B]
     UndoDecision -- 否 --> Presets[2. 匹配内置 4 大工业级设计系统]
     
     UndoEngine --> Tokens[标准设计协议 design_tokens.json]
@@ -76,7 +76,7 @@ undoPPT/
 │   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP
 ├── core/                           # 核心 Python 自动化引擎
 │   ├── __init__.py                 # 版本号导出 (1.0.0)
-│   ├── undo_engine.py              # PPTX 模板逆向解构器 (Mode A)
+│   ├── undo_engine.py              # PPTX 模板解析解构器 (Mode A)
 │   ├── vision_extractor.py         # 视觉启发式解析器 (Mode B)
 │   ├── pptx_builder.py             # 100% 原生矢量 PPTX 构建器
 │   ├── html_builder.py             # 单文件自包含 HTML 演示编译器
@@ -116,8 +116,8 @@ python3 cli.py demo
 - `output/presentation.pptx`：完全可编辑的 6 页矢量幻灯片。
 - `output/presentation.html`：双击即可在浏览器全屏播放的动态演示文稿。
 
-### 3. 逆向解构用户模板 (Undo)
-将任意已有的企业 PPTX 模板解构为标准规范：
+### 3. 解析提取用户模板 (Undo)
+将任意已有的企业 PPTX 模板解构为标准规范，确保生成结果完全符合模板风格：
 ```bash
 python3 cli.py undo --template /path/to/company_template.pptx --out .undoppt/design_tokens.json
 ```
