@@ -3,11 +3,11 @@
 [![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
-[![Antigravity](https://img.shields.io/badge/Antigravity-Super%20Skill-orange.svg)]()
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
 
 > **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**
 
-`undoPPT` 是为 **Google Antigravity、Claude Code、Cursor、OpenAI Codex、WorkBuddy、Windsurf、Trae、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
+`undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
 
 ---
 
@@ -47,10 +47,10 @@
 npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```
 
-也可以直接把这段话发给有 shell 权限的 AI Agent（Google Antigravity、Claude Code、Cursor、OpenAI Codex、WorkBuddy、Windsurf、Trae 等）：
+也可以直接把这段话发给有 shell 权限的 AI Agent（Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity 等）：
 
 ```text
-帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到你的 skills 目录（如 Antigravity 对应 ~/.gemini/config/skills/undo-ppt，Claude Code / Codex / Cursor / WorkBuddy 等对应 ~/.claude/skills/undo-ppt 或项目 .agents/skills/undo-ppt）
+帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到你的 skills 目录（如 Cursor / Claude Code / Codex / WorkBuddy 对应 ~/.claude/skills/undo-ppt 或项目 .agents/skills/undo-ppt，Antigravity 对应 ~/.gemini/config/skills/undo-ppt）
 ```
 
 已经安装过的话，用这段话更新：
@@ -202,13 +202,14 @@ python3 cli.py sync --target output/presentation.pptx
 
 ---
 
-## 🤖 在各大 AI Agent（Antigravity、Claude Code、Cursor、Codex、WorkBuddy 等）中使用
+## 🤖 在各大主流 AI Agent（Cursor、Claude Code、Codex、Windsurf、WorkBuddy 等）中使用
 
-本项目支持在多平台 AI Agent 环境中无缝挂载使用：
-1. **Google Antigravity**：支持工作区 `.agents/skills/undo-ppt/SKILL.md` 与全局 `~/.gemini/config/skills/undo-ppt/SKILL.md` 双重感知；
-2. **Claude Code / OpenAI Codex / Cursor**：克隆到对应 Agent 的 skills 路径（如 `~/.claude/skills/undo-ppt`）；
-3. **腾讯 WorkBuddy / 办公智能体平台**：直接作为自定义工作流 Skill 挂载到工作区 `.agents/skills/undo-ppt/`；
-4. **Windsurf / Trae / OpenCode**：在项目根目录或全局技能配置中直接挂载。
+本项目支持在各大主流 AI Agent 环境中无缝挂载使用（按市场普及度排序）：
+1. **Cursor / Claude Code / OpenAI Codex**：克隆到对应 Agent 的标准 skills 路径（如 `~/.claude/skills/undo-ppt` 或工作区 `.agents/skills/undo-ppt`）；
+2. **Windsurf / Trae**：在当前项目根目录 `.agents/skills/undo-ppt/` 或全局配置中直接挂载；
+3. **腾讯 WorkBuddy / 办公智能体平台**：作为办公自动化或企业自定义工作流 Skill 直接导入；
+4. **Google Antigravity**：支持工作区 `.agents/skills/undo-ppt/SKILL.md` 与全局 `~/.gemini/config/skills/undo-ppt/SKILL.md` 双重感知；
+5. **OpenCode** 等开源智能体：直接识别根目录 `SKILL.md` 规范。
 
 在任意对话中，只需自然表达您的 PPT 诉求即可触发：
 > *“帮我准备一份面向管理层的企业级 AI 战略规划汇报，我有一个公司的模板 PPT。”*

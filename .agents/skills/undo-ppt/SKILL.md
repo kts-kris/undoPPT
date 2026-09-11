@@ -78,7 +78,7 @@ graph TD
 ```
 
 ### 阶段 1 · 认知契约探针 (Cognitive Contract Probe)
-定位 Skill 安装根目录 `<SKILL_ROOT>`（例如 Antigravity 为 `~/.gemini/config/skills/undo-ppt`，Claude Code / Codex / Cursor / WorkBuddy 等为 `~/.claude/skills/undo-ppt` 或当前工作区 `.agents/skills/undo-ppt`）。
+定位 Skill 安装根目录 `<SKILL_ROOT>`（例如 Cursor / Claude Code / Codex / WorkBuddy 等为 `~/.claude/skills/undo-ppt` 或当前工作区 `.agents/skills/undo-ppt`，Antigravity 为 `~/.gemini/config/skills/undo-ppt`）。
 
 主动向用户探寻四大认知基座（不要生硬审讯，以业务顾问视角引导）：
 1. **Q1 核心主旨**：抛开所有枝节，最想传达的一个核心论点是什么？
