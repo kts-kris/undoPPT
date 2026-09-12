@@ -1,6 +1,8 @@
-"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v1.1.0).
+"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v2.5.0).
 
 Usage:
+  python3 cli.py plan --prompt "<prompt>" [--input-doc <file.md>] [--context "<notes>"] [--out <blueprint.json>]
+  python3 cli.py generate --prompt "<prompt>" [--input-doc <file.md>] [--template <template.pptx>] [--format pptx|html|all] [--out <dir>]
   python3 cli.py undo --template <template.pptx> [--out <tokens.json>]
   python3 cli.py build --blueprint <blueprint.json> [--tokens <tokens.json>] [--format pptx|html|all] [--out <dir>]
   python3 cli.py audit --blueprint <blueprint.json> [--tokens <tokens.json>]
@@ -13,6 +15,7 @@ import json
 import os
 import sys
 
+from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.html_builder import build_standalone_html
 from core.pptx_builder import build_presentation
@@ -210,13 +213,19 @@ DEMO_BLUEPRINT = {
 def cmd_undo(args):
     """Deconstruct template command."""
     print(f"[*] Starting Template Deconstruction on: {args.template}")
-    tokens = extract_template_tokens(args.template)
+    tokens = extract_template_tokens(args.template, extract_assets=True)
     out_file = args.out or ".undoppt/design_tokens.json"
     save_tokens(tokens, out_file)
     print(f"[✓] Design tokens successfully extracted and saved to: {out_file}")
-    print(f"    - Palette: Primary={tokens['palette'].get('primary')}, Background={tokens['palette'].get('background')}")
+    print(f"    - Theme Mode: {tokens.get('theme_mode', 'light').upper()}")
+    print(f"    - Palette:    Primary={tokens['palette'].get('primary')}, Background={tokens['palette'].get('background')}")
     print(f"    - Typography: Title={tokens['typography']['title']['font']}, Body={tokens['typography']['body']['font']}")
     print(f"    - Layouts parsed: {tokens.get('master_layouts_count', 0)}")
+    if tokens.get("master_slots"):
+        active_slots = [k for k, v in tokens["master_slots"].items() if v]
+        print(f"    - Master Slots detected: {', '.join(active_slots)}")
+    if tokens.get("extracted_assets"):
+        print(f"    - Visual Assets extracted: {len(tokens['extracted_assets'])} media items")
 
 
 def cmd_build(args):
@@ -245,6 +254,93 @@ def cmd_build(args):
         print(f"[✓] Standalone HTML generated successfully: {html_out}")
 
 
+def cmd_plan(args):
+    """Autonomous Cognitive Planner: transform natural language prompt into audited blueprint."""
+    print(f"[*] Planning presentation for prompt: {args.prompt}")
+    doc_path = getattr(args, "input_doc", None)
+    if doc_path:
+        print(f"    Grounded document: {doc_path}")
+    planner = CognitivePlanner()
+    blueprint = planner.plan(prompt=args.prompt, context=args.context, doc_path=doc_path)
+
+    out_file = args.out or ".undoppt/blueprint.json"
+    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(blueprint, f, ensure_ascii=False, indent=2)
+
+    print(f"[✓] Blueprint planned and saved to: {out_file}")
+    print(f"    - Core Thesis: {blueprint['contract']['core_thesis']}")
+    print(f"    - Slides:      {len(blueprint['slides'])} slides synthesized")
+    print(f"    - Audit Score: {blueprint['audit_summary']['score']} / 100 ({blueprint['audit_summary']['grade']})")
+    if blueprint.get("grounded_sources", {}).get("extracted_numbers_count"):
+        print(f"    - Grounded:    {blueprint['grounded_sources']['extracted_numbers_count']} quantitative facts extracted")
+    if blueprint.get("audit_summary", {}).get("refinements_applied"):
+        print(f"    - Refinements: {len(blueprint['audit_summary']['refinements_applied'])} auto-patches applied")
+
+
+def cmd_generate(args):
+    """End-to-end one-shot generation: prompt -> plan -> audit -> dual build."""
+    print("================================================================")
+    print("  undoPPT Super Skill - End-to-End Autonomous Generation (v2.5)")
+    print("================================================================")
+    print(f"[*] Prompt: {args.prompt}")
+    doc_path = getattr(args, "input_doc", None)
+    if doc_path:
+        print(f"[*] Input Grounding Document: {doc_path}")
+
+    # 1. Deconstruct or pick tokens
+    tokens = {}
+    if getattr(args, "template", None) and os.path.exists(args.template):
+        print(f"[1/4] Deconstructing template: {args.template}...")
+        tokens = extract_template_tokens(args.template, extract_assets=True)
+        os.makedirs(".undoppt", exist_ok=True)
+        save_tokens(tokens, ".undoppt/design_tokens.json")
+    else:
+        tokens_path = getattr(args, "tokens", None) or "presets/modern_bento.json"
+        print(f"[1/4] Loading design tokens: {tokens_path}...")
+        with open(tokens_path, "r", encoding="utf-8") as f:
+            tokens = json.load(f)
+
+    # 2. Plan Blueprint
+    print("[2/4] Running Cognitive Planner & 10-Dimension Narrative Synthesis...")
+    planner = CognitivePlanner(auditor=ContentAuditor(tokens=tokens))
+    blueprint = planner.plan(
+        prompt=args.prompt,
+        context=getattr(args, "context", None),
+        doc_path=doc_path
+    )
+    bp_path = os.path.join(args.out or "output", "blueprint.json")
+    os.makedirs(os.path.dirname(os.path.abspath(bp_path)), exist_ok=True)
+    with open(bp_path, "w", encoding="utf-8") as f:
+        json.dump(blueprint, f, ensure_ascii=False, indent=2)
+    print(f"      Composite Score: {blueprint['audit_summary']['score']}/100 | Grade: {blueprint['audit_summary']['grade']}")
+
+    # 3. Build Presentations
+    out_dir = args.out or "output"
+    os.makedirs(out_dir, exist_ok=True)
+    watcher = SyncWatcher()
+
+    if args.format in ("pptx", "all"):
+        pptx_out = os.path.join(out_dir, "presentation.pptx")
+        print("[3/4] Rendering Native Vector PPTX (with Speaker Notes injected)...")
+        build_presentation(blueprint, tokens, pptx_out)
+        watcher.record_baseline(pptx_out)
+
+    if args.format in ("html", "all"):
+        html_out = os.path.join(out_dir, "presentation.html")
+        print("[4/4] Compiling Standalone HTML (with Cognitive Inspector Drawer)...")
+        build_standalone_html(blueprint, tokens, html_out)
+        watcher.record_baseline(html_out)
+
+    print("\n[SUCCESS] Autonomous Delivery Complete!")
+    print(f"  • Blueprint:       {os.path.abspath(bp_path)}")
+    if args.format in ("pptx", "all"):
+        print(f"  • PowerPoint PPTX: {os.path.abspath(os.path.join(out_dir, 'presentation.pptx'))}")
+    if args.format in ("html", "all"):
+        print(f"  • Standalone HTML: {os.path.abspath(os.path.join(out_dir, 'presentation.html'))}")
+    print("================================================================")
+
+
 def cmd_audit(args):
     """Audit presentation blueprint for cognitive quality and content architecture."""
     with open(args.blueprint, "r", encoding="utf-8") as f:
@@ -260,12 +356,20 @@ def cmd_audit(args):
     res = auditor.audit(blueprint)
 
     print("================================================================")
-    print("  undoPPT Cognitive Quality & Content Architecture Audit        ")
+    print("  undoPPT Cognitive Quality & Content Architecture Audit (v2.5) ")
     print("================================================================")
-    print(f"  • Overall Score:  {res['score']} / 100")
-    print(f"  • Quality Grade:  {res['grade']}")
-    print(f"  • Total Slides:   {res['total_slides']}")
-    print(f"  • Result:         {'[PASS] High-Impact Presentation' if res['passed'] else '[WARN] Cognitive Optimization Needed'}")
+    print(f"  • Composite Score:  {res['score']} / 100")
+    print(f"    - Structural:     {res.get('structural_score', res['score'])} / 100")
+    print(f"    - Semantic:       {res.get('semantic_score', res['score'])} / 100")
+    if "semantic_subscores" in res:
+        subs = res["semantic_subscores"]
+        print(f"      · Causal Cohesion:    {subs.get('causal_cohesion', 0)} / 100")
+        print(f"      · Thesis Alignment:   {subs.get('thesis_alignment', 0)} / 100")
+        print(f"      · Evidence Weight:    {subs.get('evidence_weight', 0)} / 100")
+        print(f"      · Skepticism Defense: {subs.get('skepticism_defense', 0)} / 100")
+    print(f"  • Quality Grade:    {res['grade']}")
+    print(f"  • Total Slides:     {res['total_slides']}")
+    print(f"  • Result:           {'[PASS] High-Impact Presentation' if res['passed'] else '[WARN] Cognitive Optimization Needed'}")
     print("----------------------------------------------------------------")
     if not res["findings"]:
         print("  ✓ Exemplary content architecture! All 10 cognitive metrics satisfied.")
@@ -345,8 +449,25 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v1.1.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v2.5.0)")
     subparsers = parser.add_subparsers(dest="command")
+
+    # plan
+    p_plan = subparsers.add_parser("plan", help="Autonomous Cognitive Planner (Prompt to Blueprint)")
+    p_plan.add_argument("--prompt", required=True, help="User prompt / presentation goal")
+    p_plan.add_argument("--input-doc", default=None, help="Path to document (.md, .txt) to ground plan in domain facts")
+    p_plan.add_argument("--context", default=None, help="Optional background notes or constraints")
+    p_plan.add_argument("--out", default=".undoppt/blueprint.json", help="Output blueprint JSON path")
+
+    # generate
+    p_gen = subparsers.add_parser("generate", help="One-shot autonomous generation (Prompt to Deliverables)")
+    p_gen.add_argument("--prompt", required=True, help="User prompt / presentation goal")
+    p_gen.add_argument("--input-doc", default=None, help="Path to document (.md, .txt) to ground plan in domain facts")
+    p_gen.add_argument("--context", default=None, help="Optional background notes")
+    p_gen.add_argument("--template", default=None, help="Optional template .pptx to deconstruct")
+    p_gen.add_argument("--tokens", default="presets/modern_bento.json", help="Design tokens JSON path")
+    p_gen.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
+    p_gen.add_argument("--out", default="output", help="Output directory")
 
     # undo
     p_undo = subparsers.add_parser("undo", help="Deconstruct PPTX template")
@@ -377,7 +498,11 @@ def main():
         parser.print_help()
         sys.exit(0)
 
-    if args.command == "undo":
+    if args.command == "plan":
+        cmd_plan(args)
+    elif args.command == "generate":
+        cmd_generate(args)
+    elif args.command == "undo":
         cmd_undo(args)
     elif args.command == "build":
         cmd_build(args)

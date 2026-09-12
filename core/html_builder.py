@@ -266,6 +266,249 @@ def _render_summary_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
     """
 
 
+def _render_matrix_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "战略决策矩阵")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "STRATEGY MATRIX")
+    quadrants = slide.get("quadrants", [])
+    x_axis = slide.get("x_axis", {"title": "X 轴", "min_label": "弱/低", "max_label": "强/高"})
+    y_axis = slide.get("y_axis", {"title": "Y 轴", "min_label": "弱/低", "max_label": "强/高"})
+    principles = slide.get("principles") or slide.get("takeaways", [])
+
+    quad_coords = ["top_left", "top_right", "bottom_left", "bottom_right"]
+    quad_cards_html = []
+    for idx, pos_key in enumerate(quad_coords):
+        q = {}
+        if isinstance(quadrants, dict):
+            q = quadrants.get(pos_key, {})
+        elif isinstance(quadrants, list) and idx < len(quadrants):
+            q = quadrants[idx]
+
+        is_hl = q.get("highlight", False) or pos_key == "bottom_right"
+        border_cls = "border-blue-600 ring-2 ring-blue-100 bg-blue-50/50" if is_hl else "border-slate-200 bg-white"
+        title_cls = "text-blue-700 font-bold" if is_hl else "text-slate-900 font-bold"
+
+        items = q.get("items") or q.get("bullets", [])
+        items_html = "".join([f'<li class="text-xs text-slate-700 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>{item}</li>' for item in items[:3]])
+
+        quad_cards_html.append(f"""
+        <div class="border rounded-xl p-4 shadow-sm flex flex-col justify-between {border_cls}">
+          <div>
+            <h4 class="text-base {title_cls}">{q.get('name') or q.get('title', f'象限 {idx+1}')}</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-snug">{q.get('strategy') or q.get('desc', '')}</p>
+          </div>
+          <ul class="mt-3 space-y-1.5">
+            {items_html}
+          </ul>
+        </div>
+        """)
+
+    side_html = ""
+    if principles:
+        p_items = "".join([f'<div class="text-xs text-slate-700 mb-2"><span class="font-bold text-amber-600 mr-1.5">0{i+1}</span>{p}</div>' for i, p in enumerate(principles[:4])])
+        side_html = f"""
+        <div class="w-72 bg-amber-50/60 border border-amber-200 rounded-xl p-4 flex flex-col shadow-sm">
+          <h4 class="text-sm font-bold text-amber-800 mb-3 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            {slide.get('principles_title', '战略决策原则')}
+          </h4>
+          <div class="flex-1 flex flex-col justify-around">
+            {p_items}
+          </div>
+        </div>
+        """
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 flex gap-5 pb-2">
+        <div class="flex-1 flex flex-col">
+          <div class="flex-1 grid grid-cols-2 gap-3.5">
+            {"".join(quad_cards_html)}
+          </div>
+          <div class="mt-2 text-center text-xs font-bold text-blue-700 bg-blue-50/60 py-1 rounded border border-blue-100">
+            {x_axis.get('min_label', '弱')} ← {x_axis.get('title', 'X 轴')} → {x_axis.get('max_label', '强')}
+          </div>
+        </div>
+        {side_html}
+      </div>
+    </div>
+    """
+
+
+def _render_ladder_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "能力梯队成熟度模型")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "MATURITY LADDER")
+    levels = slide.get("levels", [])
+    safety_rule = slide.get("safety_line") or slide.get("footer_rule", "")
+
+    cols_html = []
+    num_cols = min(len(levels), 4)
+    for idx, lvl in enumerate(levels[:num_cols]):
+        is_hl = lvl.get("highlight", False) or idx == num_cols - 1
+        border_cls = "border-blue-600 ring-2 ring-blue-100 bg-blue-50/50" if is_hl else "border-slate-200 bg-white"
+
+        cols_html.append(f"""
+        <div class="border rounded-xl p-4 shadow-sm flex flex-col justify-between {border_cls}">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-600">{lvl.get('level', f'Level {idx+1}')}</span>
+            <h4 class="text-lg font-bold text-slate-900 mt-1">{lvl.get('name') or lvl.get('title', f'阶段 {idx+1}')}</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-snug">{lvl.get('desc', '')}</p>
+          </div>
+          <div class="space-y-2 mt-4 pt-3 border-t border-slate-100">
+            <div class="bg-blue-50/80 rounded p-2 text-xs">
+              <span class="font-bold text-blue-800">核心抓手:</span>
+              <span class="text-slate-700 block mt-0.5">{lvl.get('mechanism', '-')}</span>
+            </div>
+            <div class="bg-amber-50/80 rounded p-2 text-xs">
+              <span class="font-bold text-amber-800">衡量指标:</span>
+              <span class="text-slate-700 block mt-0.5">{lvl.get('metric', '-')}</span>
+            </div>
+            <div class="text-[11px] text-slate-500 pt-1">
+              <span class="font-semibold text-slate-600">协同:</span> {lvl.get('roles', '-')}
+            </div>
+          </div>
+        </div>
+        """)
+
+    safety_html = ""
+    if safety_rule:
+        safety_html = f"""
+        <div class="mt-3 bg-blue-50/80 border border-blue-200 rounded-lg py-2 px-4 text-center text-xs font-bold text-blue-800">
+          ★ {safety_rule}
+        </div>
+        """
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 grid grid-cols-{num_cols} gap-3.5">
+        {"".join(cols_html)}
+      </div>
+      {safety_html}
+    </div>
+    """
+
+
+def _render_horizons_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "一体两翼三道地平线分池管理")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "THREE HORIZONS")
+    horizons = slide.get("horizons", [])
+    summary_text = slide.get("summary_card") or slide.get("core_principle", "")
+
+    top_banner = ""
+    if summary_text:
+        top_banner = f"""
+        <div class="mb-3 bg-blue-50/80 border border-blue-200 rounded-lg py-2 px-4 text-center text-xs font-bold text-blue-800">
+          分池管理原则: {summary_text}
+        </div>
+        """
+
+    h_cols = []
+    accents = [
+        {"badge": "bg-blue-600", "border": "border-blue-500", "bg": "bg-blue-50/40"},
+        {"badge": "bg-indigo-600", "border": "border-indigo-500", "bg": "bg-indigo-50/40"},
+        {"badge": "bg-amber-600", "border": "border-amber-500", "bg": "bg-amber-50/40"},
+    ]
+
+    for idx, h in enumerate(horizons[:3]):
+        acc = accents[idx % len(accents)]
+        focus_items = h.get("focus") or h.get("items", [])
+        if isinstance(focus_items, str):
+            focus_items = [f.strip() for f in focus_items.split("、") if f.strip()]
+        f_html = "".join([f'<li class="text-xs text-slate-700 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>{item}</li>' for item in focus_items[:4]])
+
+        h_cols.append(f"""
+        <div class="bg-white border-2 {acc['border']} rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="inline-block {acc['badge']} text-white text-xs font-black px-2 py-0.5 rounded">
+              {h.get('id', f'H{idx+1}')}
+            </div>
+            <h4 class="text-lg font-bold text-slate-900 mt-2">{h.get('title', f'地平线 {idx+1}')}</h4>
+            <ul class="mt-3 space-y-1.5">
+              {f_html}
+            </ul>
+          </div>
+          <div class="space-y-2 mt-4 pt-3 border-t border-slate-100 text-xs">
+            <div class="bg-slate-50 p-2 rounded">
+              <span class="font-bold text-slate-700">管理方式:</span>
+              <span class="text-slate-600 block mt-0.5">{h.get('governance', '-')}</span>
+            </div>
+            <div class="bg-slate-50 p-2 rounded">
+              <span class="font-bold text-slate-700">考核标准:</span>
+              <span class="text-slate-600 block mt-0.5">{h.get('metric', '-')}</span>
+            </div>
+            <div class="text-slate-400 text-[11px] pt-1">
+              风险: {h.get('risk_profile', '-')}
+            </div>
+          </div>
+        </div>
+        """)
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-3">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      {top_banner}
+      <div class="flex-1 grid grid-cols-3 gap-4 pb-2">
+        {"".join(h_cols)}
+      </div>
+    </div>
+    """
+
+
+def _render_cross_mapping_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "四层协同组织映射全景")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "CROSS MAPPING")
+    rows = slide_data_rows = slide.get("mapping_rows") or slide.get("rows", [])
+
+    rows_html = []
+    for idx, r in enumerate(rows[:4]):
+        rows_html.append(f"""
+        <div class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:border-blue-300 transition-colors">
+          <div class="w-28 bg-blue-600 text-white font-bold text-xs py-3 px-2 rounded-lg text-center flex-shrink-0">
+            {r.get('tier', f'层级 0{idx+1}')}
+          </div>
+          <div class="flex-1 bg-slate-50 border border-slate-200/80 rounded-lg p-3">
+            <div class="text-xs font-bold text-blue-800">{r.get('source_role') or r.get('source_title', '标杆实践')}</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">{r.get('source_desc', '')}</div>
+          </div>
+          <div class="text-amber-500 font-extrabold text-base px-1">➔</div>
+          <div class="flex-1 bg-blue-50/50 border border-blue-200 rounded-lg p-3">
+            <div class="text-xs font-bold text-slate-900">{r.get('target_role') or r.get('target_title', '落地机制')}</div>
+            <div class="text-[11px] text-slate-600 mt-0.5">{r.get('target_desc', '')}</div>
+          </div>
+        </div>
+        """)
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 flex flex-col justify-between gap-2.5 pb-2">
+        {"".join(rows_html)}
+      </div>
+    </div>
+    """
+
+
 HTML_RENDERERS = {
     "cover": _render_cover_html,
     "architecture_stack": _render_architecture_stack_html,
@@ -273,6 +516,15 @@ HTML_RENDERERS = {
     "metric_spotlight": _render_metric_spotlight_html,
     "timeline": _render_timeline_html,
     "summary": _render_summary_html,
+    "matrix_2x2": _render_matrix_html,
+    "matrix": _render_matrix_html,
+    "maturity_ladder": _render_ladder_html,
+    "ladder": _render_ladder_html,
+    "horizons_curve": _render_horizons_html,
+    "horizons": _render_horizons_html,
+    "three_horizons": _render_horizons_html,
+    "cross_mapping": _render_cross_mapping_html,
+    "dual_mapping": _render_cross_mapping_html,
 }
 
 

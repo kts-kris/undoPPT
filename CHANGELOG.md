@@ -5,6 +5,64 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.5.0] - 2026-09-12
+
+### Added
+- **v1.3 True 100% Completion - Semantic Cognitive Auditor (`core/semantic_auditor.py`)**:
+  - **Rhetorical Causal Taxonomy**: Evaluates inter-slide logical connectors against 6 causal dimensions (contrast, causality, breakthrough, progression, evidence, action).
+  - **Centrifugal Thesis Alignment**: Keyword extraction and semantic drift detection to ensure every slide reinforces the core thesis.
+  - **Quantitative Smoking-Gun Evidence Weighting**: Evaluates numerical metrics, percentages, ratios, and timeframes (Q9) across core evidence and content.
+  - **Audience Skepticism Defense**: Verifies explicit defense against declared stakeholder pains and alignment with Understand-Believe-Act outcomes.
+  - **Pluggable LLM-as-a-Judge Hook**: Enables optional high-order nuanced qualitative evaluation alongside zero-dependency heuristic auditing.
+  - **Integrated into ContentAuditor (`core/content_auditor.py`)**: Reports Composite Score, Structural Score, Semantic Score, and 4 detailed subscores.
+
+- **v1.5 True 100% Completion - Dynamic Grounded Planner (`core/cognitive_planner.py`)**:
+  - **Document Context Ingestor (`DocumentContextIngestor`)**: Ingests external reference documents (Markdown, TXT, JSON) via `--input-doc` or context.
+  - **Quantitative Fact Extraction**: Automatically discovers domain numbers, ratios (e.g., 418, 71, 7:2:1, 4:3:3, 90%), pains, and entity anchors.
+  - **Autonomous Self-Correction Refinement Loop**: Proactively detects and auto-fixes passive titles, missing missions, weak evidence, and density warnings prior to final output.
+
+- **v2.0 True 100% Completion - Deep Master AST Decompiler (`core/undo_engine.py`)**:
+  - **Master Layout Slots Geometry Extraction**: Deconstructs title, body, subtitle, and footer placeholder coordinates and dimensions.
+  - **Automatic Dark/Light Theme Mode Detection**: Determines canvas luminance and dynamically configures high-contrast surface and typography palettes.
+  - **Visual Asset & Logo Extraction**: Automatically extracts embedded images and logos to `.undoppt/assets/`.
+
+- **Expanded Regression Test Suite (`tests/test_engine.py`)**:
+  - 12 comprehensive unit and integration tests covering semantic subscores, document ingestion, self-refinement, master slots, and theme modes (12/12 passing).
+
+### Changed
+- CLI upgraded to `v2.5.0` with `--input-doc` support in `plan` and `generate`, and detailed semantic audit score breakdowns.
+- Synchronized `SKILL.md` and `.agents/skills/undo-ppt/SKILL.md` to `v2.5.0`.
+- Bumped engine version to `2.5.0` in `core/__init__.py`, `cli.py`, `README.md`, and `CHANGELOG.md`.
+
+---
+
+## [2.0.0] - 2026-09-12
+
+### Added
+- **Autonomous Cognitive Planner (`core/cognitive_planner.py`)**:
+  - Automatically synthesizes natural language user prompts into 10-dimension audited blueprints (`blueprint.json`).
+  - Implements domain knowledge archetype detection (e.g. dairy/consumer goods, smart manufacturing, enterprise tech).
+  - Automatically constructs rigid Cognitive Contracts (Q1~Q4) and multi-slide narrative arcs (Hook → Conflict → Breakthrough → Evidence → Call to Action).
+  - Injects full脱稿口播演讲备注 (Speaker Notes) and causal transition connectors across all slides.
+  - New CLI command: `python3 cli.py plan --prompt "<prompt>" [--context "<notes>"] [--out <blueprint.json>]`.
+  - New one-shot generation command: `python3 cli.py generate --prompt "<prompt>" [--template <template.pptx>] [--format pptx|html|all] [--out <dir>]`.
+- **4 Advanced Strategic Infographic Primitives (Expanded from 6 to 10 Primitives)**:
+  - `matrix_2x2` (`render_matrix_slide`, `_render_matrix_html`): 2x2 four-quadrant strategic decision matrix with X/Y axes, strategy subtitles, quadrant chips, and principles sidebar.
+  - `maturity_ladder` (`render_ladder_slide`, `_render_ladder_html`): Multi-tier progressive capability maturity model (Level 1..Level 4) with mechanisms, metrics, collaboration roles, and spanning safety line.
+  - `horizons_curve` (`render_horizons_slide`, `_render_horizons_html`): Three Horizons (H1/H2/H3) portfolio governance model with distinct horizon cards, management styles, and KPI criteria.
+  - `cross_mapping` (`render_cross_mapping_slide`, `_render_cross_mapping_html`): Cross-organization / cross-tier strategic alignment mapping table with tier badges, source practices, bridging arrows, and target enterprise mechanisms.
+- **Enhanced Content Density Auditor (`core/content_auditor.py`)**:
+  - Added dedicated capacity budget and structure audits for the 4 new infographic primitives.
+- **Expanded Regression Test Suite (`tests/test_engine.py`)**:
+  - Added unit and integration tests for `CognitivePlanner`, all 10 layout primitives, and dual build pipelines (8/8 tests passing).
+
+### Changed
+- Upgraded `cli.py` to version `2.0.0` with `plan` and `generate` subparsers.
+- Synchronized `SKILL.md` and `.agents/skills/undo-ppt/SKILL.md` to `v2.0.0`.
+- Bumped engine version to `2.0.0` in `core/__init__.py` and `README.md`.
+
+---
+
 ## [1.1.0] - 2026-09-11
 
 ### Added

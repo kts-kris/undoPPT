@@ -1,6 +1,6 @@
 # undoPPT (演示文稿智能解构与重构超级智能体)
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
@@ -11,9 +11,9 @@
 
 ---
 
-## 🧠 核心升级：10 维内容质量动力学体系 (Content Dynamics & Quality Protocol)
+## 🧠 核心升级：10 维认知工程与深度语义因果审计体系 (v2.5.0)
 
-在专业商业、咨询与技术架构场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v1.1.0` 将决定 PPT 内容质量的 10 大核心问题工程化融入工作流中：
+在专业商业、咨询与技术架构场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v2.5.0` 将决定 PPT 内容质量的 10 大核心问题与深度语义本体工程化融入工作流中：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -35,6 +35,7 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+- 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、10 大信息图元与完备演讲脚本。
 - 💡 **自动化内容审计 (`cli.py audit`)**：内置 10 维规则审计器，对蓝图信息密度超标、中性被动标题、因果链缺失等问题实时评分并给出整改建议。
 - 🎙️ **PPTX 原生演讲备注注入**：单页使命（Mission）、承上启下连词（Transition）与核心证据（Core Evidence）自动编译进 PowerPoint Speaker Notes，助力脱稿演讲。
 - 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。
@@ -61,70 +62,49 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 
 **安装后直接对 Agent 说：**
 
-> “帮我基于这个模板做一份企业级 AI 战略规划汇报，控制在 6 页左右，包含产品技术架构图和关键 KPI 数据。”
-
-**也可以试这些高阶请求：**
-- *“学习我给的这个公司 PPT 模板的设计规范，提取色板与版式，后续页面全部严格遵循它。”*
-- *“帮我把这份微服务设计文档做成高保真产品技术堆叠架构图 PPT。”*
-- *“我在本地修改了刚才生成的 PPT 第 3 页，请检查我的修改并保持一致继续生成后续页面。”*
-- *“生成一份高动效单文件 HTML 演示文稿，方便我在大会上全屏演讲。”*
+> “我要编写蒙牛的 AI 战略规划，控制在 6 页，要求具备四层协同映射、2x2战略矩阵、四级阶梯进阶和三道地平线分池治理。”
 
 ---
 
-## 🌟 四大超级能力 (Super Capabilities)
+## 🌟 六大工业级超级能力 (Super Capabilities)
 
-### 1. 模板智能解构引擎 (Dual-Mode Deconstruction Engine)
-- **模式 A（原生母版 AST 解析）**：基于 `python-pptx` 深度遍历 Slide Masters、版式槽位、配色方案、字体阶梯与安全边距，将用户的 PPTX 模板精准提取为强一致性的 `design_tokens.json`，确保输出完全符合用户预期的演示文稿。
-- **模式 B（视觉启发式解析）**：针对散装样张或风格参考图，通过视觉启发式规则将色彩配比、阴影、卡片圆角标准化为统一协议。
-- **规范绝对穿透**：一旦标准确立，全任务周期不可篡改地统领所有页面的生成排版。
+### 1. 动态事实锚定规划器 (Dynamic Grounded Cognitive Planner)
+- **自然语言与外部事实文档无缝双输入**：无需人工编写复杂的 JSON，内置 `CognitivePlanner` 不仅能从一句话提示词推演完整逻辑，更支持挂载外部参考文档（`--input-doc notes.md`）。
+- **事实数据与业务实体精准挖掘**：自动从长文中提取组织层级、关键痛点与核心量化指标（如 `418个`、`71个`、`80%`、`7:2:1转向4:3:3`），动态编译进蓝图。
+- **自反思自愈修正循环 (Self-Correction Loop)**：生成蓝图后自动发起认知审计，若检测到中性标题、缺少因果过渡或证据不足，自动触发自愈补丁（Auto-patching）完成二轮修复。
 
-### 2. 六大原生图元组件库 (Infographic Primitives)
-拒绝大段无聊文本，内置 6 大工业级图表化组件元语：
+### 2. 深度语义认知审计器 (Deep Semantic Cognitive Auditor)
+- **6 大因果本体修辞分类**：严格审计页间连接词在 `contrast`（对立冲突）、`causality`（因果推演）、`breakthrough`（方案突破）、`progression`（递进深化）、`evidence`（硬核实证）、`action`（决议行动）六大修辞本体的咬合与多样性。
+- **顶层主旨离心漂移检测**：自动提取主旨关键词，核验每一页的向心力，杜绝跑题与信息孤岛。
+- **Smoking Gun 铁证加权**：多维识别百分比、比率、工时、延迟等硬核数据，杜绝定性空洞口号。
+- **受众疑虑对抗与闭环**：核验方案是否正面击穿痛点，收尾页是否坚决闭环目标行动决策。
+- **可插拔 LLM 裁判**：提供 `llm_judge_fn` 钩子，支持规则本体与大模型裁判协同。
+
+### 3. 十大高阶战略原生图元组件库 (Infographic Primitives)
+拒绝大段无聊文本，内置 10 大工业级图表化组件元语：
 - 🏗️ **产品/技术架构堆叠图 (Architecture Stacks)**：分层底板、微服务组件卡片、分类标签。
 - 🍱 **Bento 多栏对比卡片 (Bento Grid Cards)**：2/3/4 栏对比、高亮方案框、要点列表。
 - 📊 **KPI 核心指标大字报 (Metric Spotlight)**：超大字体数值、同环比标签、下钻说明。
 - ⏱️ **横向推进时间轴与里程碑 (Timeline Roadmap)**：节点圆环、连接轴线、阶段交付清单。
-- 🎯 **2x2 战略矩阵与象限 (Matrix)**：多维象限分布与业务评估。
-- 🏁 **收官要点速览 (Key Takeaways)**：胶囊编号卡片与决策建议。
+- 🎯 **2x2 战略矩阵与象限 (Matrix 2x2)**：技术广度 × 价值链控制力等四象限分布图与原则卡。
+- 🪜 **多维成熟度阶梯模型 (Maturity Ladder)**：四级演进台阶、抓手、指标与全生命周期安全底线。
+- 📈 **三道地平线发展模型 (Three Horizons)**：H1成熟效率、H2流程突破、H3模式验证分池治理。
+- 🔀 **跨层级/跨组织映射对比表 (Cross Mapping)**：双向对齐箭头、标杆实践对比、落地机制责任链。
+- 🏁 **收官要点速览 (Summary Takeaways)**：胶囊编号卡片与战略决策建议。
+- 🖼️ **高保真标题封面卡 (Cover Hero)**：分类徽章、主副标题与作者元数据。
 
-### 3. 双端极简交付 (Dual-Format Delivery)
-- **PowerPoint PPTX**：100% 原生矢量形状与独立文本框，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑，**绝不贴图**。
-- **单文件自包含 HTML**：将演示文稿打包为单个 `.html` 文件，内置精美排版、键盘导航（←/→/Space/F 全屏）、进度条，**双击即播，零依赖，极度易于分发**。
+### 4. 母版 AST 深度逆向解构引擎 (Deep Master AST Decompiler)
+- **母版槽位绝对坐标 AST 提取**：深度遍历 Slide Masters 与 Layouts，提取 `Title`、`Body`、`Subtitle`、`Footer` 的绝对坐标（英寸）与相对网格尺寸。
+- **自动明亮/暗黑主题模式识别**：智能检测背景与形状亮度，自适应判定 `theme_mode` 并映射高对比度文字与卡片配色。
+- **嵌入式高清视觉与 Logo 提取**：自动导出母版与页面中嵌入的图片与矢量 Logo 至 `.undoppt/assets/`。
 
-### 4. 毫秒级双向协同感知 (Always-in-Sync)
+### 5. 双端极简交付与认知自省 (Dual-Format Delivery & Notes Inspection)
+- **PowerPoint PPTX**：100% 原生矢量形状与独立文本框，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑，**绝不贴图**；自动将单页使命、因果转折和核心证据注入底层 Speaker Notes 演讲备注。
+- **单文件自包含 HTML**：将演示文稿打包为单个 `.html` 文件，内置精美排版、键盘导航（←/→/Space/F 全屏）、进度条，按 `N` 键滑出认知动力学抽屉，**双击即播，零依赖，极度易于分发**。
+
+### 6. 毫秒级双向协同感知 (Always-in-Sync)
 - 每一轮对话伊始，优先运行 **Sync Watcher**，在 `<10ms` 内完成 SHA-256 指纹比对。
 - 若用户在外部对 PPTX 进行了手动修改（如调整标题、删减节点、微调颜色），智能体自动生成 AST 差异分析，并在回复开始前主动告知用户：“*检测到您在本地修改了第 3 页，已同步更新意图...*”，真正实现人机并肩共创。
-
----
-
-## 🏗️ 系统拓扑架构
-
-```mermaid
-graph TD
-    User([用户发起任务 / 提出需求]) --> Guide[1. 意图研判与信息充分性探针 Guide]
-    Guide --> Probe{信息是否达到充分标准?}
-    Probe -- 否 --> Guide
-    Probe -- 是 --> UndoDecision{是否提供企业模板?}
-    
-    UndoDecision -- 是 --> UndoEngine[2. 模板智能解构引擎 Mode A/B]
-    UndoDecision -- 否 --> Presets[2. 匹配内置 4 大工业级设计系统]
-    
-    UndoEngine --> Tokens[标准设计协议 design_tokens.json]
-    Presets --> Tokens
-    
-    Tokens --> InfoArch[3. 信息架构与图表化蓝图 slides_blueprint.json]
-    InfoArch --> Compiler[4. 渲染构建集群]
-    
-    Compiler --> PPTX[100% 原生矢量 PPTX]
-    Compiler --> HTML[单文件自包含 HTML]
-    
-    PPTX --> Deliverable[(交付物 output/)]
-    HTML --> Deliverable
-    
-    Deliverable --> LocalEdit[用户本地外部编辑]
-    LocalEdit --> SyncWatcher[5. 毫秒级指纹比对与 AST Diff]
-    SyncWatcher -->|主动向用户同步理解| Guide
-```
 
 ---
 
@@ -133,12 +113,14 @@ graph TD
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP
+│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v2.5.0)
 ├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (1.1.0)
-│   ├── content_auditor.py          # 10 维认知质量与叙事动力学审计器
-│   ├── undo_engine.py              # PPTX 模板解析解构器 (Mode A)
-│   ├── vision_extractor.py         # 视觉启发式解析器 (Mode B)
+│   ├── __init__.py                 # 版本号导出 (2.5.0)
+│   ├── cognitive_planner.py        # 动态事实锚定认知规划器与自愈修正循环 (v2.5.0)
+│   ├── semantic_auditor.py         # 深度语义因果认知审计器 (修辞/离心/实证/疑虑)
+│   ├── content_auditor.py          # 10 维认知质量与容量预算综合审计器
+│   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
+│   ├── vision_extractor.py         # 视觉启发式解析器
 │   ├── pptx_builder.py             # 100% 原生矢量 PPTX 构建器 (含 Speaker Notes 注入)
 │   ├── html_builder.py             # 单文件自包含 HTML 演示编译器 (含 N 键认知抽屉)
 │   └── sync_watcher.py             # 毫秒级指纹追踪与语义 AST 差异对比器
@@ -147,13 +129,13 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件
+├── tests/                          # 自动化单元与回归测试套件 (12/12 passing)
 │   └── test_engine.py
 ├── output/                         # 最终交付物目录
 │   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)
 │   └── presentation.html           # 单文件自包含 HTML (含认知抽屉)
-├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync)
-├── cli.py                          # 统一命令行交互入口 (undo / build / audit / sync / demo)
+├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
+├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
 ├── README.md                       # 本说明文档
 └── CHANGELOG.md                    # 语义化版本变更记录
 ```
@@ -168,23 +150,24 @@ undoPPT/
 pip install python-pptx
 ```
 
-### 2. 一键运行端到端演示 (Demo)
-运行内置的企业级 Agentic AI 方案生成演示（包含认知审计、双端编译与指纹建档）：
+### 2. 自主规划与生成 (Plan & Generate)
+支持一句话输入，可选挂载事实参考文档：
 ```bash
-python3 cli.py demo
-```
-输出：
-- `output/presentation.pptx`：完全可编辑的 6 页矢量幻灯片，每页备注栏包含单页使命与连词。
-- `output/presentation.html`：双击即可在浏览器全屏播放的动态演示文稿，按 `N` 键开启认知动力学抽屉。
+# 规划高分蓝图 (支持参考文档摄取与自愈修正)
+python3 cli.py plan --prompt "我要编写蒙牛的AI战略" [--input-doc doc.md]
 
-### 3. 内容质量与认知动力学审计 (Audit)
-在生成前对蓝图进行严格的 10 维质量审计（检查信息密度超限、行动标题缺失、因果断裂等）：
+# 一键端到端极速交付 (规划 -> 事实锚定 -> 审计 -> 双端构建)
+python3 cli.py generate --prompt "我要编写蒙牛的AI战略" [--input-doc doc.md] [--template /path/to/template.pptx]
+```
+
+### 3. 内容质量与深度语义因果审计 (Audit)
+在生成前对蓝图进行严格的结构质量与语义修辞审计（综合分 + 结构分 + 语义分 + 4大子项）：
 ```bash
 python3 cli.py audit --blueprint .undoppt/blueprint.json
 ```
 
-### 4. 解析提取用户模板 (Undo)
-将任意已有的企业 PPTX 模板解构为标准规范，确保生成结果完全符合模板风格：
+### 4. 解析提取用户模板母版 (Undo)
+深度解构企业 PPTX 模板母版、槽位坐标、明暗主题与多媒体资产：
 ```bash
 python3 cli.py undo --template /path/to/company_template.pptx --out .undoppt/design_tokens.json
 ```

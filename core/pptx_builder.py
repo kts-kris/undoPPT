@@ -645,6 +645,559 @@ def render_summary_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]
             run_d.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
 
 
+def render_matrix_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render 2x2 Strategic Matrix with X/Y axes and 4 quadrant cards."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "STRATEGY MATRIX")
+    title = slide_data.get("action_title") or slide_data.get("title", "战略决策矩阵")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
+
+    principles = slide_data.get("principles") or slide_data.get("takeaways", [])
+    has_side = bool(principles)
+
+    start_x = 1.3
+    start_y = 2.1
+    matrix_w = 7.6 if has_side else 10.8
+    matrix_h = 4.8
+    gap = 0.2
+    card_w = (matrix_w - gap) / 2
+    card_h = (matrix_h - gap) / 2
+
+    x_axis = slide_data.get("x_axis", {"title": "X 轴维度", "min_label": "低/弱", "max_label": "高/强"})
+    y_axis = slide_data.get("y_axis", {"title": "Y 轴维度", "min_label": "低/弱", "max_label": "高/强"})
+
+    # Y-axis title on left
+    tb_y = slide.shapes.add_textbox(Inches(0.2), Inches(start_y + card_h - 0.4), Inches(0.9), Inches(0.8))
+    tf_y = tb_y.text_frame
+    tf_y.word_wrap = True
+    p_y = tf_y.paragraphs[0]
+    p_y.alignment = PP_ALIGN.CENTER
+    run_y = p_y.add_run()
+    run_y.text = y_axis.get("title", "Y 轴")
+    run_y.font.size = Pt(12)
+    run_y.font.bold = True
+    run_y.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+    # Y-axis max/min
+    tb_y_max = slide.shapes.add_textbox(Inches(0.2), Inches(start_y), Inches(0.9), Inches(0.3))
+    tb_y_max.text_frame.paragraphs[0].text = y_axis.get("max_label", "高")
+    tb_y_max.text_frame.paragraphs[0].font.size = Pt(10)
+    tb_y_max.text_frame.paragraphs[0].font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+    tb_y_min = slide.shapes.add_textbox(Inches(0.2), Inches(start_y + matrix_h - 0.35), Inches(0.9), Inches(0.3))
+    tb_y_min.text_frame.paragraphs[0].text = y_axis.get("min_label", "低")
+    tb_y_min.text_frame.paragraphs[0].font.size = Pt(10)
+    tb_y_min.text_frame.paragraphs[0].font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+    # X-axis title at bottom
+    tb_x = slide.shapes.add_textbox(Inches(start_x + matrix_w / 2 - 2.0), Inches(start_y + matrix_h + 0.05), Inches(4.0), Inches(0.35))
+    tf_x = tb_x.text_frame
+    p_x = tf_x.paragraphs[0]
+    p_x.alignment = PP_ALIGN.CENTER
+    run_x = p_x.add_run()
+    run_x.text = f"{x_axis.get('min_label', '弱')} ← {x_axis.get('title', 'X 轴')} → {x_axis.get('max_label', '强')}"
+    run_x.font.size = Pt(11)
+    run_x.font.bold = True
+    run_x.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+    quadrants = slide_data.get("quadrants", [])
+    quad_coords = [
+        ("top_left", start_x, start_y),
+        ("top_right", start_x + card_w + gap, start_y),
+        ("bottom_left", start_x, start_y + card_h + gap),
+        ("bottom_right", start_x + card_w + gap, start_y + card_h + gap),
+    ]
+
+    for idx, (pos_key, qx, qy) in enumerate(quad_coords):
+        q_data = {}
+        if isinstance(quadrants, dict):
+            q_data = quadrants.get(pos_key, {})
+        elif isinstance(quadrants, list) and idx < len(quadrants):
+            q_data = quadrants[idx]
+
+        is_hl = q_data.get("highlight", False) or pos_key == "bottom_right"
+
+        q_card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(qx), Inches(qy), Inches(card_w), Inches(card_h)
+        )
+        q_card.fill.solid()
+        q_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_hl else "#FFFFFF")
+        q_card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_hl else palette.get("border", "#CBD5E1"))
+        q_card.line.width = Pt(2 if is_hl else 1)
+
+        tf_q = q_card.text_frame
+        tf_q.word_wrap = True
+        tf_q.margin_left = Inches(0.18)
+        tf_q.margin_top = Inches(0.18)
+        tf_q.margin_right = Inches(0.18)
+
+        p_qt = tf_q.paragraphs[0]
+        p_qt.space_after = Pt(3)
+        run_qt = p_qt.add_run()
+        run_qt.text = q_data.get("name") or q_data.get("title", f"象限 {idx+1}")
+        run_qt.font.bold = True
+        run_qt.font.size = Pt(13)
+        run_qt.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_hl else palette.get("text_primary", "#0F172A"))
+
+        strategy = q_data.get("strategy") or q_data.get("desc", "")
+        if strategy:
+            p_qs = tf_q.add_paragraph()
+            p_qs.space_after = Pt(4)
+            run_qs = p_qs.add_run()
+            run_qs.text = strategy
+            run_qs.font.size = Pt(10)
+            run_qs.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        items = q_data.get("items") or q_data.get("bullets", [])
+        for item in items[:3]:
+            p_item = tf_q.add_paragraph()
+            run_item = p_item.add_run()
+            run_item.text = f"•  {item}"
+            run_item.font.size = Pt(10)
+            run_item.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+    if has_side:
+        side_x = start_x + matrix_w + 0.35
+        side_w = 3.2
+        side_card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(side_x), Inches(start_y), Inches(side_w), Inches(matrix_h)
+        )
+        side_card.fill.solid()
+        side_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+        side_card.line.color.rgb = _hex_to_rgb(palette.get("accent", "#F59E0B"))
+        side_card.line.width = Pt(1.5)
+
+        tf_side = side_card.text_frame
+        tf_side.word_wrap = True
+        tf_side.margin_left = Inches(0.18)
+        tf_side.margin_top = Inches(0.2)
+        tf_side.margin_right = Inches(0.18)
+
+        p_sh = tf_side.paragraphs[0]
+        p_sh.space_after = Pt(6)
+        run_sh = p_sh.add_run()
+        run_sh.text = slide_data.get("principles_title", "战略选择原则")
+        run_sh.font.bold = True
+        run_sh.font.size = Pt(13)
+        run_sh.font.color.rgb = _hex_to_rgb(palette.get("accent", "#F59E0B"))
+
+        for p_idx, p_text in enumerate(principles[:5]):
+            p_p = tf_side.add_paragraph()
+            p_p.space_after = Pt(4)
+            run_p = p_p.add_run()
+            run_p.text = f"0{p_idx+1}  {p_text}"
+            run_p.font.size = Pt(10)
+            run_p.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+
+def render_ladder_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Multi-tier Progressive Maturity Ladder."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "MATURITY LADDER")
+    title = slide_data.get("action_title") or slide_data.get("title", "能力梯队成熟度模型")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
+
+    levels = slide_data.get("levels", [])
+    if not levels:
+        return
+
+    num_levels = min(len(levels), 4)
+    start_x = 0.8
+    start_y = 2.1
+    avail_w = 11.73
+    gap = 0.2
+    col_w = (avail_w - (num_levels - 1) * gap) / num_levels
+    safety_rule = slide_data.get("safety_line") or slide_data.get("footer_rule")
+    card_h = 4.2 if safety_rule else 4.8
+
+    for idx, lvl in enumerate(levels[:num_levels]):
+        curr_x = start_x + idx * (col_w + gap)
+        is_high = lvl.get("highlight", False) or idx == num_levels - 1
+
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(curr_x), Inches(start_y), Inches(col_w), Inches(card_h)
+        )
+        card.fill.solid()
+        card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_high else "#FFFFFF")
+        card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_high else palette.get("border", "#CBD5E1"))
+        card.line.width = Pt(2 if is_high else 1)
+
+        tf = card.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.16)
+        tf.margin_top = Inches(0.18)
+        tf.margin_right = Inches(0.16)
+
+        # Level tag
+        p_lvl = tf.paragraphs[0]
+        run_lvl = p_lvl.add_run()
+        run_lvl.text = lvl.get("level", f"Level {idx+1}").upper()
+        run_lvl.font.bold = True
+        run_lvl.font.size = Pt(11)
+        run_lvl.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+        # Tier Name
+        p_name = tf.add_paragraph()
+        p_name.space_after = Pt(4)
+        run_name = p_name.add_run()
+        run_name.text = lvl.get("name") or lvl.get("title", f"阶段 {idx+1}")
+        run_name.font.bold = True
+        run_name.font.size = Pt(15)
+        run_name.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        # Description
+        desc = lvl.get("desc", "")
+        if desc:
+            p_desc = tf.add_paragraph()
+            p_desc.space_after = Pt(6)
+            run_d = p_desc.add_run()
+            run_d.text = desc
+            run_d.font.size = Pt(10)
+            run_d.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        # Core Mechanism Box
+        mech = lvl.get("mechanism", "")
+        if mech:
+            p_m = tf.add_paragraph()
+            p_m.space_after = Pt(3)
+            run_mh = p_m.add_run()
+            run_mh.text = "核心抓手: "
+            run_mh.font.bold = True
+            run_mh.font.size = Pt(10)
+            run_mh.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            run_m = p_m.add_run()
+            run_m.text = mech
+            run_m.font.size = Pt(10)
+            run_m.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+        # Metric Box
+        metric = lvl.get("metric", "")
+        if metric:
+            p_met = tf.add_paragraph()
+            p_met.space_after = Pt(3)
+            run_meth = p_met.add_run()
+            run_meth.text = "衡量指标: "
+            run_meth.font.bold = True
+            run_meth.font.size = Pt(10)
+            run_meth.font.color.rgb = _hex_to_rgb(palette.get("accent", "#F59E0B"))
+            run_met = p_met.add_run()
+            run_met.text = metric
+            run_met.font.size = Pt(10)
+            run_met.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+        # Role tag
+        roles = lvl.get("roles", "")
+        if roles:
+            p_r = tf.add_paragraph()
+            run_rh = p_r.add_run()
+            run_rh.text = "协同角色: "
+            run_rh.font.bold = True
+            run_rh.font.size = Pt(10)
+            run_rh.font.color.rgb = _hex_to_rgb(palette.get("secondary", "#3B82F6"))
+            run_r = p_r.add_run()
+            run_r.text = roles
+            run_r.font.size = Pt(10)
+            run_r.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+    # Spanning Safety Line / Footer Rule
+    if safety_rule:
+        bar_y = start_y + card_h + 0.15
+        bar = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(start_x), Inches(bar_y), Inches(avail_w), Inches(0.42)
+        )
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF"))
+        bar.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        bar.line.width = Pt(1)
+
+        tf_bar = bar.text_frame
+        p_bar = tf_bar.paragraphs[0]
+        p_bar.alignment = PP_ALIGN.CENTER
+        run_bar = p_bar.add_run()
+        run_bar.text = f"★  {safety_rule}"
+        run_bar.font.bold = True
+        run_bar.font.size = Pt(11)
+        run_bar.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+
+def render_horizons_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Three Horizons (H1/H2/H3) Portfolio Governance Model."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "THREE HORIZONS")
+    title = slide_data.get("action_title") or slide_data.get("title", "一体两翼三道地平线分池管理")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
+
+    horizons = slide_data.get("horizons", [])
+    if not horizons:
+        return
+
+    start_x = 0.8
+    start_y = 2.1
+    avail_w = 11.73
+    summary_text = slide_data.get("summary_card") or slide_data.get("core_principle", "")
+
+    top_offset = 0.6 if summary_text else 0.0
+    if summary_text:
+        s_bar = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(start_x), Inches(start_y), Inches(avail_w), Inches(0.46)
+        )
+        s_bar.fill.solid()
+        s_bar.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF"))
+        s_bar.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        s_bar.line.width = Pt(1)
+        p_sb = s_bar.text_frame.paragraphs[0]
+        p_sb.alignment = PP_ALIGN.CENTER
+        run_sb = p_sb.add_run()
+        run_sb.text = f"分池管理原则: {summary_text}"
+        run_sb.font.bold = True
+        run_sb.font.size = Pt(11)
+        run_sb.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+    num_h = min(len(horizons), 3)
+    gap = 0.25
+    col_w = (avail_w - (num_h - 1) * gap) / num_h
+    card_h = 4.8 - top_offset
+    col_y = start_y + top_offset
+
+    colors = [
+        {"bg": "#FFFFFF", "border": palette.get("primary", "#1A56DB"), "badge_bg": palette.get("primary", "#1A56DB")},
+        {"bg": "#FFFFFF", "border": palette.get("secondary", "#3B82F6"), "badge_bg": palette.get("secondary", "#3B82F6")},
+        {"bg": "#FFFFFF", "border": palette.get("accent", "#F59E0B"), "badge_bg": palette.get("accent", "#F59E0B")},
+    ]
+
+    for idx, h in enumerate(horizons[:num_h]):
+        curr_x = start_x + idx * (col_w + gap)
+        c_spec = colors[idx % len(colors)]
+
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(curr_x), Inches(col_y), Inches(col_w), Inches(card_h)
+        )
+        card.fill.solid()
+        card.fill.fore_color.rgb = _hex_to_rgb(c_spec["bg"])
+        card.line.color.rgb = _hex_to_rgb(c_spec["border"])
+        card.line.width = Pt(2)
+
+        tf = card.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.2)
+        tf.margin_top = Inches(0.2)
+        tf.margin_right = Inches(0.2)
+
+        # Horizon ID badge
+        p_hid = tf.paragraphs[0]
+        run_hid = p_hid.add_run()
+        run_hid.text = h.get("id", f"H{idx+1}")
+        run_hid.font.bold = True
+        run_hid.font.size = Pt(20)
+        run_hid.font.color.rgb = _hex_to_rgb(c_spec["badge_bg"])
+
+        # Horizon Title
+        p_ht = tf.add_paragraph()
+        p_ht.space_after = Pt(6)
+        run_ht = p_ht.add_run()
+        run_ht.text = h.get("title", f"业务地平线 {idx+1}")
+        run_ht.font.bold = True
+        run_ht.font.size = Pt(15)
+        run_ht.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        # Horizon Focus
+        focus_items = h.get("focus") or h.get("items", [])
+        if isinstance(focus_items, str):
+            focus_items = [f.strip() for f in focus_items.split("、") if f.strip()]
+        for f_item in focus_items[:4]:
+            p_f = tf.add_paragraph()
+            run_f = p_f.add_run()
+            run_f.text = f"• {f_item}"
+            run_f.font.size = Pt(11)
+            run_f.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+        p_sp = tf.add_paragraph()
+        p_sp.space_after = Pt(4)
+
+        # Governance model
+        gov = h.get("governance", "")
+        if gov:
+            p_gov = tf.add_paragraph()
+            p_gov.space_after = Pt(2)
+            run_gh = p_gov.add_run()
+            run_gh.text = "管理方式: "
+            run_gh.font.bold = True
+            run_gh.font.size = Pt(10)
+            run_gh.font.color.rgb = _hex_to_rgb(c_spec["badge_bg"])
+            run_g = p_gov.add_run()
+            run_g.text = gov
+            run_g.font.size = Pt(10)
+            run_g.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+        # Metric
+        metric = h.get("metric", "")
+        if metric:
+            p_met = tf.add_paragraph()
+            p_met.space_after = Pt(2)
+            run_mh = p_met.add_run()
+            run_mh.text = "考核标准: "
+            run_mh.font.bold = True
+            run_mh.font.size = Pt(10)
+            run_mh.font.color.rgb = _hex_to_rgb(c_spec["badge_bg"])
+            run_m = p_met.add_run()
+            run_m.text = metric
+            run_m.font.size = Pt(10)
+            run_m.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#1E293B"))
+
+        # Risk Profile
+        risk = h.get("risk_profile", "")
+        if risk:
+            p_r = tf.add_paragraph()
+            run_rh = p_r.add_run()
+            run_rh.text = "风险定位: "
+            run_rh.font.bold = True
+            run_rh.font.size = Pt(10)
+            run_rh.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+            run_r = p_r.add_run()
+            run_r.text = risk
+            run_r.font.size = Pt(10)
+            run_r.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+
+def render_cross_mapping_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Cross-Organization / Cross-Tier Strategic Alignment Mapping Table."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "CROSS MAPPING")
+    title = slide_data.get("action_title") or slide_data.get("title", "四层协同组织映射全景")
+    _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
+
+    rows = slide_data.get("mapping_rows") or slide_data.get("rows", [])
+    if not rows:
+        return
+
+    num_rows = min(len(rows), 4)
+    start_x = 0.8
+    start_y = 2.1
+    avail_w = 11.73
+    avail_h = 4.8
+    gap = 0.15
+    row_h = (avail_h - (num_rows - 1) * gap) / num_rows
+
+    tier_w = 1.8
+    src_w = 4.3
+    arrow_w = 0.5
+    tgt_w = avail_w - tier_w - src_w - arrow_w - 0.3
+
+    for idx, r in enumerate(rows[:num_rows]):
+        curr_y = start_y + idx * (row_h + gap)
+
+        # 1. Tier Badge
+        t_card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(start_x), Inches(curr_y), Inches(tier_w), Inches(row_h)
+        )
+        t_card.fill.solid()
+        t_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        t_card.line.fill.background()
+        tf_t = t_card.text_frame
+        tf_t.word_wrap = True
+        p_t = tf_t.paragraphs[0]
+        p_t.alignment = PP_ALIGN.CENTER
+        run_t = p_t.add_run()
+        run_t.text = r.get("tier", f"层级 0{idx+1}")
+        run_t.font.bold = True
+        run_t.font.size = Pt(13)
+        run_t.font.color.rgb = RGBColor(255, 255, 255)
+
+        # 2. Source Card
+        sx = start_x + tier_w + 0.1
+        s_card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(sx), Inches(curr_y), Inches(src_w), Inches(row_h)
+        )
+        s_card.fill.solid()
+        s_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#F8FAFC"))
+        s_card.line.color.rgb = _hex_to_rgb(palette.get("border", "#E2E8F0"))
+        s_card.line.width = Pt(1)
+
+        tf_s = s_card.text_frame
+        tf_s.word_wrap = True
+        tf_s.margin_left = Inches(0.15)
+        tf_s.margin_top = Inches(0.12)
+        p_st = tf_s.paragraphs[0]
+        run_st = p_st.add_run()
+        run_st.text = r.get("source_role") or r.get("source_title", "标杆实践")
+        run_st.font.bold = True
+        run_st.font.size = Pt(12)
+        run_st.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+        s_desc = r.get("source_desc", "")
+        if s_desc:
+            p_sd = tf_s.add_paragraph()
+            run_sd = p_sd.add_run()
+            run_sd.text = s_desc
+            run_sd.font.size = Pt(10)
+            run_sd.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+        # 3. Middle Arrow
+        ax = sx + src_w + 0.05
+        tb_a = slide.shapes.add_textbox(Inches(ax), Inches(curr_y + row_h / 2 - 0.25), Inches(arrow_w), Inches(0.5))
+        p_a = tb_a.text_frame.paragraphs[0]
+        p_a.alignment = PP_ALIGN.CENTER
+        run_a = p_a.add_run()
+        run_a.text = "➔"
+        run_a.font.bold = True
+        run_a.font.size = Pt(16)
+        run_a.font.color.rgb = _hex_to_rgb(palette.get("accent", "#F59E0B"))
+
+        # 4. Target Card
+        tx = ax + arrow_w + 0.05
+        t_card_tgt = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(tx), Inches(curr_y), Inches(tgt_w), Inches(row_h)
+        )
+        t_card_tgt.fill.solid()
+        t_card_tgt.fill.fore_color.rgb = _hex_to_rgb("#FFFFFF")
+        t_card_tgt.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        t_card_tgt.line.width = Pt(1.5)
+
+        tf_tgt = t_card_tgt.text_frame
+        tf_tgt.word_wrap = True
+        tf_tgt.margin_left = Inches(0.15)
+        tf_tgt.margin_top = Inches(0.12)
+        p_tt = tf_tgt.paragraphs[0]
+        run_tt = p_tt.add_run()
+        run_tt.text = r.get("target_role") or r.get("target_title", "企业落地")
+        run_tt.font.bold = True
+        run_tt.font.size = Pt(12)
+        run_tt.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        t_desc = r.get("target_desc", "")
+        if t_desc:
+            p_td = tf_tgt.add_paragraph()
+            run_td = p_td.add_run()
+            run_td.text = t_desc
+            run_td.font.size = Pt(10)
+            run_td.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+
 RENDERERS = {
     "cover": render_cover_slide,
     "architecture_stack": render_architecture_stack_slide,
@@ -652,6 +1205,15 @@ RENDERERS = {
     "metric_spotlight": render_metric_spotlight_slide,
     "timeline": render_timeline_slide,
     "summary": render_summary_slide,
+    "matrix_2x2": render_matrix_slide,
+    "matrix": render_matrix_slide,
+    "maturity_ladder": render_ladder_slide,
+    "ladder": render_ladder_slide,
+    "horizons_curve": render_horizons_slide,
+    "horizons": render_horizons_slide,
+    "three_horizons": render_horizons_slide,
+    "cross_mapping": render_cross_mapping_slide,
+    "dual_mapping": render_cross_mapping_slide,
 }
 
 

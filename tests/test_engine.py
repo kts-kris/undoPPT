@@ -9,6 +9,7 @@ import unittest
 
 from pptx import Presentation
 
+from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.html_builder import build_standalone_html
 from core.pptx_builder import build_presentation
@@ -59,6 +60,46 @@ class TestUndoPPTEngine(unittest.TestCase):
                 "steps": [
                     {"time": "阶段 1", "title": "概念验证", "items": ["环境准备", "冒烟测试"]},
                     {"time": "阶段 2", "title": "上线试跑", "items": ["灰度发布", "全量推广"]}
+                ]
+            },
+            {
+                "layout_type": "matrix_2x2",
+                "title": "象限决策矩阵",
+                "quadrants": [
+                    {"name": "生态协作", "strategy": "联合研发", "items": ["外部模型"]},
+                    {"name": "平台主导", "strategy": "标准制定", "items": ["行业规范"]},
+                    {"name": "差异聚焦", "strategy": "局部深耕", "items": ["定制算法"]},
+                    {"name": "核心整合", "strategy": "全链穿透", "items": ["自研资产"], "highlight": True}
+                ],
+                "principles": ["原则1", "原则2"]
+            },
+            {
+                "layout_type": "maturity_ladder",
+                "title": "四级能力阶梯",
+                "levels": [
+                    {"level": "L1", "name": "访问", "mechanism": "开通", "metric": "覆盖率"},
+                    {"level": "L2", "name": "使用", "mechanism": "考评", "metric": "活跃度"},
+                    {"level": "L3", "name": "常态", "mechanism": "模板", "metric": "复用率"},
+                    {"level": "L4", "name": "结果", "mechanism": "账本", "metric": "净收益", "highlight": True}
+                ],
+                "safety_line": "全流程安全合规"
+            },
+            {
+                "layout_type": "horizons_curve",
+                "title": "三道地平线治理",
+                "summary_card": "分池独立考核",
+                "horizons": [
+                    {"id": "H1", "title": "核心效率", "focus": ["问答", "审核"], "governance": "标准化", "metric": "现金节省"},
+                    {"id": "H2", "title": "成长重构", "focus": ["排产", "预测"], "governance": "敏捷", "metric": "北极星改善"},
+                    {"id": "H3", "title": "新兴模式", "focus": ["数据服务"], "governance": "孵化", "metric": "PMF验证"}
+                ]
+            },
+            {
+                "layout_type": "cross_mapping",
+                "title": "四层穿透映射",
+                "rows": [
+                    {"tier": "01 决策", "source_role": "顶层定调", "target_role": "集团战略委"},
+                    {"tier": "02 统筹", "source_role": "协同中枢", "target_role": "业务技术中枢"}
                 ]
             },
             {
@@ -215,6 +256,103 @@ class TestUndoPPTEngine(unittest.TestCase):
             self.assertIn("cognitive-drawer", content)
             self.assertIn("data-mission=\"确立核心目标\"", content)
             self.assertIn("Notes (N)", content)
+
+    def test_cognitive_planner_generation(self):
+        """Test CognitivePlanner synthesizes an audited blueprint from a prompt."""
+        planner = CognitivePlanner()
+        bp = planner.plan("智能制造数字化战略规划")
+        self.assertIn("contract", bp)
+        self.assertIn("core_thesis", bp["contract"])
+        self.assertGreaterEqual(len(bp["slides"]), 5)
+        self.assertGreaterEqual(bp["audit_summary"]["score"], 70)
+
+        # Test dual build of the planner output
+        out_pptx = os.path.join(self.test_dir, "planner_test.pptx")
+        out_html = os.path.join(self.test_dir, "planner_test.html")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        build_standalone_html(bp, self.sample_tokens, out_html)
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertTrue(os.path.exists(out_html))
+
+    def test_semantic_auditor_metrics(self):
+        """Test SemanticAuditor evaluates causal cohesion, thesis alignment, and evidence."""
+        from core.semantic_auditor import SemanticAuditor
+        auditor = SemanticAuditor()
+        contract = {
+            "core_thesis": "从应用规模表象全面迈向以经营结果为导向的蒙牛AI系统性重构与闭环",
+            "knowledge_delta": {"blindspots_and_pains": ["400+智能体闲置", "数据断点"]},
+            "target_outcomes": {"act": "当场决议批准成立四层协同组织"}
+        }
+        slides = [
+            {"layout_type": "cover", "title": "蒙牛AI战略规划", "narrative_arc": "hook"},
+            {
+                "layout_type": "bento_cards",
+                "narrative_arc": "conflict",
+                "transition": "【冲突】然而 400+ 智能体中长尾闲置高达 80%",
+                "action_title": "痛点：400+智能体闲置，数据断点严重",
+                "core_evidence": "长尾闲置占比高达 80%，投入产出比脱节",
+                "title": "现状分析与冲突痛点"
+            },
+            {
+                "layout_type": "summary",
+                "narrative_arc": "call_to_action",
+                "transition": "【决议】因此当场决议批准成立四层协同组织，重构 4:3:3 投资结构",
+                "action_title": "决议：当场决议批准成立四层协同组织",
+                "core_evidence": "重构 4:3:3 投资结构，预计回收期缩减至 12个月",
+                "title": "收官决议",
+                "points": [{"title": "批准成立四层协同组织", "desc": "全面闭环"}]
+            }
+        ]
+        res = auditor.audit_semantics(contract, slides)
+        self.assertIn("semantic_score", res)
+        self.assertGreaterEqual(res["semantic_score"], 80.0)
+        self.assertIn("causal_cohesion", res["subscores"])
+        self.assertIn("thesis_alignment", res["subscores"])
+        self.assertIn("evidence_weight", res["subscores"])
+        self.assertIn("skepticism_defense", res["subscores"])
+
+    def test_document_context_ingestion(self):
+        """Test DocumentContextIngestor extracts numbers, pains, actions, and entities."""
+        from core.cognitive_planner import DocumentContextIngestor
+        ingestor = DocumentContextIngestor()
+        doc_content = """
+        # 蒙牛智能化转型复盘
+        痛点：当前存在 418个智能体，但真正高频使用的仅 71个，长尾闲置高达 80%。
+        现状：传统投资结构为 7:2:1，导致底层数据治理严重滞后。
+        建议：当场决议将投资结构重构为 4:3:3，并在 18个月内完成三大旗舰战役打穿。
+        """
+        data = ingestor.ingest(doc_content)
+        self.assertIn("418个", data["numbers"])
+        self.assertIn("80%", data["numbers"])
+        self.assertIn("4:3:3", data["numbers"])
+        self.assertIn("蒙牛", data["entity_mentions"])
+        self.assertGreaterEqual(len(data["extracted_pains"]), 1)
+        self.assertGreaterEqual(len(data["extracted_actions"]), 1)
+
+    def test_grounded_planner_with_document_and_refinement(self):
+        """Test CognitivePlanner grounds blueprint in document context and performs self-refinement."""
+        planner = CognitivePlanner()
+        sample_doc = os.path.join(self.test_dir, "sample_doc.md")
+        with open(sample_doc, "w", encoding="utf-8") as f:
+            f.write("蒙牛数字化战略：418个智能体中 80% 闲置。决议重构 4:3:3 预算，立项奶源与供应链战役。")
+
+        bp = planner.plan("我要编写蒙牛的AI战略", doc_path=sample_doc, auto_refine=True)
+        self.assertTrue(bp["grounded_sources"]["has_doc"])
+        self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
+        self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
+        self.assertEqual(bp["version"], "2.5.0")
+
+    def test_undo_engine_master_slots_and_theme_mode(self):
+        """Test undo_engine extracts master slots geometry and theme mode."""
+        out_pptx = os.path.join(self.test_dir, "slots_test.pptx")
+        build_presentation(self.sample_blueprint, self.sample_tokens, out_pptx)
+
+        tokens = extract_template_tokens(out_pptx, extract_assets=True, assets_dir=os.path.join(self.test_dir, "assets"))
+        self.assertIn("master_slots", tokens)
+        self.assertIn("theme_mode", tokens)
+        self.assertIn(tokens["theme_mode"], ["light", "dark"])
+        self.assertGreater(tokens["master_layouts_count"], 0)
+        self.assertIn("slots", tokens["layouts"][0])
 
 
 if __name__ == "__main__":

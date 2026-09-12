@@ -14,18 +14,20 @@ Audits presentation blueprints against the 10 Core Content Quality Metrics:
 """
 
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+from core.semantic_auditor import SemanticAuditor
 
 
 class ContentAuditor:
-    """Audits blueprints and tokens against cognitive engineering standards."""
+    """Audits blueprints and tokens against cognitive engineering and semantic standards."""
 
     PASSIVE_TITLE_KEYWORDS = [
         "简介", "背景", "概览", "介绍", "现状", "思考", "分析", "总结",
         "overview", "background", "introduction", "status", "architecture", "summary"
     ]
 
-    def __init__(self, tokens: Optional[Dict[str, Any]] = None):
+    def __init__(self, tokens: Optional[Dict[str, Any]] = None, llm_judge_fn: Optional[Callable] = None):
         self.tokens = tokens or {}
         self.budget = self.tokens.get("content_budget", {
             "density_tier": "balanced",
@@ -34,9 +36,10 @@ class ContentAuditor:
             "max_bullet_points": 4,
             "max_desc_words": 50
         })
+        self.semantic_auditor = SemanticAuditor(llm_judge_fn=llm_judge_fn)
 
     def audit(self, blueprint_data: Any) -> Dict[str, Any]:
-        """Perform comprehensive cognitive audit of a presentation blueprint.
+        """Perform comprehensive cognitive & semantic audit of a presentation blueprint.
 
         Supports both raw list of slides and wrapped dict {"contract": ..., "slides": [...]}.
         """
@@ -50,41 +53,52 @@ class ContentAuditor:
             slides = blueprint_data
 
         findings: List[Dict[str, Any]] = []
-        score = 100
+        struct_score = 100
 
         # --- 1. Audit Cognitive Contract (Q1 - Q4) ---
         contract_findings, contract_score_deduction = self._audit_contract(contract)
         findings.extend(contract_findings)
-        score -= contract_score_deduction
+        struct_score -= contract_score_deduction
 
         # --- 2. Audit Narrative Flow & Pacing (Q5, Q10) ---
         flow_findings, flow_deduction = self._audit_narrative_flow(slides)
         findings.extend(flow_findings)
-        score -= flow_deduction
+        struct_score -= flow_deduction
 
         # --- 3. Audit Slide-by-Slide Cognitive Quality (Q6 - Q9) ---
         slide_findings, slide_deduction = self._audit_slides(slides)
         findings.extend(slide_findings)
-        score -= slide_deduction
+        struct_score -= slide_deduction
 
-        score = max(0, min(100, score))
+        struct_score = max(0, min(100, struct_score))
+
+        # --- 4. Deep Semantic & Rhetorical Audit (v2.5.0) ---
+        semantic_res = self.semantic_auditor.audit_semantics(contract, slides)
+        findings.extend(semantic_res.get("findings", []))
+        semantic_score = semantic_res.get("semantic_score", 100.0)
+
+        # Composite score: 50% structural density & rules + 50% deep semantic cohesion & evidence
+        final_score = round(max(0.0, min(100.0, struct_score * 0.5 + semantic_score * 0.5)), 1)
 
         # Overall assessment
-        if score >= 85:
+        if final_score >= 85:
             grade = "A (Exemplary Cognitive Impact)"
-        elif score >= 70:
+        elif final_score >= 70:
             grade = "B (Solid Logic with Minor Noise)"
-        elif score >= 50:
+        elif final_score >= 50:
             grade = "C (Information Overload / Generic Flow)"
         else:
             grade = "D (Needs Cognitive Restructuring)"
 
         return {
-            "score": score,
+            "score": final_score,
+            "structural_score": struct_score,
+            "semantic_score": semantic_score,
+            "semantic_subscores": semantic_res.get("subscores", {}),
             "grade": grade,
             "total_slides": len(slides),
             "findings": findings,
-            "passed": score >= 70
+            "passed": final_score >= 70
         }
 
     def _audit_contract(self, contract: Optional[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
@@ -201,7 +215,7 @@ class ContentAuditor:
                 deduction += 2
 
             # Q7: Information Density budget check
-            if layout == "bento_cards":
+            if layout in ("bento_cards",):
                 cards = slide.get("cards", [])
                 max_cards = self.budget.get("max_cards", 4)
                 if len(cards) > max_cards:
@@ -211,7 +225,7 @@ class ContentAuditor:
                         "message": f"第 {page_num} 页卡片数量({len(cards)})超过当前设计预设上限({max_cards})，易引发认知过载(Q7)。"
                     })
                     deduction += 3
-            elif layout == "architecture_stack":
+            elif layout in ("architecture_stack",):
                 layers = slide.get("layers", [])
                 max_layers = self.budget.get("max_layers", 4)
                 if len(layers) > max_layers:
@@ -221,5 +235,41 @@ class ContentAuditor:
                         "message": f"第 {page_num} 页架构层级({len(layers)})过多，建议归纳提炼至 {max_layers} 层以内(Q7)。"
                     })
                     deduction += 3
+            elif layout in ("matrix_2x2", "matrix"):
+                quads = slide.get("quadrants", [])
+                if isinstance(quads, list) and len(quads) > 4:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"MATRIX_QUADS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页 2x2 矩阵象限数({len(quads)})超出4个，请核查布局结构(Q7)。"
+                    })
+                    deduction += 2
+            elif layout in ("maturity_ladder", "ladder"):
+                levels = slide.get("levels", [])
+                if len(levels) > 5:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"LADDER_LEVELS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页阶梯阶数({len(levels)})过多，建议精简至 4-5 级以内保障视觉呼吸感(Q7)。"
+                    })
+                    deduction += 3
+            elif layout in ("horizons_curve", "horizons", "three_horizons"):
+                horizons = slide.get("horizons", [])
+                if len(horizons) > 3:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"HORIZONS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页地平线模型应遵循经典 H1/H2/H3 三层次，当前为 {len(horizons)} 层(Q7)。"
+                    })
+                    deduction += 2
+            elif layout in ("cross_mapping", "dual_mapping"):
+                rows = slide.get("mapping_rows") or slide.get("rows", [])
+                if len(rows) > 5:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"MAPPING_ROWS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页映射行数({len(rows)})过多，建议精炼核心层级至 4-5 行以内(Q7)。"
+                    })
+                    deduction += 2
 
         return findings, deduction
