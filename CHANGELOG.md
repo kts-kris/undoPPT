@@ -5,6 +5,29 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.6.0] - 2026-09-12
+
+### Added
+- **Full Architecture Decoupling & Multi-Scenario Cognitive Engine (`core/cognitive_planner.py`)**:
+  - **Complete Removal of Domain Hardcoding**: Eliminated all static company/benchmark scripts (e.g. Mengniu, Singapore NAIS, dairy buzzwords). The engine now dynamically extracts entities, subjects, and roles from natural language prompts and reference documents.
+  - **Dynamic Scenario Archetype Classification (`_classify_scenario`)**:
+    - `strategic_planning`: Enterprise strategy, organizational restructuring, transformation roadmaps.
+    - `career_portfolio`: Personal resume, promotion defense, executive portfolio, talent profiles.
+    - `tech_architecture`: Technical architecture proposals, platform design, high-availability system reviews.
+    - `product_pitch`: Commercial pitch decks, startup roadshows, product launch decks.
+  - **Scenario-Specific Narrative & Layout Assembly**:
+    - For `career_portfolio`: Assembles `cover` (Career positioning) ➔ `bento_cards` (Execution vs Composite Leader) ➔ `architecture_stack` (3-tier competency stack) ➔ `metric_spotlight` (Hardcore performance metrics: 99.99%, 300%+, 40M+ savings) ➔ `timeline` (Career breakthrough milestones) ➔ `summary` (First 90-day execution roadmap).
+    - Adaptable Speaker Notes generation: Automatically switches tone and voice from executive briefing ("各位领导...") to interview/defense presentation ("各位评委、面试官好...").
+  - **Dynamic Linguistic Entity & Candidate Extraction**:
+    - Strips conversational filler prefixes ("帮我生成一份", "我要写一个") and uses NLP splitting rules to isolate the authentic core entity or candidate role.
+  - **Expanded Test Suite (`tests/test_engine.py`)**:
+    - Added `test_career_resume_planner` validating full pipeline synthesis and dual PPTX/HTML compilation for personal resume decks (13/13 tests passing).
+
+### Changed
+- Bumped engine version to `2.6.0` in `core/__init__.py`, `cli.py`, `README.md`, `CHANGELOG.md`, and all `SKILL.md` configurations.
+
+---
+
 ## [2.5.0] - 2026-09-12
 
 ### Added

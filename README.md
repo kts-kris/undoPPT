@@ -1,6 +1,6 @@
 # undoPPT (演示文稿智能解构与重构超级智能体)
 
-[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
@@ -11,9 +11,9 @@
 
 ---
 
-## 🧠 核心升级：10 维认知工程与深度语义因果审计体系 (v2.5.0)
+## 🧠 核心升级：多场景通用解耦架构与 10 维认知工程体系 (v2.6.0)
 
-在专业商业、咨询与技术架构场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v2.5.0` 将决定 PPT 内容质量的 10 大核心问题与深度语义本体工程化融入工作流中：
+在专业商业、战略咨询、技术架构与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v2.6.0` 全面去除了领域硬编码，支持战略规划、个人简历/述职、技术方案、产品路演等多种场景的原型自适应装配：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -113,10 +113,10 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v2.5.0)
+│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v2.6.0)
 ├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (2.5.0)
-│   ├── cognitive_planner.py        # 动态事实锚定认知规划器与自愈修正循环 (v2.5.0)
+│   ├── __init__.py                 # 版本号导出 (2.6.0)
+│   ├── cognitive_planner.py        # 多场景通用解耦认知规划器与自愈修正循环 (v2.6.0)
 │   ├── semantic_auditor.py         # 深度语义因果认知审计器 (修辞/离心/实证/疑虑)
 │   ├── content_auditor.py          # 10 维认知质量与容量预算综合审计器
 │   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
@@ -129,7 +129,7 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件 (12/12 passing)
+├── tests/                          # 自动化单元与回归测试套件 (13/13 passing)
 │   └── test_engine.py
 ├── output/                         # 最终交付物目录
 │   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)
