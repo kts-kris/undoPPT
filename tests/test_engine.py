@@ -279,12 +279,12 @@ class TestUndoPPTEngine(unittest.TestCase):
         from core.semantic_auditor import SemanticAuditor
         auditor = SemanticAuditor()
         contract = {
-            "core_thesis": "从应用规模表象全面迈向以经营结果为导向的蒙牛AI系统性重构与闭环",
+            "core_thesis": "从应用规模表象全面迈向以经营结果为导向的企业级AI系统性重构与闭环",
             "knowledge_delta": {"blindspots_and_pains": ["400+智能体闲置", "数据断点"]},
             "target_outcomes": {"act": "当场决议批准成立四层协同组织"}
         }
         slides = [
-            {"layout_type": "cover", "title": "蒙牛AI战略规划", "narrative_arc": "hook"},
+            {"layout_type": "cover", "title": "企业级AI战略规划", "narrative_arc": "hook"},
             {
                 "layout_type": "bento_cards",
                 "narrative_arc": "conflict",
@@ -316,7 +316,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         from core.cognitive_planner import DocumentContextIngestor
         ingestor = DocumentContextIngestor()
         doc_content = """
-        # 蒙牛智能化转型复盘
+        # 某制造集团智能化转型复盘
         痛点：当前存在 418个智能体，但真正高频使用的仅 71个，长尾闲置高达 80%。
         现状：传统投资结构为 7:2:1，导致底层数据治理严重滞后。
         建议：当场决议将投资结构重构为 4:3:3，并在 18个月内完成三大旗舰战役打穿。
@@ -325,7 +325,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertIn("418个", data["numbers"])
         self.assertIn("80%", data["numbers"])
         self.assertIn("4:3:3", data["numbers"])
-        self.assertIn("蒙牛", data["entity_mentions"])
+        self.assertIn("某制造集团", data["entity_mentions"])
         self.assertGreaterEqual(len(data["extracted_pains"]), 1)
         self.assertGreaterEqual(len(data["extracted_actions"]), 1)
 
@@ -334,9 +334,9 @@ class TestUndoPPTEngine(unittest.TestCase):
         planner = CognitivePlanner()
         sample_doc = os.path.join(self.test_dir, "sample_doc.md")
         with open(sample_doc, "w", encoding="utf-8") as f:
-            f.write("蒙牛数字化战略：418个智能体中 80% 闲置。决议重构 4:3:3 预算，立项奶源与供应链战役。")
+            f.write("某制造集团数字化战略：418个智能体中 80% 闲置。决议重构 4:3:3 预算，立项制造与供应链战役。")
 
-        bp = planner.plan("我要编写蒙牛的AI战略", doc_path=sample_doc, auto_refine=True)
+        bp = planner.plan("我要编写某制造集团的AI战略", doc_path=sample_doc, auto_refine=True)
         self.assertTrue(bp["grounded_sources"]["has_doc"])
         self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
         self.assertGreaterEqual(bp["audit_summary"]["score"], 85)

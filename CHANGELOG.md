@@ -38,7 +38,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - **Full Architecture Decoupling & Multi-Scenario Cognitive Engine (`core/cognitive_planner.py`)**:
-  - **Complete Removal of Domain Hardcoding**: Eliminated all static company/benchmark scripts (e.g. Mengniu, Singapore NAIS, dairy buzzwords). The engine now dynamically extracts entities, subjects, and roles from natural language prompts and reference documents.
+  - **Complete Removal of Domain Hardcoding**: Eliminated all static company/benchmark scripts and domain-specific hardcoded buzzwords. The engine now dynamically extracts entities, subjects, and roles from natural language prompts and reference documents.
   - **Dynamic Scenario Archetype Classification (`_classify_scenario`)**:
     - `strategic_planning`: Enterprise strategy, organizational restructuring, transformation roadmaps.
     - `career_portfolio`: Personal resume, promotion defense, executive portfolio, talent profiles.

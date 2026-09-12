@@ -63,7 +63,7 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 
 **安装后直接对 Agent 说：**
 
-> “我要编写蒙牛的 AI 战略规划，控制在 6 页，要求具备四层协同映射、2x2战略矩阵、四级阶梯进阶和三道地平线分池治理。”
+> “我要编写某大型制造企业的数字化转型与 AI 战略规划，控制在 6 页，要求具备四层协同映射、2x2战略矩阵、四级阶梯进阶和三道地平线分池治理。”
 
 ---
 
@@ -160,10 +160,10 @@ pip install python-pptx
 支持一句话输入，可选挂载事实参考文档：
 ```bash
 # 规划高分蓝图 (支持参考文档摄取与自愈修正)
-python3 cli.py plan --prompt "我要编写蒙牛的AI战略" [--input-doc doc.md]
+python3 cli.py plan --prompt "某大型制造企业数字化战略规划" [--input-doc doc.md]
 
 # 一键端到端极速交付 (规划 -> 事实锚定 -> 审计 -> 双端构建)
-python3 cli.py generate --prompt "我要编写蒙牛的AI战略" [--input-doc doc.md] [--template /path/to/template.pptx]
+python3 cli.py generate --prompt "某大型制造企业数字化战略规划" [--input-doc doc.md] [--template /path/to/template.pptx]
 ```
 
 ### 3. 内容质量与深度语义因果审计 (Audit)
