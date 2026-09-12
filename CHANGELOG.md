@@ -5,7 +5,36 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [2.6.0] - 2026-09-12
+## [3.0.0] - 2026-09-12
+
+### Added
+- **15 High-Fidelity Layout Primitives Expansion (`core/pptx_builder.py` & `core/html_builder.py`)**:
+  - Expanded layout primitives from 10 to 15, adding:
+    1. `standard_table`: Native PowerPoint and responsive HTML tables with themed headers, alternating rows, borders, and structured cells.
+    2. `data_chart`: Native PowerPoint vector charts powered by `pptx.chart.data.CategoryChartData` (clustered column, line, pie) and pure CSS/HTML responsive chart equivalents. Editable directly in PowerPoint/Keynote.
+    3. `content_columns`: 2 to 4 parallel content cards with tags, header titles, and bullet point items.
+    4. `keynote_quote`: High-impact hero quote layout with typography emphasis, author/source title, and key takeaway badge.
+    5. `process_flow`: Horizontal progressive step-by-step process diagram with sequence chips and milestone descriptions.
+- **Universal Multi-Scenario Planner Overhaul (`core/cognitive_planner.py`)**:
+  - Fully decoupled architecture across **6 universal scenario archetypes**:
+    1. `strategic_planning`: Corporate strategy, transformation roadmaps, organizational alignment.
+    2. `tech_architecture`: Technical architecture proposals, platform design, high-availability SLA benchmarks.
+    3. `product_pitch`: Commercial pitch decks, startup roadshows, product launch decks.
+    4. `personal_resume`: Personal resumes, promotion defense, executive portfolio, talent profiles.
+    5. `education_training`: Pedagogical teaching, courseware, training curricula, concept breakdown.
+    6. `general_informative`: Enterprise summaries, progress briefings, general work presentations.
+  - Zero hardcoding: Complete eradication of legacy static scripts, hardcoded 94.8% auto-patches, and domain-bound assumptions.
+  - Dynamic Self-Correction Refinement Loop: Generates custom contextual action titles, quantitative or pedagogical proof points, and valid transitions dynamically.
+- **Scenario-Aware Auditor Decoupling (`core/content_auditor.py` & `core/semantic_auditor.py`)**:
+  - Scenario-aware evidence evaluation: Recognizes qualitative pedagogical/training evidence for education and training decks without penalizing them for absence of corporate ROI metrics.
+  - Expanded rhetorical transition taxonomy: Added pedagogical, instructional, and analytical transition phrases.
+  - Density checks extended to all 15 layouts (table rows/cols, column count, process flow steps, chart categories).
+- **Direct Agent Authoring JSON Schema (`SKILL.md`)**:
+  - Full JSON schema documentation for all 15 layout primitives enabling AI Agents to craft dynamic blueprints directly.
+
+### Changed
+- Bumped engine version to `3.0.0` across `core/__init__.py`, `cli.py`, `README.md`, `CHANGELOG.md`, `SKILL.md`, and `.agents/skills/undo-ppt/SKILL.md`.
+- Updated `cli.py demo` to demonstrate `data_chart` and `standard_table` primitives.
 
 ### Added
 - **Full Architecture Decoupling & Multi-Scenario Cognitive Engine (`core/cognitive_planner.py`)**:

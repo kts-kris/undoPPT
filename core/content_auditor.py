@@ -271,5 +271,49 @@ class ContentAuditor:
                         "message": f"第 {page_num} 页映射行数({len(rows)})过多，建议精炼核心层级至 4-5 行以内(Q7)。"
                     })
                     deduction += 2
+            elif layout in ("standard_table", "table"):
+                rows = slide.get("rows", [])
+                headers = slide.get("headers", [])
+                if len(rows) > 8:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"TABLE_ROWS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页表格行数({len(rows)})过多，建议精简至 8 行以内或拆页呈现(Q7)。"
+                    })
+                    deduction += 2
+                if len(headers) > 6:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"TABLE_COLS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页表格列数({len(headers)})过多，易导致阅读拥挤(Q7)。"
+                    })
+                    deduction += 2
+            elif layout in ("content_columns", "columns"):
+                cols = slide.get("columns", [])
+                if len(cols) > 4:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"COLUMNS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页并列列数({len(cols)})超过 4 列上限，横向排版易受挤压(Q7)。"
+                    })
+                    deduction += 2
+            elif layout in ("process_flow", "flow", "linear_flow"):
+                steps = slide.get("steps", [])
+                if len(steps) > 6:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"FLOW_STEPS_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页流程节点({len(steps)})过多，建议阶段化或精简至 6 步以内(Q7)。"
+                    })
+                    deduction += 2
+            elif layout in ("data_chart", "chart"):
+                categories = slide.get("categories", [])
+                if len(categories) > 8:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"CHART_CATEGORIES_EXCEEDED_P{page_num}",
+                        "message": f"第 {page_num} 页图表类目数({len(categories)})过多，建议精简核心对比维度(Q7)。"
+                    })
+                    deduction += 2
 
         return findings, deduction

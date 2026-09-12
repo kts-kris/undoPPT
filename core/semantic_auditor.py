@@ -18,34 +18,40 @@ class SemanticAuditor:
     # Rhetorical transition taxonomy
     TRANSITION_TAXONOMY = {
         "contrast": [
-            "然而", "但是", "但", "相反", "反之", "不过", "偏偏", "现实是", "痛点", "冲突",
-            "however", "but", "yet", "nevertheless", "in contrast", "conversely"
+            "然而", "但是", "但", "相反", "反之", "不过", "偏偏", "现实是", "痛点", "冲突", "容易混淆", "常犯错误", "难点",
+            "however", "but", "yet", "nevertheless", "in contrast", "conversely", "misconception"
         ],
         "causality": [
-            "因此", "所以", "导致", "造成", "因而", "鉴于此", "由此可见", "故而", "必然",
+            "因此", "所以", "导致", "造成", "因而", "鉴于此", "由此可见", "故而", "必然", "由于",
             "therefore", "thus", "consequently", "as a result", "hence", "accordingly"
         ],
         "breakthrough": [
-            "破局", "解法", "突破", "应对", "重构", "打穿", "重塑", "策略", "方案", "立足",
-            "solution", "breakthrough", "transform", "reframe", "overcome", "solve"
+            "破局", "解法", "突破", "应对", "重构", "打穿", "重塑", "策略", "方案", "立足", "掌握方法", "记忆诀窍", "核心要点", "核心解法",
+            "solution", "breakthrough", "transform", "reframe", "overcome", "solve", "technique"
         ],
         "progression": [
-            "进而", "进一步", "随后", "不仅如此", "在此基础上", "递进", "同时", "随之",
-            "furthermore", "moreover", "next", "in addition", "subsequently", "beyond"
+            "进而", "进一步", "随后", "不仅如此", "在此基础上", "递进", "同时", "随之", "由浅入深", "循序渐进", "拓展延伸", "由此及彼", "深入解析", "分步拆解",
+            "furthermore", "moreover", "next", "in addition", "subsequently", "beyond", "step by step"
         ],
         "evidence": [
-            "实证", "验证", "数据表明", "测算", "落地成效", "实践表明", "核验", "硬核",
-            "evidence", "proven", "data shows", "metrics", "empirically", "verified"
+            "实证", "验证", "数据表明", "测算", "落地成效", "实践表明", "核验", "硬核", "实例印证", "案例分析", "范例", "示例", "例句", "课堂反馈", "实践证明",
+            "evidence", "proven", "data shows", "metrics", "empirically", "verified", "case study", "example"
         ],
         "action": [
-            "决议", "建议", "号召", "当场", "启动", "批准", "行动", "实施", "拍板", "落地",
-            "call to action", "decision", "action", "approve", "mandate", "execute"
+            "决议", "建议", "号召", "当场", "启动", "批准", "行动", "实施", "拍板", "落地", "学以致用", "演练实践", "实战巩固", "作业布置", "实践练习", "巩固提升",
+            "call to action", "decision", "action", "approve", "mandate", "execute", "practice", "exercise"
         ]
     }
 
     # Number / evidence patterns: percentages, multipliers, ratios, units (ms, s, 万, 亿, etc.)
     EVIDENCE_PATTERN = re.compile(
-        r"(\d+(?:\.\d+)?%|\b\d+x\b|\d+:\d+(?::\d+)?|[<>]?\s*\d+(?:\.\d+)?\s*(?:ms|s|h|min|万|亿|千|元|k|m|b|倍|个|家|天|月|年|分|条|点))",
+        r"(\d+(?:\.\d+)?%|\b\d+x\b|\d+:\d+(?::\d+)?|[<>]?\s*\d+(?:\.\d+)?\s*(?:ms|s|h|min|万|亿|千|元|k|m|b|倍|个|家|天|月|年|分|条|点|道|字|篇))",
+        re.IGNORECASE
+    )
+
+    # Pedagogical / qualitative evidence pattern for education and training
+    QUALITATIVE_EVIDENCE_PATTERN = re.compile(
+        r"(例|示例|例题|案例|课标|法则|诀窍|规范|步骤|示范|练习|掌握|考点|对比|解析|真题|图解|经典)",
         re.IGNORECASE
     )
 
@@ -73,7 +79,7 @@ class SemanticAuditor:
         findings.extend(alignment_findings)
 
         # 3. Quantitative Smoking Gun Evidence Weight
-        evidence_score, evidence_findings = self._audit_evidence_weight(slides)
+        evidence_score, evidence_findings = self._audit_evidence_weight(slides, contract=contract)
         findings.extend(evidence_findings)
 
         # 4. Audience Skepticism Defense
@@ -253,12 +259,14 @@ class SemanticAuditor:
         score = max(0.0, min(100.0, score))
         return score, findings
 
-    def _audit_evidence_weight(self, slides: List[Dict[str, Any]]) -> Tuple[float, List[Dict[str, Any]]]:
-        """Audit whether claims are backed by hard, quantified smoking gun evidence."""
+    def _audit_evidence_weight(self, slides: List[Dict[str, Any]], contract: Optional[Dict[str, Any]] = None) -> Tuple[float, List[Dict[str, Any]]]:
+        """Audit whether claims are backed by hard, quantified smoking gun evidence or grounded pedagogical examples."""
         findings = []
         score = 100.0
         total_evidence_points = 0
         pages_with_evidence = 0
+        scenario = (contract.get("scenario") or contract.get("genre") or "").lower() if contract else ""
+        is_education_or_general = scenario in ("education_training", "general_informative")
 
         for idx, slide in enumerate(slides):
             page = idx + 1
@@ -277,11 +285,12 @@ class SemanticAuditor:
                         else:
                             raw_dump += f" {item}"
 
-            matches = self.EVIDENCE_PATTERN.findall(raw_dump)
-            count = len(matches)
+            num_matches = self.EVIDENCE_PATTERN.findall(raw_dump)
+            qual_matches = self.QUALITATIVE_EVIDENCE_PATTERN.findall(raw_dump) if is_education_or_general else []
+            count = len(num_matches) + len(qual_matches)
             total_evidence_points += count
 
-            if count > 0:
+            if (len(num_matches) > 0) or (is_education_or_general and len(qual_matches) > 0):
                 pages_with_evidence += 1
 
             # Specifically check core_evidence field
@@ -293,24 +302,28 @@ class SemanticAuditor:
                     "message": f"第 {page} 页未定义核心实证(core_evidence)，论证说服力易受削弱。"
                 })
                 score -= 3
-            elif not self.EVIDENCE_PATTERN.search(core_evidence):
-                findings.append({
-                    "level": "info",
-                    "code": f"UNQUANTIFIED_EVIDENCE_P{page}",
-                    "message": f"第 {page} 页核心实证 '{core_evidence[:24]}...' 缺乏具体量化数字指标，流于定性宣称。"
-                })
-                score -= 2
+            else:
+                has_quant = bool(self.EVIDENCE_PATTERN.search(core_evidence))
+                has_qual = bool(self.QUALITATIVE_EVIDENCE_PATTERN.search(core_evidence))
+                if not has_quant and not (is_education_or_general and has_qual):
+                    findings.append({
+                        "level": "info",
+                        "code": f"UNQUANTIFIED_EVIDENCE_P{page}",
+                        "message": f"第 {page} 页核心实证 '{core_evidence[:24]}...' 缺乏具体量化数据或代表性范例支撑。"
+                    })
+                    score -= 2
 
         content_pages = max(1, len(slides) - 1)
         evidence_ratio = pages_with_evidence / content_pages
+        min_ratio = 0.35 if is_education_or_general else 0.50
 
-        if evidence_ratio < 0.5:
+        if evidence_ratio < min_ratio:
             findings.append({
                 "level": "warning",
                 "code": "EVIDENCE_POVERTY",
-                "message": f"仅有 {pages_with_evidence}/{content_pages} 页具备量化硬证据，全篇说服力呈经验主义贫血状态。"
+                "message": f"仅有 {pages_with_evidence}/{content_pages} 页具备充分实证/范例支撑，建议强化论据厚度。"
             })
-            score -= 15
+            score -= 10 if is_education_or_general else 15
         elif evidence_ratio >= 0.8:
             score += 5
 
@@ -354,7 +367,8 @@ class SemanticAuditor:
         # Check call to action resolution
         if act_goal:
             last_slide = slides[-1] if slides else {}
-            last_text = f"{last_slide.get('title', '')} {last_slide.get('action_title', '')} {str(last_slide.get('points', ''))}"
+            last_dump_parts = [str(last_slide.get(k, '')) for k in ("title", "action_title", "points", "cards", "steps", "columns", "quadrants", "layers", "mission", "subtitle")]
+            last_text = " ".join(last_dump_parts)
             act_keywords = self._extract_keywords(act_goal)
             overlap = act_keywords.intersection(self._extract_keywords(last_text))
             if not overlap:

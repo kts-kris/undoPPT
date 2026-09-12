@@ -509,6 +509,289 @@ def _render_cross_mapping_html(slide: Dict[str, Any], tokens: Dict[str, Any]) ->
     """
 
 
+
+def _render_table_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "数据与指标概览")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "DATA TABLE")
+    headers = slide.get("headers", ["维度", "指标", "目标值", "达成说明"])
+    rows = slide.get("rows", [])
+    if not rows:
+        rows = [["示例维度", "基础指标", "100%", "符合预期"]]
+
+    highlight_idx = slide.get("highlight_row_index", -1)
+    if isinstance(highlight_idx, int):
+        highlight_set = {highlight_idx}
+    elif isinstance(highlight_idx, list):
+        highlight_set = set(highlight_idx)
+    else:
+        highlight_set = set()
+
+    th_html = "".join([
+        f'<th class="py-3 px-4 text-center text-xs font-bold text-white uppercase tracking-wider bg-blue-600 first:rounded-tl-lg last:rounded-tr-lg first:text-left">{h}</th>'
+        for h in headers
+    ])
+
+    tr_html = []
+    for r_idx, row in enumerate(rows[:8]):
+        is_hl = r_idx in highlight_set
+        bg_cls = "bg-blue-50/70 font-semibold" if is_hl else ("bg-slate-50/70" if r_idx % 2 == 1 else "bg-white")
+        td_items = []
+        for c_idx, cell in enumerate(row):
+            align_cls = "text-left font-medium text-slate-900" if c_idx == 0 else "text-center text-slate-700"
+            if is_hl:
+                align_cls += " text-blue-700"
+            td_items.append(f'<td class="py-2.5 px-4 text-xs {align_cls} border-b border-slate-200/70">{cell}</td>')
+        tr_html.append(f'<tr class="{bg_cls} hover:bg-blue-50/30 transition-colors">{"".join(td_items)}</tr>')
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm p-2 flex flex-col justify-center">
+        <table class="min-w-full text-left border-collapse">
+          <thead>
+            <tr>{th_html}</tr>
+          </thead>
+          <tbody>
+            {"".join(tr_html)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    """
+
+
+def _render_chart_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "核心数据趋势分析")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "DATA CHART")
+    categories = slide.get("categories", ["Q1", "Q2", "Q3", "Q4"])
+    series = slide.get("series", [{"name": "数值", "values": [35, 55, 78, 95]}])
+    takeaway = slide.get("takeaway") or slide.get("core_evidence", "")
+    bullets = slide.get("bullets", [])
+
+    max_val = 1.0
+    for s in series:
+        for v in s.get("values", []):
+            try:
+                max_val = max(max_val, float(v))
+            except Exception:
+                pass
+
+    bars_html = []
+    for c_idx, cat in enumerate(categories):
+        cat_bars = []
+        for s_idx, s in enumerate(series):
+            val = 0.0
+            if c_idx < len(s.get("values", [])):
+                try:
+                    val = float(s["values"][c_idx])
+                except Exception:
+                    val = 0.0
+            pct = min(100.0, max(8.0, (val / max_val) * 100))
+            col_bg = "bg-blue-600" if s_idx == 0 else ("bg-indigo-400" if s_idx == 1 else "bg-amber-400")
+            cat_bars.append(f"""
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="text-[11px] font-bold text-slate-600">{val}</span>
+              <div class="w-full {col_bg} rounded-t-md transition-all hover:opacity-80" style="height: {int(pct * 1.7)}px;"></div>
+            </div>
+            """)
+
+        bars_html.append(f"""
+        <div class="flex-1 flex flex-col items-center justify-end h-48 border-b border-slate-200 pb-2 px-2">
+          <div class="w-full flex items-end justify-center gap-1.5 h-full">
+            {"".join(cat_bars)}
+          </div>
+          <span class="text-xs font-semibold text-slate-700 mt-2">{cat}</span>
+        </div>
+        """)
+
+    legend_items = []
+    for s_idx, s in enumerate(series):
+        col_bg = "bg-blue-600" if s_idx == 0 else ("bg-indigo-400" if s_idx == 1 else "bg-amber-400")
+        legend_items.append(f"""
+        <div class="flex items-center gap-1.5">
+          <div class="w-3 h-3 rounded {col_bg}"></div>
+          <span class="text-xs text-slate-600 font-medium">{s.get('name', '指标')}</span>
+        </div>
+        """)
+
+    bullets_html = "".join([f'<li class="text-xs text-slate-600 mb-1">▸ {b}</li>' for b in bullets[:3]])
+
+    takeaway_card = f"""
+    <div class="w-80 bg-white border border-blue-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+      <div>
+        <span class="text-[10px] font-bold text-blue-600 tracking-wider uppercase bg-blue-50 px-2 py-0.5 rounded">KEY TAKEAWAY</span>
+        <h4 class="text-sm font-bold text-slate-900 mt-2 mb-2">核心数据洞察与结论</h4>
+        <p class="text-xs text-slate-600 leading-relaxed">{takeaway}</p>
+        <ul class="mt-3 list-none p-0">{bullets_html}</ul>
+      </div>
+      <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 mt-4">数据驱动决策 · 闭环可核验</div>
+    </div>
+    """ if takeaway else ""
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-3">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 flex gap-5 items-stretch pb-2">
+        <div class="flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">趋势对比指标</span>
+            <div class="flex gap-4">{"".join(legend_items)}</div>
+          </div>
+          <div class="flex-1 flex items-end justify-between gap-3 pt-4">
+            {"".join(bars_html)}
+          </div>
+        </div>
+        {takeaway_card}
+      </div>
+    </div>
+    """
+
+
+def _render_columns_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "核心要素与内容解构")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "OVERVIEW")
+    columns = slide.get("columns", [])
+    if not columns:
+        columns = [
+            {"badge": "板块 1", "title": "核心主张", "desc": "阐明核心概念与基础背景。", "bullets": ["要点 1", "要点 2"]},
+            {"badge": "板块 2", "title": "关键举措", "desc": "明确关键实施路径与抓手。", "bullets": ["要点 1", "要点 2"]},
+            {"badge": "板块 3", "title": "成效保障", "desc": "落实落地机制与保障举措。", "bullets": ["要点 1", "要点 2"]}
+        ]
+
+    cols_html = []
+    for idx, col in enumerate(columns[:4]):
+        is_hl = bool(col.get("highlight", False))
+        badge = col.get("badge") or f"0{idx+1}"
+        bullets = "".join([f'<li class="text-xs text-slate-700 flex items-start gap-1.5"><span class="text-blue-600 font-bold">✔</span> <span>{b}</span></li>' for b in col.get("bullets", [])[:4]])
+        border_cls = "border-blue-500 ring-1 ring-blue-500 shadow-md" if is_hl else "border-slate-200 shadow-sm"
+
+        cols_html.append(f"""
+        <div class="flex-1 bg-white border {border_cls} rounded-xl p-5 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
+          {'<div class="absolute top-0 left-0 right-0 h-1.5 bg-blue-600"></div>' if is_hl else ''}
+          <div>
+            <span class="text-[10px] font-bold text-blue-600 tracking-wider uppercase bg-blue-50 px-2 py-0.5 rounded">{badge}</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-2 mb-1.5">{col.get('title', f'要素 {idx+1}')}</h3>
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">{col.get('desc', '')}</p>
+            <ul class="space-y-2 list-none p-0">{bullets}</ul>
+          </div>
+        </div>
+        """)
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 flex gap-4 items-stretch pb-2">
+        {"".join(cols_html)}
+      </div>
+    </div>
+    """
+
+
+def _render_quote_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "核心洞察与主张")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "INSIGHT")
+    quote = slide.get("quote") or slide.get("statement") or "“真正卓越的方案并非功能的繁琐堆砌，而是以最小认知负荷实现确定性的业务交付。”"
+    author = slide.get("author", "核心观点")
+    role = slide.get("role", "评审专家")
+    context = slide.get("context", "")
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 bg-white border border-slate-200 border-l-[10px] border-l-blue-600 rounded-2xl p-10 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div class="text-7xl font-serif text-blue-100 absolute top-4 left-6 select-none pointer-events-none">“</div>
+        <div class="relative z-10 pt-4">
+          <p class="text-2xl font-bold text-slate-900 leading-relaxed tracking-wide mb-6 max-w-4xl">
+            {quote}
+          </p>
+        </div>
+        <div class="border-t border-slate-100 pt-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center font-bold text-blue-700 text-sm">
+              {author[:2]}
+            </div>
+            <div>
+              <div class="text-sm font-bold text-slate-900">— {author}</div>
+              <div class="text-xs text-slate-500">{role}</div>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 italic max-w-md text-right">{context}</div>
+        </div>
+      </div>
+    </div>
+    """
+
+
+def _render_flow_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    title = slide.get("action_title") or slide.get("title", "标准化实施流水线与推进流程")
+    subtitle = slide.get("subtitle", "")
+    tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "PROCESS FLOW")
+    stages = slide.get("stages") or slide.get("steps", [])
+    if not stages:
+        stages = [
+            {"step": "01", "name": "需求输入与对齐", "desc": "明确目标与边界", "items": ["痛点调研", "认知契约确立"]},
+            {"step": "02", "name": "方案设计与建模", "desc": "架构解耦与设计", "items": ["图元选型", "蓝图语法校验"]},
+            {"step": "03", "name": "工程构建与审计", "desc": "原生矢量交付", "items": ["质量体检", "双端渲染输出"]},
+            {"step": "04", "name": "协同感知与闭环", "desc": "持续演进复盘", "items": ["双向同步", "效果持续跟踪"]}
+        ]
+
+    n_stages = min(5, len(stages))
+    stages_html = []
+    for idx, stg in enumerate(stages[:n_stages]):
+        is_hl = bool(stg.get("highlight", False))
+        step_lbl = str(stg.get("step") or f"0{idx+1}")
+        items_html = "".join([f'<li class="text-[11px] text-slate-600 flex items-start gap-1"><span class="text-blue-500">▸</span> {it}</li>' for it in stg.get("items", [])[:4]])
+        border_cls = "border-blue-500 ring-1 ring-blue-500" if is_hl else "border-slate-200"
+
+        stages_html.append(f"""
+        <div class="flex-1 bg-white border {border_cls} rounded-xl p-4 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div>
+            <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center mb-3">
+              {step_lbl}
+            </div>
+            <h4 class="text-sm font-bold text-slate-900 mb-1">{stg.get('name') or stg.get('title', f'阶段 {idx+1}')}</h4>
+            <p class="text-[11px] text-slate-500 mb-3 leading-tight">{stg.get('desc', '')}</p>
+            <ul class="space-y-1.5 list-none p-0 border-t border-slate-100 pt-2.5">{items_html}</ul>
+          </div>
+        </div>
+        """)
+        if idx < n_stages - 1:
+            stages_html.append('<div class="flex items-center text-blue-400 font-bold text-lg px-0.5">➔</div>')
+
+    return f"""
+    <div class="h-full flex flex-col px-12 py-8">
+      <div class="mb-4">
+        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      </div>
+      <div class="flex-1 flex items-stretch gap-2 pb-2">
+        {"".join(stages_html)}
+      </div>
+    </div>
+    """
+
+
 HTML_RENDERERS = {
     "cover": _render_cover_html,
     "architecture_stack": _render_architecture_stack_html,
@@ -525,6 +808,20 @@ HTML_RENDERERS = {
     "three_horizons": _render_horizons_html,
     "cross_mapping": _render_cross_mapping_html,
     "dual_mapping": _render_cross_mapping_html,
+    # v3.0 New Primitives
+    "standard_table": _render_table_html,
+    "table": _render_table_html,
+    "data_chart": _render_chart_html,
+    "chart": _render_chart_html,
+    "content_columns": _render_columns_html,
+    "columns": _render_columns_html,
+    "rich_content": _render_columns_html,
+    "keynote_quote": _render_quote_html,
+    "quote": _render_quote_html,
+    "statement": _render_quote_html,
+    "process_flow": _render_flow_html,
+    "flow": _render_flow_html,
+    "workflow": _render_flow_html,
 }
 
 

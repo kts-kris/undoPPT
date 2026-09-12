@@ -1,4 +1,4 @@
-"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v2.6.0).
+"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v3.0.0).
 
 Usage:
   python3 cli.py plan --prompt "<prompt>" [--input-doc <file.md>] [--context "<notes>"] [--out <blueprint.json>]
@@ -147,6 +147,40 @@ DEMO_BLUEPRINT = {
             ]
         },
         {
+            "layout_type": "data_chart",
+            "narrative_arc": "evidence",
+            "mission": "用原生矢量数据图表横向对齐关键业务指标与ROI演进曲线",
+            "transition": "【验证】从横向基准实测来看，自主协同集群在各核心维度全面领跑",
+            "action_title": "评测：全场景端到端自主完成率与耗时显著优于行业基准",
+            "core_evidence": "Agentic 方案实现 94.8% 自主完成率，交付耗时从 450s 降至 45s",
+            "title": "行业主流技术路线综合效能横向测评",
+            "subtitle": "针对生产环境四大典型场景的自动化程度与人机协同综合评分（满分100）",
+            "chart_type": "column_clustered",
+            "categories": ["意图对齐", "长程规划", "沙箱工具调用", "异常自愈"],
+            "series": [
+                {"name": "被动对话 LLM", "values": [65, 42, 30, 25]},
+                {"name": "传统工作流 RPA", "values": [40, 55, 70, 35]},
+                {"name": "Agentic AI 架构", "values": [95, 92, 94, 88]}
+            ]
+        },
+        {
+            "layout_type": "standard_table",
+            "narrative_arc": "evidence",
+            "mission": "以结构化规整矩阵清晰对照核心能力成熟度与落地保障",
+            "transition": "【细化】进一步通过功能与合规成熟度矩阵，锁定各组件能力层级",
+            "action_title": "规约：构建高可用、多租户、工具沙箱三位一体的落地护城河",
+            "core_evidence": "100% 覆盖安全隔离与审计合规要求，故障自愈恢复耗时 <10s",
+            "title": "平台核心组件能力指标与 SLA 成熟度矩阵",
+            "subtitle": "明确各关键模块的技术能力界限、响应延迟与可用性保障标准",
+            "headers": ["模块组件", "技术能力", "延迟/SLA", "自愈策略", "合规评级"],
+            "rows": [
+                ["意图研判探针", "上下文语义解析与盲区嗅探", "<50ms", "自适应多轮澄清", "L4 级安全"],
+                ["解构分析引擎", "多版式 AST 逆向与母版穿透", "<120ms", "启发式降级映射", "原生矢量认证"],
+                ["协同感知哨兵", "文件指纹与非侵入增量感知", "<8ms", "状态快照自动回滚", "100% 审计追踪"],
+                ["工具沙箱集群", "容器化隔离代码与 MCP 执行", "<200ms", "超时阻断与隔离恢复", "金融级沙箱"]
+            ]
+        },
+        {
             "layout_type": "timeline",
             "narrative_arc": "progression",
             "mission": "给出低风险渐进式落地路径，打消听众对迁移风险的顾虑",
@@ -281,7 +315,7 @@ def cmd_plan(args):
 def cmd_generate(args):
     """End-to-end one-shot generation: prompt -> plan -> audit -> dual build."""
     print("================================================================")
-    print("  undoPPT Super Skill - End-to-End Autonomous Generation (v2.6)")
+    print("  undoPPT Super Skill - End-to-End Autonomous Generation (v3.0)")
     print("================================================================")
     print(f"[*] Prompt: {args.prompt}")
     doc_path = getattr(args, "input_doc", None)
@@ -356,7 +390,7 @@ def cmd_audit(args):
     res = auditor.audit(blueprint)
 
     print("================================================================")
-    print("  undoPPT Cognitive Quality & Content Architecture Audit (v2.6) ")
+    print("  undoPPT Cognitive Quality & Content Architecture Audit (v3.0) ")
     print("================================================================")
     print(f"  • Composite Score:  {res['score']} / 100")
     print(f"    - Structural:     {res.get('structural_score', res['score'])} / 100")
@@ -449,7 +483,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v2.6.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.0.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan

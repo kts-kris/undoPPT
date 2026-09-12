@@ -1,91 +1,116 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v2.6.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.0.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
-  Specializes in: (1) multi-scenario generic cognitive planning (strategic planning, personal resume/portfolio, tech architecture, pitch deck) with zero hardcoded domain scripts;
-  (2) multi-turn Cognitive Contract & information sufficiency inquiry before drafting;
-  (3) 10-dimension content quality protocol (audience profiling, knowledge delta, understand-believe-act closure, narrative arc, action titles, core evidence, inter-slide transitions);
-  (4) Deep Semantic Cognitive Auditor (rhetorical causal taxonomy, thesis centrifugal alignment, smoking-gun evidence weighting, skepticism defense);
-  (5) Dynamic Grounded Planner with document ingestion (--input-doc) and autonomous self-correction refinement loop;
-  (6) Deep Master AST Decompiler (placeholder slots geometry, dark/light theme mode, card styles, and visual media asset extraction);
-  (7) Infographic-first layouts with strict content density budgets (architecture stacks, Bento cards, KPI dashboards, milestone roadmaps, 2x2 matrices, maturity ladders, three horizons, cross mappings);
-  (8) 100% editable native vector deliverables (PPTX with speaker notes) and single-file standalone HTML with Cognitive Inspector (N key);
-  (9) automated content quality auditing (cli.py audit) and proactive turn-by-turn sync watcher.
+  Specializes in: (1) multi-scenario generic cognitive planning across 6 archetypes (strategy, tech architecture, pitch deck, resume, education/training, general informative) with zero domain hardcoding;
+  (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows);
+  (3) native editable vector PPTX with speaker notes and single-file standalone HTML with Cognitive Inspector (N key);
+  (4) 10-dimension content quality protocol with scenario-aware rhetorical causal audit (cli.py audit);
+  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher (cli.py sync).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v2.6.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.0.0)
 
-`undoPPT` 是一个工业级智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面去除领域硬编码，支持战略规划、个人简历/述职、技术方案、产品路演等多场景原型自适应装配。以 10 维认知工程与深度语义因果审计重塑内容质量，交付 100% 可编辑的原生矢量 PPTX（内置口播演讲备注）与零依赖单文件 HTML（内置认知动力学抽屉），支持全生命周期毫秒级双向协同感知。
+`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），以 10 维认知动力学与深度语义因果审计保障内容质量，交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
 
 ---
 
 ## 1. 核心运行原则 (Core Operating Principles)
 
-1. **认知契约与多场景信息充分性（Cognitive Contract & Multi-Scenario Sufficiency）**
+1. **认知契约先行（Cognitive Contract & Multi-Scenario Sufficiency）**
    - 严禁在信息贫血或逻辑模糊时仓促生成，坚决不预设硬编码公司或案例。
-   - 针对不同场景（战略汇报、个人求职述职、技术评审、商业计划），确立**《认知契约》（Cognitive Contract）**：
-     - **Q1 主旨唯一性**：我想表达什么？核心论题/个人核心定位是什么？
-     - **Q2 受众画像与立场**：我的对象是谁（高管、评委、HRD、投资人）？他们持什么态度、防范什么风险？
-     - **Q3 认知差与痛点**：对方知道什么、不知道什么？关键盲区与待破局点在哪里？
-     - **Q4 终局行动转化**：希望对方看完以后**理解什么（认知）、相信什么（心理）、做什么（当场决策动作/录用/立项）**？
+   - 确立顶层**《认知契约》（Cognitive Contract）**：
+     - **Q1 主旨唯一性**：核心论题与观点先行（Core Thesis）。
+     - **Q2 受众画像与立场**：受众角色（高管、评委、HRD、学员、投资人）与其核心痛点。
+     - **Q3 认知差与盲区**：对方已知基准 vs 未知盲区/痛点（Knowledge Delta）。
+     - **Q4 终局行动转化**：看完后理解什么（Understand）、相信什么（Believe）、做出什么动作（Act）。
 
-2. **叙事动力学与场景原型自适应（Scenario-Driven Narrative & Archetypes）**
-   - 根据场景原型动态装配叙事节拍与高阶图元：
-     - **战略规划场景**：`cross_mapping`（顶层映射）➔ `matrix_2x2`（战略取舍）➔ `maturity_ladder`（进阶阶梯）➔ `horizons_curve`（分池地平线）➔ `summary`（决议号召）。
-     - **个人简历/述职场景**：`cover`（个人定位）➔ `bento_cards`（差异化对比）➔ `architecture_stack`（专业能力全景栈）➔ `metric_spotlight`（硬核战绩度量）➔ `timeline`（职业进阶里程碑）➔ `summary`（入职前90天行动承诺）。
-     - **技术架构场景**：`architecture_stack`（三层解耦）➔ `bento_cards`（方案对比）➔ `metric_spotlight`（高可用指标）➔ `timeline`（演进路线图）。
+2. **6 大场景原型通用解耦（Zero Hardcoding Across 6 Scenarios）**
+   - **战略规划 (`strategic_planning`)**: 聚焦顶层映射、战略取舍、阶梯推进与三道地平线。
+   - **技术架构 (`tech_architecture`)**: 聚焦分层解耦、主流方案对比、高可用SLA指标与演进路线。
+   - **商业路演 (`product_pitch`)**: 聚焦行业痛点、核心产品突破、商业模式与融资里程碑。
+   - **个人履历/述职 (`personal_resume`)**: 聚焦定位画像、核心专业栈、量化战绩与行动承诺。
+   - **教育教学/培训 (`education_training`)**: 聚焦认知盲区剖析、概念递进拆解、教学示例对比与随堂演练巩固。
+   - **通用政企/综合汇报 (`general_informative`)**: 聚焦背景现状、核心举措、数据成效与后续推进安排。
 
-3. **深度语义因果与质量审计（Deep Semantic Cognitive Audit）**
-   - 演示文稿绝非并列信息罗列，必须具备因果必然性：
-     - **Q10 页间因果语法（Transitions）**：每两页之间必须显式声明强连接词（对立冲突、因果推演、破局突破、递进深化、实证支撑、决议行动）。
-     - **Q6 单页使命纯粹度（Mission）**：一页一使命（Single Responsibility）。
-     - **Q8 结论与行动标题先行（Action Titles）**：全面采用“痛点：…”、“成效：…”等行动结论式标题。
-     - **Q9 论据效力分级（Smoking Gun Evidence Weight）**：核心铁证突出量化硬指标（百分比、比率、工时、延迟），杜绝定性口号。
-     - **语义离心漂移检测**：自动核验单页概念与顶层主旨的语义向心力，防范跑题。
+3. **15 大图元规约与信息密度预算（15 Layout Primitives & Content Density Budget）**
+   每一页必须映射为 15 种标准信息图元之一，坚决杜绝无结构的纯文本大段堆砌：
+   - 基础与分析：`cover`, `bento_cards`, `architecture_stack`, `metric_spotlight`, `timeline`, `summary`
+   - 战略与推演：`matrix_2x2`, `maturity_ladder`, `horizons_curve`, `cross_mapping`
+   - 数据与表现 (v3.0)：`standard_table`, `data_chart`, `content_columns`, `keynote_quote`, `process_flow`
 
-4. **动态事实锚定与自修正规划（Dynamic Grounded Planning & Self-Correction）**
-   - 支持解析外部参考文档（`--input-doc`），自动提取真实业务指标、组织层级与核心痛点。
-   - 规划器内置自反思修正循环（Self-Correction Loop），自动完成二轮自愈补丁修复。
-
-5. **母版 AST 深度逆向解构（Deep Master AST Decompiler）**
-   - 深度提取母版占位符（Title, Body, Subtitle, Footer）绝对坐标与相对比例。
-   - 自动识别暗黑/明亮主题模式（Dark/Light Theme Mode）并调整配色方案。
-   - 自动提取母版与页面中嵌入的高清媒体、矢量 Logo 至 `.undoppt/assets/`。
-
-6. **图表化元语与信息预算（Infographic Primitives & Content Budget）**
-   - 坚决拒绝通篇大段文字堆砌，每一页必须映射为 10 大高阶信息图元之一：
-     - `cover`: 封面大卡片，包含分类标头、主副标题、作者/日期元数据。
-     - `architecture_stack`: 产品与技术架构堆叠图（多层容器、微服务模块卡片、层级徽章）。
-     - `bento_cards`: Bento 网格对比卡片（2/3/4 栏对比、高亮卡片、标签列表）。
-     - `metric_spotlight`: KPI 核心数据大字报（DIN 大字号、同环比标签、下钻说明）。
-     - `timeline`: 演进路线与横向时间轴（节点圆环、连接线、阶段里程碑清单）。
-     - `matrix_2x2`: 2x2 四象限战略决策矩阵（技术广度 × 控制力、XY轴标签、原则侧栏）。
-     - `maturity_ladder`: 多维成熟度阶梯与进阶模型（四级演进台阶、核心抓手、考核指标、安全底线）。
-     - `horizons_curve`: 三道地平线发展模型（H1效率复制、H2流程突破、H3新模式验证、分池管理看板）。
-     - `cross_mapping`: 跨层级/跨组织对齐映射表（双向对齐箭头、标杆实践对比、落地机制责任链）。
-     - `summary`: 战略决议/行动承诺收官卡片（数字徽章、落地推进建议）。
-   - **Q7 严格遵守信息容量预算（Content Budget）**：杜绝“文字垃圾桶”。
-
-7. **双端极简交付与认知自省（Zero-Friction Dual Delivery & Notes Inspection）**
-   - **PPTX**: 100% 原生矢量形状与独立文本框，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑；**自动将单页使命、逻辑转折和核心论据写入底层 Speaker Notes（演讲备注），自适应场景口播口吻**。
-   - **HTML**: 单文件自包含 HTML（`output/presentation.html`），内置 Tailwind 样式、键盘导航（←/→/Space/F 全屏）；**按 `N` 键可实时展开认知动力学抽屉（Cognitive Inspector）**，双击即播，零依赖。
-
-8. **双向协同感知与意图对齐（Always-in-Sync & Intent Auditing）**
-   - 每一轮对话伊始，先运行 Sync Watcher（耗时 `<10ms`）。
-   - 若检测到用户在本地对文件进行了微调，不仅反馈字符差异，更结合认知契约分析用户的逻辑意图偏移，并融入后续创作。
+4. **100% 原生双端高精交付**
+   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象，可在 PowerPoint/Keynote 中直接二次编辑；自动注入场景演讲口播备注（Speaker Notes）。
+   - **HTML**: 单文件自包含 HTML，内置 Tailwind CSS、键盘导航（←/→/Space/F 全屏）；按 `N` 键弹出认知动力学抽屉（Cognitive Inspector）。
 
 ---
 
-## 2. 标准作业流程 (SOP)
+## 2. 15 大图元 JSON Blueprint 规范 (Schema Reference)
+
+AI Agent 既可以通过 CLI 生成，也可以**直接编写 `blueprint.json`** 并调用 `cli.py build` 进行高精构建。以下为 15 种图元的标准化数据结构：
+
+### 通用元数据字段（每一页必须具备）
+```json
+{
+  "layout_type": "<15种图元之一>",
+  "narrative_arc": "hook | conflict | breakthrough | evidence | progression | call_to_action",
+  "mission": "本页唯一的认知使命（Q6）",
+  "transition": "【承上启下】连接上一页的因果或转折连词（Q10）",
+  "action_title": "行动/结论先行标题（Q8）",
+  "core_evidence": "硬核量化数据指标或典型案例支撑（Q9）",
+  "title": "主标题",
+  "subtitle": "副标题/补充说明"
+}
+```
+
+### 15 种布局专有数据结构
+1. **`cover` (封面卡片)**
+   `"category"`: 分类标头, `"title"`: 大标题, `"subtitle"`: 副标题, `"meta"`: 作者/日期/密级
+2. **`bento_cards` (网格卡片对比)**
+   `"cards"`: `[{"tag": "TAG", "title": "标题", "desc": "说明", "bullets": ["点1", "点2"], "highlight": true|false}]` (2~4张)
+3. **`architecture_stack` (分层架构栈)**
+   `"layers"`: `[{"name": "层级名", "desc": "定位说明", "items": ["组件1", "组件2", "组件3"]}]` (3~4层)
+4. **`metric_spotlight` (KPI 关键数据大字报)**
+   `"metrics"`: `[{"label": "指标名", "value": "94.8%", "delta": "同比+30%", "desc": "指标说明"}]` (3~4项)
+5. **`timeline` (时间轴里程碑)**
+   `"steps"`: `[{"time": "阶段/时间", "title": "阶段目标", "items": ["成果1", "成果2"]}]` (3~4步)
+6. **`matrix_2x2` (2x2 四象限决策矩阵)**
+   `"quadrants"`: `[{"name": "象限名", "desc": "特征描述", "tag": "策略标签"}]` (4项), `"axes"`: `{"x": "X轴维度", "y": "Y轴维度"}`
+7. **`maturity_ladder` (成熟度进阶阶梯)**
+   `"levels"`: `[{"step": "L1", "name": "起步期", "desc": "描述", "target": "目标", "focus": "抓手", "metric": "指标"}]` (3~5级)
+8. **`horizons_curve` (三道地平线模型)**
+   `"horizons"`: `[{"horizon": "H1", "name": "当前主业", "desc": "描述", "focus": "侧重", "kpi": "核心指标"}]` (3层)
+9. **`cross_mapping` (跨层级对齐映射)**
+   `"mapping_rows"`: `[{"layer": "业务层", "current": "现状痛点", "target": "目标解法", "action": "牵引抓手"}]` (3~5行)
+10. **`summary` (收官行动与战略决议)**
+    `"points"`: `[{"title": "行动要点标题", "desc": "详细落地行动与推进机制"}]` (3~4条)
+11. **`standard_table` (规整数据与能力对比表) [v3.0]**
+    `"headers"`: `["维度", "指标A", "指标B", "结论"]`,
+    `"rows"`: `[["数据1", "数据2", "数据3", "优"], ["数据4", "数据5", "数据6", "胜出"]]`
+12. **`data_chart` (原生矢量数据图表) [v3.0]**
+    `"chart_type"`: `"column_clustered" | "line" | "pie"`,
+    `"categories"`: `["类目1", "类目2", "类目3", "类目4"]`,
+    `"series"`: `[{"name": "系列A", "values": [30, 45, 80, 95]}, {"name": "系列B", "values": [20, 35, 60, 85]}]`
+13. **`content_columns` (多栏并列内容卡片) [v3.0]**
+    `"columns"`: `[{"title": "栏目标题", "tag": "标签", "points": ["核心要点1", "核心要点2", "核心要点3"]}]` (2~4栏)
+14. **`keynote_quote` (金句引用与核心观点破局) [v3.0]**
+    `"quote_text"`: "核心洞见金句或专家名言",
+    `"author"`: "作者/出处", `"author_title"`: "头衔/行业背景", `"key_takeaway"`: "核心推论与破局启示"
+15. **`process_flow` (横向流程步骤推演) [v3.0]**
+    `"steps"`: `[{"step": "01", "name": "阶段名称", "desc": "执行机制与关键交付物"}]` (3~6步)
+
+---
+
+## 3. 标准作业流程 (SOP)
 
 ```mermaid
 graph TD
-    A[用户提出需求 / 输入文档] --> B[阶段 1: 认知契约探针 Q1~Q4 识别场景原型]
+    A[用户提出需求 / 输入文档] --> B[阶段 1: 认知契约探针 Q1~Q4 识别 6 大场景之一]
     B --> C{是否提供模板?}
     C -- 是 --> D[阶段 2: 模板深度逆向解构 AST/Slots/Assets]
-    C -- 否 --> E[阶段 2: 匹配内置 4 大工业级设计系统]
-    D --> F[阶段 3: 场景图元装配 blueprint.json & 语义因果自修正审计]
+    C -- 否 --> E[阶段 2: 匹配内置设计规范 modern_bento / cyber_dark]
+    D --> F[阶段 3: 编排 15 大图元 blueprint.json & 审计自愈]
     E --> F
     F --> G[阶段 4: 双端原生高精构建 注入Notes与认知抽屉]
     G --> H[交付 PPTX 与单文件 HTML]
@@ -95,41 +120,40 @@ graph TD
 ```
 
 ### 阶段 1 · 认知契约探针 (Cognitive Contract Probe)
-主动向用户探寻四大认知基座（不要生硬审讯，以业务顾问视角引导）：
+探寻四大认知基座（以顾问视角提问，不生硬审讯）：
 1. **Q1 核心主旨**：抛开所有枝节，最想传达的一个核心论点是什么？
-2. **Q2 演讲受众**：汇报对象是谁（高管、评审专家、HRD、客户）？其立场与核心顾虑是什么？
-3. **Q3 认知差与痛点**：听众有哪些已知的背景？有哪些未知但关键的痛点/盲区？
-4. **Q4 终局行动目标**：演示结束后，受众必须当场做出的具体动作是什么？
-5. **参考输入**：是否有事实文档（`--input-doc`）或现有模板 PPTX。
+2. **Q2 演讲受众**：汇报对象是谁？其立场与核心顾虑是什么？
+3. **Q3 认知差与痛点**：听众已知什么？未知但关键的痛点/盲区是什么？
+4. **Q4 终局行动目标**：演示结束后，受众必须做出的具体动作/决策是什么？
+5. **场景原型**：属于战略规划、技术架构、产品路演、个人履历、教育教学还是通用汇报？
 
 ### 阶段 2 · 模板解析提取 (Template Deconstruction)
 若用户提供了模板文件：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" undo --template /path/to/template.pptx --out .undoppt/design_tokens.json
 ```
-提炼出色彩方案、主题模式（Dark/Light）、母版占位槽位与版式规则后，向用户展示确认。
 
-### 阶段 3 · 叙事蓝图编排与语义因果自修正审计
-运行自主认知规划器（支持事实文档挂载与场景自适应）：
+### 阶段 3 · 蓝图编排与质量审计 (Plan & Audit)
+方式 A（CLI 自主规划）：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" plan --prompt "<提示词>" [--input-doc <file.md>] [--out .undoppt/blueprint.json]
 ```
-规划器会自动识别场景（战略/简历/架构/路演），完成因果语法编排、铁证注入与自修正审计：
+方式 B（Agent 智能编排）：Agent 直接依据上述 15 大图元规约构造 `.undoppt/blueprint.json`。
+
+运行 10 维认知质量与深度语义审计：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" audit --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json
 ```
-输出包含结构分、语义分（因果推进、主旨离心、硬证据加权、疑虑对抗）的完整体检报告。
 
-### 阶段 4 · 高精构建 (Build)
-运行渲染器交付双端文件：
+### 阶段 4 · 双端高精构建 (Build)
 ```bash
-python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json --format all --out output
+python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --tokens presets/modern_bento.json --format all --out output
 ```
 交付产物：
-- `output/presentation.pptx`（含演讲备注注入）
-- `output/presentation.html`（含 `N` 键认知抽屉）
+- `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注）
+- `output/presentation.html`（单文件自包含、Tailwind 排版、`N` 键认知抽屉）
 
-### 阶段 5 · 协同感知检查 (Sync Watcher)
+### 阶段 5 · 协同感知与意图对齐 (Sync Watcher)
 在后续每轮用户发言开始时：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
@@ -137,10 +161,10 @@ python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 
 ---
 
-## 3. CLI 快速调用参考
+## 4. CLI 快速调用参考
 
 ```bash
-# 1. 自主认知规划器 (支持多场景: 战略规划/个人简历/技术方案/商业路演)
+# 1. 自主认知规划器 (6 大场景自适应)
 python3 "<SKILL_ROOT>/cli.py" plan --prompt "<提示词>" [--input-doc <file.md>] [--out blueprint.json]
 
 # 2. 一键全流程极速生成 (规划 -> 场景装配 -> 审计 -> 双端构建)
@@ -149,10 +173,10 @@ python3 "<SKILL_ROOT>/cli.py" generate --prompt "<提示词>" [--input-doc <file
 # 3. 深度解析模板母版与设计规范
 python3 "<SKILL_ROOT>/cli.py" undo --template <template.pptx>
 
-# 4. 蓝图内容质量与深度语义因果审计 (结构分 + 语义分 + 4大子项)
+# 4. 蓝图认知质量与深度语义因果审计 (结构分 + 语义分 + 4大子项)
 python3 "<SKILL_ROOT>/cli.py" audit --blueprint <blueprint.json>
 
-# 5. 基于蓝图与设计规范构建双端演示文稿
+# 5. 基于蓝图与设计规范构建双端演示文稿 (支持 15 种图元)
 python3 "<SKILL_ROOT>/cli.py" build --blueprint <blueprint.json> --tokens <tokens.json> --format all
 
 # 6. 检查用户本地外部修改
@@ -161,3 +185,4 @@ python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 # 7. 一键运行端到端示范流水线
 python3 "<SKILL_ROOT>/cli.py" demo
 ```
+

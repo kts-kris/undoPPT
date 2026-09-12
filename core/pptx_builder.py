@@ -15,7 +15,9 @@ import os
 from typing import Any, Dict, List, Optional
 
 from pptx import Presentation
+from pptx.chart.data import CategoryChartData
 from pptx.dml.color import RGBColor
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
@@ -1198,6 +1200,470 @@ def render_cross_mapping_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str
             run_td.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
 
 
+
+def render_standard_table_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Standard Data Table slide with styled headers, zebra striping, and cell padding."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+
+    title = slide_data.get("action_title") or slide_data.get("title", "数据与指标概览")
+    subtitle = slide_data.get("subtitle", "")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "DATA TABLE")
+    _add_header(slide, title, subtitle, tokens, tag=tag)
+
+    headers = slide_data.get("headers", ["维度", "指标", "目标值", "达成说明"])
+    rows = slide_data.get("rows", [])
+    if not rows:
+        rows = [["示例维度", "基础指标", "100%", "符合预期"]]
+
+    num_rows = len(rows) + 1
+    num_cols = len(headers)
+
+    left = Inches(0.8)
+    top = Inches(2.2)
+    width = Inches(11.733)
+    row_height = min(0.6, max(0.38, 4.6 / max(1, num_rows)))
+    height = Inches(row_height * num_rows)
+
+    table_shape = slide.shapes.add_table(num_rows, num_cols, left, top, width, height)
+    table = table_shape.table
+
+    # Format header row
+    for col_idx, header_text in enumerate(headers):
+        cell = table.cell(0, col_idx)
+        cell.fill.solid()
+        cell.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        tf = cell.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        run = p.add_run()
+        run.text = str(header_text)
+        run.font.name = typo.get("title", {}).get("font", "PingFang SC")
+        run.font.size = Pt(13)
+        run.font.bold = True
+        run.font.color.rgb = _hex_to_rgb("#FFFFFF")
+
+    # Format data rows
+    highlight_idx = slide_data.get("highlight_row_index", -1)
+    if isinstance(highlight_idx, int):
+        highlight_set = {highlight_idx}
+    elif isinstance(highlight_idx, list):
+        highlight_set = set(highlight_idx)
+    else:
+        highlight_set = set()
+
+    for r_idx, row_data in enumerate(rows):
+        is_highlighted = r_idx in highlight_set
+        is_even = (r_idx % 2 == 0)
+        bg_col = palette.get("surface_subtle", "#F1F5F9") if is_even else palette.get("surface", "#FFFFFF")
+        if is_highlighted:
+            bg_col = "#EFF6FF"
+
+        for c_idx in range(num_cols):
+            val = row_data[c_idx] if c_idx < len(row_data) else ""
+            cell = table.cell(r_idx + 1, c_idx)
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = _hex_to_rgb(bg_col)
+            tf = cell.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = PP_ALIGN.LEFT if c_idx == 0 else PP_ALIGN.CENTER
+            run = p.add_run()
+            run.text = str(val)
+            run.font.name = typo.get("body", {}).get("font", "Arial")
+            run.font.size = Pt(11)
+            if is_highlighted:
+                run.font.bold = True
+                run.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            else:
+                run.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+
+def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render native vector PowerPoint Chart (Bar, Column, Line, Pie) with CategoryChartData."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+
+    title = slide_data.get("action_title") or slide_data.get("title", "核心数据趋势分析")
+    subtitle = slide_data.get("subtitle", "")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "DATA CHART")
+    _add_header(slide, title, subtitle, tokens, tag=tag)
+
+    chart_type_str = str(slide_data.get("chart_type", "column")).lower()
+    categories = slide_data.get("categories", ["Q1", "Q2", "Q3", "Q4"])
+    series_list = slide_data.get("series", [{"name": "数值", "values": [35, 55, 78, 95]}])
+    takeaway = slide_data.get("takeaway") or slide_data.get("core_evidence", "")
+
+    chart_data = CategoryChartData()
+    chart_data.categories = categories
+    for s in series_list:
+        chart_data.add_series(str(s.get("name", "指标")), [float(v) if isinstance(v, (int, float)) else 0.0 for v in s.get("values", [])])
+
+    if chart_type_str == "bar":
+        chart_type_enum = XL_CHART_TYPE.BAR_CLUSTERED
+    elif chart_type_str == "line":
+        chart_type_enum = XL_CHART_TYPE.LINE
+    elif chart_type_str == "pie":
+        chart_type_enum = XL_CHART_TYPE.PIE
+    else:
+        chart_type_enum = XL_CHART_TYPE.COLUMN_CLUSTERED
+
+    has_takeaway = bool(takeaway)
+    chart_w = Inches(8.0) if has_takeaway else Inches(11.733)
+    chart_h = Inches(4.7)
+    chart_l = Inches(0.8)
+    chart_t = Inches(2.2)
+
+    chart_shape = slide.shapes.add_chart(chart_type_enum, chart_l, chart_t, chart_w, chart_h, chart_data)
+    chart = chart_shape.chart
+    chart.has_legend = len(series_list) > 1 or chart_type_str == "pie"
+    if chart.has_legend:
+        try:
+            chart.legend.position = XL_LEGEND_POSITION.TOP
+            chart.legend.include_in_layout = False
+        except Exception:
+            pass
+
+    # Takeaway Side Card
+    if has_takeaway:
+        side_l = Inches(9.1)
+        side_w = Inches(3.433)
+        side_card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE, side_l, chart_t, side_w, chart_h
+        )
+        side_card.fill.solid()
+        side_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+        side_card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        side_card.line.width = Pt(1.5)
+
+        tf_s = side_card.text_frame
+        tf_s.word_wrap = True
+        tf_s.margin_left = Inches(0.2)
+        tf_s.margin_top = Inches(0.2)
+
+        p_badge = tf_s.paragraphs[0]
+        run_b = p_badge.add_run()
+        run_b.text = "KEY TAKEAWAY"
+        run_b.font.bold = True
+        run_b.font.size = Pt(10)
+        run_b.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+        p_tw_title = tf_s.add_paragraph()
+        p_tw_title.space_before = Pt(8)
+        run_twt = p_tw_title.add_run()
+        run_twt.text = "核心数据洞察与结论"
+        run_twt.font.bold = True
+        run_twt.font.size = Pt(14)
+        run_twt.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        p_tw_body = tf_s.add_paragraph()
+        p_tw_body.space_before = Pt(10)
+        run_twb = p_tw_body.add_run()
+        run_twb.text = takeaway
+        run_twb.font.size = Pt(12)
+        run_twb.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        extra_bullets = slide_data.get("bullets", [])
+        for b in extra_bullets[:3]:
+            p_eb = tf_s.add_paragraph()
+            p_eb.space_before = Pt(6)
+            run_dot = p_eb.add_run()
+            run_dot.text = "• "
+            run_dot.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            run_b = p_eb.add_run()
+            run_b.text = b
+            run_b.font.size = Pt(11)
+            run_b.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+
+def render_content_columns_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render universal multi-column content cards (2 to 4 columns) with badges, descriptions, and bullets."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+
+    title = slide_data.get("action_title") or slide_data.get("title", "核心要素与内容解构")
+    subtitle = slide_data.get("subtitle", "")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "OVERVIEW")
+    _add_header(slide, title, subtitle, tokens, tag=tag)
+
+    columns = slide_data.get("columns", [])
+    if not columns:
+        columns = [
+            {"badge": "板块 1", "title": "核心主张", "desc": "阐明核心概念与基础背景。", "bullets": ["要点 1", "要点 2"]},
+            {"badge": "板块 2", "title": "关键举措", "desc": "明确关键实施路径与抓手。", "bullets": ["要点 1", "要点 2"]},
+            {"badge": "板块 3", "title": "成效保障", "desc": "落实落地机制与保障举措。", "bullets": ["要点 1", "要点 2"]}
+        ]
+
+    n_cols = min(4, max(2, len(columns)))
+    columns = columns[:n_cols]
+
+    total_w = 11.733
+    gap = 0.25
+    col_w = (total_w - gap * (n_cols - 1)) / n_cols
+    top = 2.2
+    col_h = 4.7
+
+    for idx, col in enumerate(columns):
+        col_x = 0.8 + idx * (col_w + gap)
+        is_highlight = bool(col.get("highlight", False))
+
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE, Inches(col_x), Inches(top), Inches(col_w), Inches(col_h)
+        )
+        card.fill.solid()
+        card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+        card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_highlight else palette.get("border", "#E2E8F0"))
+        card.line.width = Pt(2.0 if is_highlight else 1.0)
+
+        if is_highlight:
+            accent_bar = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE, Inches(col_x), Inches(top), Inches(col_w), Inches(0.12)
+            )
+            accent_bar.fill.solid()
+            accent_bar.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            accent_bar.line.fill.background()
+
+        tf = card.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.2)
+        tf.margin_right = Inches(0.2)
+        tf.margin_top = Inches(0.25)
+
+        badge = col.get("badge") or f"0{idx+1}"
+        p_badge = tf.paragraphs[0]
+        run_b = p_badge.add_run()
+        run_b.text = badge.upper()
+        run_b.font.bold = True
+        run_b.font.size = Pt(10)
+        run_b.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+        p_title = tf.add_paragraph()
+        p_title.space_before = Pt(6)
+        p_title.space_after = Pt(8)
+        run_t = p_title.add_run()
+        run_t.text = col.get("title", f"要素 {idx+1}")
+        run_t.font.name = typo.get("title", {}).get("font", "PingFang SC")
+        run_t.font.size = Pt(15)
+        run_t.font.bold = True
+        run_t.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        desc = col.get("desc", "")
+        if desc:
+            p_desc = tf.add_paragraph()
+            p_desc.space_after = Pt(10)
+            run_d = p_desc.add_run()
+            run_d.text = desc
+            run_d.font.size = Pt(11)
+            run_d.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        bullets = col.get("bullets", [])
+        for b in bullets[:4]:
+            p_b = tf.add_paragraph()
+            p_b.space_before = Pt(4)
+            run_dot = p_b.add_run()
+            run_dot.text = "✔ " if is_highlight else "• "
+            run_dot.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            run_txt = p_b.add_run()
+            run_txt.text = b
+            run_txt.font.size = Pt(11)
+            run_txt.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+
+def render_keynote_quote_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Keynote Quote & Core Insight statement slide."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+
+    title = slide_data.get("action_title") or slide_data.get("title", "核心洞察与主张")
+    subtitle = slide_data.get("subtitle", "")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "INSIGHT")
+    _add_header(slide, title, subtitle, tokens, tag=tag)
+
+    quote = slide_data.get("quote") or slide_data.get("statement") or "“真正卓越的架构并非功能的繁琐堆砌，而是以最小认知负荷实现确定性的业务交付。”"
+    author = slide_data.get("author", "核心观点")
+    role = slide_data.get("role", "评审专家")
+    context = slide_data.get("context", "")
+
+    card_w = Inches(11.733)
+    card_h = Inches(4.7)
+    left = Inches(0.8)
+    top = Inches(2.2)
+
+    card = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, left, top, card_w, card_h
+    )
+    card.fill.solid()
+    card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+    card.line.color.rgb = _hex_to_rgb(palette.get("border", "#E2E8F0"))
+    card.line.width = Pt(1.5)
+
+    accent_bar = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE, left, top, Inches(0.18), card_h
+    )
+    accent_bar.fill.solid()
+    accent_bar.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+    accent_bar.line.fill.background()
+
+    q_icon = slide.shapes.add_textbox(Inches(1.3), Inches(2.3), Inches(1.5), Inches(1.0))
+    p_qi = q_icon.text_frame.paragraphs[0]
+    run_qi = p_qi.add_run()
+    run_qi.text = "“"
+    run_qi.font.size = Pt(64)
+    run_qi.font.bold = True
+    run_qi.font.color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#BFDBFE"))
+
+    tb = slide.shapes.add_textbox(Inches(1.5), Inches(3.0), Inches(10.3), Inches(2.4))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    p_q = tf.paragraphs[0]
+    run_q = p_q.add_run()
+    run_q.text = quote
+    run_q.font.name = typo.get("title", {}).get("font", "PingFang SC")
+    run_q.font.size = Pt(21)
+    run_q.font.bold = True
+    run_q.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+    author_box = slide.shapes.add_textbox(Inches(1.5), Inches(5.5), Inches(10.3), Inches(1.1))
+    tf_a = author_box.text_frame
+    tf_a.word_wrap = True
+    p_a = tf_a.paragraphs[0]
+    run_a = p_a.add_run()
+    run_a.text = f"— {author} "
+    run_a.font.bold = True
+    run_a.font.size = Pt(14)
+    run_a.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+
+    if role:
+        run_r = p_a.add_run()
+        run_r.text = f"({role})"
+        run_r.font.size = Pt(12)
+        run_r.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+    if context:
+        p_c = tf_a.add_paragraph()
+        p_c.space_before = Pt(4)
+        run_c = p_c.add_run()
+        run_c.text = f"背景与说明: {context}"
+        run_c.font.size = Pt(11)
+        run_c.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#94A3B8"))
+
+
+def render_process_flow_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
+    """Render Process Workflow & Step-by-Step Execution Pipeline slide."""
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    palette = tokens.get("palette", {})
+    typo = tokens.get("typography", {})
+    _apply_background(slide, prs, palette.get("background", "#F8FAFC"))
+
+    title = slide_data.get("action_title") or slide_data.get("title", "标准化实施流水线与推进流程")
+    subtitle = slide_data.get("subtitle", "")
+    tag = slide_data.get("tag") or (slide_data.get("narrative_arc", "").upper() if slide_data.get("narrative_arc") else "PROCESS FLOW")
+    _add_header(slide, title, subtitle, tokens, tag=tag)
+
+    stages = slide_data.get("stages") or slide_data.get("steps", [])
+    if not stages:
+        stages = [
+            {"step": "01", "name": "需求输入与对齐", "desc": "明确目标与边界", "items": ["痛点调研", "认知契约确立"]},
+            {"step": "02", "name": "方案设计与建模", "desc": "架构解耦与设计", "items": ["图元选型", "蓝图语法校验"]},
+            {"step": "03", "name": "工程构建与审计", "desc": "原生矢量交付", "items": ["质量体检", "双端渲染输出"]},
+            {"step": "04", "name": "协同感知与闭环", "desc": "持续演进复盘", "items": ["双向同步", "效果持续跟踪"]}
+        ]
+
+    n_stages = min(5, max(2, len(stages)))
+    stages = stages[:n_stages]
+
+    total_w = 11.733
+    arrow_w = 0.28
+    gap = 0.12
+    card_w = (total_w - (arrow_w + gap * 2) * (n_stages - 1)) / n_stages
+    top = 2.2
+    card_h = 4.7
+
+    for idx, stg in enumerate(stages):
+        cx = 0.8 + idx * (card_w + arrow_w + gap * 2)
+        is_highlight = bool(stg.get("highlight", False))
+
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE, Inches(cx), Inches(top), Inches(card_w), Inches(card_h)
+        )
+        card.fill.solid()
+        card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+        card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_highlight else palette.get("border", "#E2E8F0"))
+        card.line.width = Pt(2.0 if is_highlight else 1.0)
+
+        step_badge_w = 0.45
+        badge = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL, Inches(cx + 0.15), Inches(top + 0.18), Inches(step_badge_w), Inches(step_badge_w)
+        )
+        badge.fill.solid()
+        badge.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+        badge.line.fill.background()
+        p_b = badge.text_frame.paragraphs[0]
+        p_b.alignment = PP_ALIGN.CENTER
+        run_b = p_b.add_run()
+        step_label = str(stg.get("step") or f"0{idx+1}")
+        run_b.text = step_label[-2:] if len(step_label) >= 2 else step_label
+        run_b.font.bold = True
+        run_b.font.size = Pt(11)
+        run_b.font.color.rgb = _hex_to_rgb("#FFFFFF")
+
+        tf = card.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.18)
+        tf.margin_right = Inches(0.18)
+        tf.margin_top = Inches(0.75)
+
+        p_title = tf.paragraphs[0]
+        run_t = p_title.add_run()
+        run_t.text = stg.get("name") or stg.get("title", f"阶段 {idx+1}")
+        run_t.font.name = typo.get("title", {}).get("font", "PingFang SC")
+        run_t.font.size = Pt(14)
+        run_t.font.bold = True
+        run_t.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        desc = stg.get("desc", "")
+        if desc:
+            p_desc = tf.add_paragraph()
+            p_desc.space_before = Pt(4)
+            p_desc.space_after = Pt(8)
+            run_d = p_desc.add_run()
+            run_d.text = desc
+            run_d.font.size = Pt(11)
+            run_d.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        items = stg.get("items", [])
+        for item in items[:4]:
+            p_it = tf.add_paragraph()
+            p_it.space_before = Pt(4)
+            run_dot = p_it.add_run()
+            run_dot.text = "▸ "
+            run_dot.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+            run_it = p_it.add_run()
+            run_it.text = str(item)
+            run_it.font.size = Pt(10.5)
+            run_it.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+        if idx < n_stages - 1:
+            ax = cx + card_w + gap
+            tb_a = slide.shapes.add_textbox(Inches(ax), Inches(top + card_h / 2 - 0.25), Inches(arrow_w), Inches(0.5))
+            p_a = tb_a.text_frame.paragraphs[0]
+            p_a.alignment = PP_ALIGN.CENTER
+            run_a = p_a.add_run()
+            run_a.text = "➔"
+            run_a.font.bold = True
+            run_a.font.size = Pt(14)
+            run_a.font.color.rgb = _hex_to_rgb(palette.get("primary", "#3B82F6"))
+
+
 RENDERERS = {
     "cover": render_cover_slide,
     "architecture_stack": render_architecture_stack_slide,
@@ -1214,6 +1680,20 @@ RENDERERS = {
     "three_horizons": render_horizons_slide,
     "cross_mapping": render_cross_mapping_slide,
     "dual_mapping": render_cross_mapping_slide,
+    # v3.0 New Primitives
+    "standard_table": render_standard_table_slide,
+    "table": render_standard_table_slide,
+    "data_chart": render_data_chart_slide,
+    "chart": render_data_chart_slide,
+    "content_columns": render_content_columns_slide,
+    "columns": render_content_columns_slide,
+    "rich_content": render_content_columns_slide,
+    "keynote_quote": render_keynote_quote_slide,
+    "quote": render_keynote_quote_slide,
+    "statement": render_keynote_quote_slide,
+    "process_flow": render_process_flow_slide,
+    "flow": render_process_flow_slide,
+    "workflow": render_process_flow_slide,
 }
 
 

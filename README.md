@@ -1,6 +1,6 @@
 # undoPPT (演示文稿智能解构与重构超级智能体)
 
-[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
@@ -11,9 +11,9 @@
 
 ---
 
-## 🧠 核心升级：多场景通用解耦架构与 10 维认知工程体系 (v2.6.0)
+## 🧠 核心升级：15 大高阶图元与 6 大场景通用解耦架构 (v3.0.0)
 
-在专业商业、战略咨询、技术架构与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v2.6.0` 全面去除了领域硬编码，支持战略规划、个人简历/述职、技术方案、产品路演等多种场景的原型自适应装配：
+在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.0.0` 全面彻底清除了领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育教学、通用政企汇报 **6 大通用场景原型**，并扩展至 **15 大高保真信息图元**：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -35,9 +35,10 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、10 大信息图元与完备演讲脚本。
-- 💡 **自动化内容审计 (`cli.py audit`)**：内置 10 维规则审计器，对蓝图信息密度超标、中性被动标题、因果链缺失等问题实时评分并给出整改建议。
-- 🎙️ **PPTX 原生演讲备注注入**：单页使命（Mission）、承上启下连词（Transition）与核心证据（Core Evidence）自动编译进 PowerPoint Speaker Notes，助力脱稿演讲。
+- 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、15 大信息图元与完备演讲脚本，支持 6 大场景自适应。
+- 📊 **15 大信息图元与原生矢量图表**：新增原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。
+- 💡 **自动化内容与因果审计 (`cli.py audit`)**：内置场景感知审计器，兼顾商业量化数据与教学定性范例，实时评分并给出整改建议。
+- 🎙️ **PPTX 原生演讲备注注入**：单页使命（Mission）、承上启下连词（Transition）与核心证据（Core Evidence）自动编译进 PowerPoint Speaker Notes，自适应口播口吻。
 - 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。
 
 ---
@@ -80,8 +81,8 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 - **受众疑虑对抗与闭环**：核验方案是否正面击穿痛点，收尾页是否坚决闭环目标行动决策。
 - **可插拔 LLM 裁判**：提供 `llm_judge_fn` 钩子，支持规则本体与大模型裁判协同。
 
-### 3. 十大高阶战略原生图元组件库 (Infographic Primitives)
-拒绝大段无聊文本，内置 10 大工业级图表化组件元语：
+### 3. 十五大高阶原生图元组件库 (15 Infographic Primitives)
+拒绝大段无聊文本，内置 15 大工业级图表化与数据组件元语：
 - 🏗️ **产品/技术架构堆叠图 (Architecture Stacks)**：分层底板、微服务组件卡片、分类标签。
 - 🍱 **Bento 多栏对比卡片 (Bento Grid Cards)**：2/3/4 栏对比、高亮方案框、要点列表。
 - 📊 **KPI 核心指标大字报 (Metric Spotlight)**：超大字体数值、同环比标签、下钻说明。
@@ -92,6 +93,11 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 - 🔀 **跨层级/跨组织映射对比表 (Cross Mapping)**：双向对齐箭头、标杆实践对比、落地机制责任链。
 - 🏁 **收官要点速览 (Summary Takeaways)**：胶囊编号卡片与战略决策建议。
 - 🖼️ **高保真标题封面卡 (Cover Hero)**：分类徽章、主副标题与作者元数据。
+- 📋 **规整数据与能力对比表 (Standard Table) [v3.0]**：原生 PowerPoint/HTML 斑马纹双色规整数据矩阵。
+- 📊 **原生矢量数据图表 (Data Chart) [v3.0]**：基于 `CategoryChartData` 的原生矢量柱状图、折线图与饼图（可在 Office/Keynote 中直接改数据）。
+- 📑 **多栏并列内容卡片 (Content Columns) [v3.0]**：2~4 栏并列卡片，配备分类胶囊与清单要点。
+- 💬 **金句引用与破局卡片 (Keynote Quote) [v3.0]**：大师名言/核心洞见视觉居中强化与 Key Takeaway 启示。
+- 🔄 **横向流程推进步骤 (Process Flow) [v3.0]**：带序号胶囊与阶段推演的横向流程图。
 
 ### 4. 母版 AST 深度逆向解构引擎 (Deep Master AST Decompiler)
 - **母版槽位绝对坐标 AST 提取**：深度遍历 Slide Masters 与 Layouts，提取 `Title`、`Body`、`Subtitle`、`Footer` 的绝对坐标（英寸）与相对网格尺寸。
@@ -99,7 +105,7 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 - **嵌入式高清视觉与 Logo 提取**：自动导出母版与页面中嵌入的图片与矢量 Logo 至 `.undoppt/assets/`。
 
 ### 5. 双端极简交付与认知自省 (Dual-Format Delivery & Notes Inspection)
-- **PowerPoint PPTX**：100% 原生矢量形状与独立文本框，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑，**绝不贴图**；自动将单页使命、因果转折和核心证据注入底层 Speaker Notes 演讲备注。
+- **PowerPoint PPTX**：100% 原生矢量形状、规整表格与矢量图表，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑，**绝不贴图**；自动将单页使命、因果转折和核心证据注入底层 Speaker Notes 演讲备注。
 - **单文件自包含 HTML**：将演示文稿打包为单个 `.html` 文件，内置精美排版、键盘导航（←/→/Space/F 全屏）、进度条，按 `N` 键滑出认知动力学抽屉，**双击即播，零依赖，极度易于分发**。
 
 ### 6. 毫秒级双向协同感知 (Always-in-Sync)
@@ -113,23 +119,23 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v2.6.0)
+│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.0.0)
 ├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (2.6.0)
-│   ├── cognitive_planner.py        # 多场景通用解耦认知规划器与自愈修正循环 (v2.6.0)
-│   ├── semantic_auditor.py         # 深度语义因果认知审计器 (修辞/离心/实证/疑虑)
-│   ├── content_auditor.py          # 10 维认知质量与容量预算综合审计器
+│   ├── __init__.py                 # 版本号导出 (3.0.0)
+│   ├── cognitive_planner.py        # 6 大场景通用解耦认知规划器与自愈修正循环 (v3.0.0)
+│   ├── semantic_auditor.py         # 场景感知语义因果认知审计器 (修辞/离心/实证/疑虑)
+│   ├── content_auditor.py          # 15 大图元 10 维认知质量与容量预算综合审计器
 │   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
 │   ├── vision_extractor.py         # 视觉启发式解析器
-│   ├── pptx_builder.py             # 100% 原生矢量 PPTX 构建器 (含 Speaker Notes 注入)
-│   ├── html_builder.py             # 单文件自包含 HTML 演示编译器 (含 N 键认知抽屉)
+│   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
+│   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉)
 │   └── sync_watcher.py             # 毫秒级指纹追踪与语义 AST 差异对比器
 ├── presets/                        # 4 大工业级预设设计系统 (含 content_budget 预算规则)
 │   ├── modern_bento.json           # 现代企业 Bento 卡片 (默认)
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件 (13/13 passing)
+├── tests/                          # 自动化单元与回归测试套件
 │   └── test_engine.py
 ├── output/                         # 最终交付物目录
 │   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)

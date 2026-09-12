@@ -340,7 +340,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(bp["grounded_sources"]["has_doc"])
         self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
         self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
-        self.assertEqual(bp["version"], "2.5.0")
+        self.assertEqual(bp["version"], "3.0.0")
 
     def test_undo_engine_master_slots_and_theme_mode(self):
         """Test undo_engine extracts master slots geometry and theme mode."""
@@ -367,7 +367,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         layouts = [s["layout_type"] for s in bp["slides"]]
         self.assertIn("cover", layouts)
         self.assertIn("bento_cards", layouts)
-        self.assertIn("architecture_stack", layouts)
+        self.assertIn("content_columns", layouts)
         self.assertIn("metric_spotlight", layouts)
         self.assertIn("timeline", layouts)
         self.assertIn("summary", layouts)
@@ -375,6 +375,69 @@ class TestUndoPPTEngine(unittest.TestCase):
         # Verify dual build works for resume blueprint
         out_pptx = os.path.join(self.test_dir, "resume_test.pptx")
         out_html = os.path.join(self.test_dir, "resume_test.html")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        build_standalone_html(bp, self.sample_tokens, out_html)
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertTrue(os.path.exists(out_html))
+
+    def test_all_15_layouts_render(self):
+        """Test PPTX and HTML builders render all 15 layout primitives cleanly."""
+        all_15_blueprint = [
+            {"layout_type": "cover", "title": "P1 封面", "subtitle": "全图元演练", "category": "TEST"},
+            {"layout_type": "architecture_stack", "title": "P2 架构栈", "layers": [{"name": "层1", "items": ["组件A"]}]},
+            {"layout_type": "bento_cards", "title": "P3 Bento卡片", "cards": [{"title": "卡片1", "desc": "说明"}]},
+            {"layout_type": "metric_spotlight", "title": "P4 指标", "metrics": [{"label": "达成率", "value": "99%"}]},
+            {"layout_type": "timeline", "title": "P5 时间轴", "steps": [{"time": "2026", "title": "节点", "items": ["完成"]}]},
+            {"layout_type": "matrix_2x2", "title": "P6 矩阵", "quadrants": [{"name": "象限A", "desc": "描述"}], "axes": {"x": "X", "y": "Y"}},
+            {"layout_type": "maturity_ladder", "title": "P7 阶梯", "levels": [{"step": "L1", "name": "起步", "target": "标"}]},
+            {"layout_type": "horizons_curve", "title": "P8 地平线", "horizons": [{"horizon": "H1", "name": "基准", "focus": "核心"}]},
+            {"layout_type": "cross_mapping", "title": "P9 映射", "rows": [{"tier": "01", "source_role": "A", "target_role": "B"}]},
+            {"layout_type": "summary", "title": "P10 总结", "points": [{"title": "要点", "desc": "建议"}]},
+            {"layout_type": "standard_table", "title": "P11 表格", "headers": ["A", "B", "C"], "rows": [["1", "2", "3"], ["4", "5", "6"]]},
+            {"layout_type": "data_chart", "title": "P12 图表", "chart_type": "column_clustered", "categories": ["Q1", "Q2"], "series": [{"name": "收入", "values": [10, 20]}]},
+            {"layout_type": "content_columns", "title": "P13 并列栏", "columns": [{"title": "栏1", "points": ["点1", "点2"]}]},
+            {"layout_type": "keynote_quote", "title": "P14 金句", "quote_text": "博观而约取，厚积而薄发", "author": "苏轼", "key_takeaway": "深度思考"},
+            {"layout_type": "process_flow", "title": "P15 流程", "steps": [{"step": "01", "name": "立项", "desc": "确立契约"}, {"step": "02", "name": "构建", "desc": "交付产物"}]}
+        ]
+        out_pptx = os.path.join(self.test_dir, "all_15.pptx")
+        out_html = os.path.join(self.test_dir, "all_15.html")
+        build_presentation(all_15_blueprint, self.sample_tokens, out_pptx)
+        build_standalone_html(all_15_blueprint, self.sample_tokens, out_html)
+
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertTrue(os.path.exists(out_html))
+
+        prs = Presentation(out_pptx)
+        self.assertEqual(len(prs.slides), 15)
+
+        # Verify table shape exists on slide 11 (index 10)
+        table_slide = prs.slides[10]
+        has_table = any(s.has_table for s in table_slide.shapes)
+        self.assertTrue(has_table, "Slide 11 should contain a native PowerPoint table shape")
+
+        # Verify chart shape exists on slide 12 (index 11)
+        chart_slide = prs.slides[11]
+        has_chart = any(s.has_chart for s in chart_slide.shapes)
+        self.assertTrue(has_chart, "Slide 12 should contain a native PowerPoint chart shape")
+
+    def test_education_training_planner(self):
+        """Test CognitivePlanner synthesizes an education/pedagogical presentation with zero tech jargon."""
+        planner = CognitivePlanner()
+        bp = planner.plan("小学语文识字教学公开课")
+        self.assertEqual(bp["scenario"], "education_training")
+        self.assertIn("教学", bp["contract"]["core_thesis"])
+        self.assertGreaterEqual(bp["audit_summary"]["score"], 70)
+
+        # Verify that tech jargon is NOT present
+        bp_json_str = json.dumps(bp, ensure_ascii=False)
+        self.assertNotIn("CTO", bp_json_str)
+        self.assertNotIn("微服务", bp_json_str)
+        self.assertNotIn("高并发", bp_json_str)
+        self.assertNotIn("全栈架构师", bp_json_str)
+
+        # Verify build succeeds
+        out_pptx = os.path.join(self.test_dir, "edu_test.pptx")
+        out_html = os.path.join(self.test_dir, "edu_test.html")
         build_presentation(bp, self.sample_tokens, out_pptx)
         build_standalone_html(bp, self.sample_tokens, out_html)
         self.assertTrue(os.path.exists(out_pptx))
