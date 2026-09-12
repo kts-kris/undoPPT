@@ -354,6 +354,32 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertGreater(tokens["master_layouts_count"], 0)
         self.assertIn("slots", tokens["layouts"][0])
 
+    def test_career_resume_planner(self):
+        """Test CognitivePlanner synthesizes and audits a personal resume / career portfolio deck."""
+        planner = CognitivePlanner()
+        bp = planner.plan("帮我生成一份资深全栈架构师的个人简历")
+        self.assertEqual(bp["scenario"], "career_portfolio")
+        self.assertIn("架构", bp["contract"]["core_thesis"])
+        self.assertIn("架构师", bp["slides"][0]["title"])
+        self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
+
+        # Verify layout mix for career portfolio
+        layouts = [s["layout_type"] for s in bp["slides"]]
+        self.assertIn("cover", layouts)
+        self.assertIn("bento_cards", layouts)
+        self.assertIn("architecture_stack", layouts)
+        self.assertIn("metric_spotlight", layouts)
+        self.assertIn("timeline", layouts)
+        self.assertIn("summary", layouts)
+
+        # Verify dual build works for resume blueprint
+        out_pptx = os.path.join(self.test_dir, "resume_test.pptx")
+        out_html = os.path.join(self.test_dir, "resume_test.html")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        build_standalone_html(bp, self.sample_tokens, out_html)
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertTrue(os.path.exists(out_html))
+
 
 if __name__ == "__main__":
     unittest.main()
