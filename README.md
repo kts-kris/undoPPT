@@ -1,19 +1,20 @@
 # undoPPT (演示文稿智能解构与重构超级智能体)
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
 
-> **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**
+> **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**  
+> 📖 **深度阅读**：[《undoPPT 设计哲学与架构协同白皮书》](DESIGN_PHILOSOPHY.md) —— 彻底厘清 Agent 认知大脑与 Skill 执行底座的协同分工与五重质量保障闭环。
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
 
 ---
 
-## 🧠 核心升级：15 大高阶图元与 6 大场景通用解耦架构 (v3.0.0)
+## 🧠 核心升级：15 大高阶图元与 6 大场景通用解耦架构 (v3.1.0)
 
-在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.0.0` 全面彻底清除了领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育教学、通用政企汇报 **6 大通用场景原型**，并扩展至 **15 大高保真信息图元**：
+在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.1.0` 全面彻底清除了领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育教学、通用政企汇报 **6 大通用场景原型**，并扩展至 **15 大高保真信息图元**：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -119,10 +120,10 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.0.0)
+│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.1.0)
 ├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (3.0.0)
-│   ├── cognitive_planner.py        # 6 大场景通用解耦认知规划器与自愈修正循环 (v3.0.0)
+│   ├── __init__.py                 # 版本号导出 (3.1.0)
+│   ├── cognitive_planner.py        # 6 大场景通用解耦认知规划器与自愈修正循环 (v3.1.0)
 │   ├── semantic_auditor.py         # 场景感知语义因果认知审计器 (修辞/离心/实证/疑虑)
 │   ├── content_auditor.py          # 15 大图元 10 维认知质量与容量预算综合审计器
 │   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
@@ -135,13 +136,14 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件
+├── tests/                          # 自动化单元与回归测试套件 (15/15 passing)
 │   └── test_engine.py
 ├── output/                         # 最终交付物目录
 │   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)
 │   └── presentation.html           # 单文件自包含 HTML (含认知抽屉)
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
+├── DESIGN_PHILOSOPHY.md            # 核心设计哲学与 Agent-Skill 协同白皮书 (v3.1.0)
 ├── README.md                       # 本说明文档
 └── CHANGELOG.md                    # 语义化版本变更记录
 ```

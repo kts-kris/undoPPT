@@ -1,4 +1,4 @@
-"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v3.0.0).
+"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v3.1.0).
 
 Usage:
   python3 cli.py plan --prompt "<prompt>" [--input-doc <file.md>] [--context "<notes>"] [--out <blueprint.json>]
@@ -315,7 +315,7 @@ def cmd_plan(args):
 def cmd_generate(args):
     """End-to-end one-shot generation: prompt -> plan -> audit -> dual build."""
     print("================================================================")
-    print("  undoPPT Super Skill - End-to-End Autonomous Generation (v3.0)")
+    print("  undoPPT Super Skill - End-to-End Autonomous Generation (v3.1)")
     print("================================================================")
     print(f"[*] Prompt: {args.prompt}")
     doc_path = getattr(args, "input_doc", None)
@@ -390,7 +390,7 @@ def cmd_audit(args):
     res = auditor.audit(blueprint)
 
     print("================================================================")
-    print("  undoPPT Cognitive Quality & Content Architecture Audit (v3.0) ")
+    print("  undoPPT Cognitive Quality & Content Architecture Audit (v3.1) ")
     print("================================================================")
     print(f"  • Composite Score:  {res['score']} / 100")
     print(f"    - Structural:     {res.get('structural_score', res['score'])} / 100")
@@ -483,7 +483,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.0.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.1.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan

@@ -5,6 +5,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.1.0] - 2026-09-12
+
+### Added
+- **Design Philosophy & Architecture Synergy Whitepaper (`DESIGN_PHILOSOPHY.md`)**:
+  - Released comprehensive whitepaper formalizing the foundational manifesto: *"PPT is not an art album, but an audience-centric cognitive reshaping and decision intervention project."*
+  - Explicitly defined the operational boundaries between **AI Agent** (Soft Cognition: Q1-Q4 contract probe, 6-scenario routing, 15-primitive blueprint authoring, intent reflection) and **undoPPT Skill** (Hard Enforcement: master AST decompilation, mathematical layout, native vector charts/tables, 10-dimension dual auditing, SHA-256 sync sensing).
+  - Detailed the **5-Layer Quality Assurance Closed-Loop Framework** (Cognitive Contract ➔ 15-Primitive Schema Discipline ➔ Design Tokens & Density Budgets ➔ 10-Dimension Dual Auditing with Self-Correction ➔ Native Editable Deliverables with Speaker Notes).
+- **Complete Legacy String Sanitization**:
+  - Fully purged all legacy company names and domain artifacts across `README.md`, `CHANGELOG.md`, `tests/test_engine.py`, and runtime caches.
+- **Clean Blueprint Regeneration**:
+  - Re-synthesized standard generic blueprints and sync states with version `3.1.0`.
+
+### Changed
+- Bumped engine version to `3.1.0` (v3.1) across `core/__init__.py`, `cli.py`, `core/cognitive_planner.py`, `SKILL.md`, `.agents/skills/undo-ppt/SKILL.md`, `README.md`, and `tests/test_engine.py`.
+
+---
+
 ## [3.0.0] - 2026-09-12
 
 ### Added

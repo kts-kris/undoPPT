@@ -340,7 +340,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(bp["grounded_sources"]["has_doc"])
         self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
         self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
-        self.assertEqual(bp["version"], "3.0.0")
+        self.assertEqual(bp["version"], "3.1.0")
 
     def test_undo_engine_master_slots_and_theme_mode(self):
         """Test undo_engine extracts master slots geometry and theme mode."""

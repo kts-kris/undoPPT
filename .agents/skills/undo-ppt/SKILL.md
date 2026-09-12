@@ -1,18 +1,19 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.0.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.1.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 6 archetypes (strategy, tech architecture, pitch deck, resume, education/training, general informative) with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows);
   (3) native editable vector PPTX with speaker notes and single-file standalone HTML with Cognitive Inspector (N key);
   (4) 10-dimension content quality protocol with scenario-aware rhetorical causal audit (cli.py audit);
-  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher (cli.py sync).
+  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher (cli.py sync);
+  (6) strict Agent-Skill synergy adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.0.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.1.0)
 
-`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），以 10 维认知动力学与深度语义因果审计保障内容质量，交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
+`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](file:///Users/liuweigang/undoPPT/DESIGN_PHILOSOPHY.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
 
 ---
 
