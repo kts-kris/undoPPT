@@ -1,229 +1,268 @@
-# undoPPT (演示文稿智能解构与重构超级智能体)
+<div align="center">
+
+# undoPPT
+
+**Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
 [![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
-[![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-purple.svg)]()
-[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)]()
+[![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
 
-> **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**  
-> 📖 **深度阅读**：[《undoPPT 设计哲学与架构协同白皮书》](DESIGN_PHILOSOPHY.md) —— 彻底厘清 Agent 认知大脑与 Skill 执行底座的协同分工与五重质量保障闭环。
+[English](README.md) | [简体中文](README_zh.md)
 
-`undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
+</div>
+
+> **“Cognitive Contract • Master Decompilation • Graphic Reconstruction • Zero-Friction Delivery • Always-in-Sync”**  
+> 📖 **Deep Dive**: [undoPPT Design Philosophy & Architecture Synergy Whitepaper](DESIGN_PHILOSOPHY.md) ([简体中文](DESIGN_PHILOSOPHY_zh.md)) — Formalizing the collaboration boundaries between the AI Agent brain and the Skill execution engine through a 5-layer quality assurance closed-loop.
+
+`undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, and one-way generation without feedback loops.**
 
 ---
 
-## 🧠 核心升级：15 大高阶图元与 6 大场景通用解耦架构 (v3.1.0)
+## 🧠 Core Highlights: 15 High-Fidelity Primitives & 6-Scenario Decoupled Engine (v3.1.0)
 
-在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.1.0` 全面彻底清除了领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育教学、通用政企汇报 **6 大通用场景原型**，并扩展至 **15 大高保真信息图元**：
+In corporate strategy, technical architecture, commercial pitch decks, educational lectures, and executive debriefs, **a presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.**
+
+`undoPPT v3.1.0` eliminates all hardcoded domain assumptions, introducing generic support for **6 universal scenario archetypes** and expanding to **15 high-fidelity infographic primitives**:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. 认知基座 (Cognitive Contract)                                             │
-│    • Q1: 我想表达什么？(主旨唯一性 / Core Message)                           │
-│    • Q2: 我的对象是谁？(受众画像与立场偏好 / Audience Profile)               │
-│    • Q3: 对方知道什么、不知道什么？(认知差与盲区痛点 / Knowledge Delta)       │
-│    • Q4: 希望对方看完后理解什么、相信什么、做什么？(行动转化闭环 / Outcomes) │
+│ 1. Cognitive Foundation (Cognitive Contract)                                │
+│    • Q1: What is the core message? (Core Thesis & Premise)                  │
+│    • Q2: Who is the audience? (Audience Profile, Risks & Stance)            │
+│    • Q3: What do they know vs. what are their blindspots? (Knowledge Delta) │
+│    • Q4: What should they understand, believe, and do? (Target Action/Act)  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 2. 全局叙事 (Narrative Dynamics)                                            │
-│    • Q5: 演示按什么节奏展开？(叙事弧线: Hook → Conflict → Breakthrough...)  │
-│    • Q10: 页面之间如何形成因果、冲突、递进、转折与结论？(页间推演语法)       │
+│ 2. Global Narrative (Narrative Dynamics)                                    │
+│    • Q5: What is the narrative pacing? (Hook → Conflict → Breakthrough...)   │
+│    • Q10: How do slides causally connect? (Rhetorical Transitions)          │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 3. 单页切片 (Slide Slicing & Budget)                                        │
-│    • Q6: 每一页到底承担什么任务？(单页使命纯粹度 / Single Responsibility)    │
-│    • Q7: 一页应该放多少信息？(信息容量预算红线 / Content Budget)            │
-│    • Q8: 哪些信息先出现、哪些延后？(行动结论标题先行 / Action Titles)         │
-│    • Q9: 哪些是核心证据、哪些只是补充？(铁证突出与次级降噪 / Proof vs Note)  │
+│ 3. Slide Slicing & Content Budget                                           │
+│    • Q6: What single duty does each slide carry? (Single Responsibility)    │
+│    • Q7: How much information fits on one slide? (Content Budget Redline)   │
+│    • Q8: What appears first vs. later? (Action-First Conclusion Titles)     │
+│    • Q9: What is empirical evidence vs. secondary context? (Hard Proof)     │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、15 大信息图元与完备演讲脚本，支持 6 大场景自适应。
-- 📊 **15 大信息图元与原生矢量图表**：新增原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。
-- 💡 **自动化内容与因果审计 (`cli.py audit`)**：内置场景感知审计器，兼顾商业量化数据与教学定性范例，实时评分并给出整改建议。
-- 🎙️ **PPTX 原生演讲备注注入**：单页使命（Mission）、承上启下连词（Transition）与核心证据（Core Evidence）自动编译进 PowerPoint Speaker Notes，自适应口播口吻。
-- 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。
+- 🤖 **Autonomous Cognitive Planner (`cli.py plan` / `cli.py generate`)**: Synthesizes a structured Cognitive Contract, narrative arcs, 15 layout primitives, and complete spoken scripts from a single prompt or reference document across 6 scenarios.
+- 📊 **15 Layout Primitives & Native Vector Charts**: Generates native PowerPoint vector charts (clustered column, line, pie), formatted tables, bento card grids, quote cards, and horizontal process workflows. See [Blueprint Specification](docs/en/blueprint_specification.md).
+- 💡 **Automated Content & Semantic Auditing (`cli.py audit`)**: Audits slides across 10 structural and semantic dimensions, balancing quantitative enterprise metrics with qualitative educational case studies.
+- 🎙️ **Automated Speaker Notes Injection**: Slide missions, rhetorical transition phrases, and conversational talking points are compiled directly into PowerPoint Speaker Notes.
+- 🔍 **HTML Cognitive Inspector Drawer (`N` key)**: Press `N` in the standalone HTML presentation to inspect underlying slide objectives, causal transitions, and argument hierarchies.
 
 ---
 
-## ⚡ 30 秒开始 (Quickstart)
+## ⚡ 30-Second Quickstart
 
 ```bash
 npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```
 
-也可以直接把这段话发给有 shell 权限的 AI Agent（Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity 等）：
+Or provide this instruction to any AI Agent with shell access (Cursor, Claude Code, OpenAI Codex, Windsurf, WorkBuddy, Trae, Google Antigravity, etc.):
 
 ```text
-帮我安装 undo-ppt。请把 https://github.com/kts-kris/undoPPT 克隆到你的 skills 目录（如 Cursor / Claude Code / Codex / WorkBuddy 对应 ~/.claude/skills/undo-ppt 或项目 .agents/skills/undo-ppt，Antigravity 对应 ~/.gemini/config/skills/undo-ppt）
+Please install undo-ppt. Clone https://github.com/kts-kris/undoPPT into your skills directory (e.g. ~/.claude/skills/undo-ppt or project .agents/skills/undo-ppt for Cursor / Claude Code / Codex / WorkBuddy, ~/.gemini/config/skills/undo-ppt for Antigravity).
 ```
 
-已经安装过的话，用这段话更新：
+To update an existing installation:
 
 ```text
-帮我更新 undo-ppt。请进入 ~/.gemini/config/skills/undo-ppt 执行 git pull，然后告诉我当前最新提交
+Please update undo-ppt. Navigate to ~/.gemini/config/skills/undo-ppt (or your skill folder), run git pull, and tell me the latest commit.
 ```
 
-**安装后直接对 Agent 说：**
+**Once installed, simply prompt your Agent:**
 
-> “我要编写某大型制造企业的数字化转型与 AI 战略规划，控制在 6 页，要求具备四层协同映射、2x2战略矩阵、四级阶梯进阶和三道地平线分池治理。”
+> "Prepare a 6-slide enterprise digital transformation and AI strategy roadmap for executive leadership. Require a 4-layer architecture stack, a 2x2 strategic priority matrix, a 4-level maturity ladder, and a 3-horizons growth framework."
 
 ---
 
-## 🌟 六大工业级超级能力 (Super Capabilities)
+## 🌟 6 Industrial-Grade Super Capabilities
 
-### 1. 动态事实锚定规划器 (Dynamic Grounded Cognitive Planner)
-- **自然语言与外部事实文档无缝双输入**：无需人工编写复杂的 JSON，内置 `CognitivePlanner` 不仅能从一句话提示词推演完整逻辑，更支持挂载外部参考文档（`--input-doc notes.md`）。
-- **事实数据与业务实体精准挖掘**：自动从长文中提取组织层级、关键痛点与核心量化指标（如 `418个`、`71个`、`80%`、`7:2:1转向4:3:3`），动态编译进蓝图。
-- **自反思自愈修正循环 (Self-Correction Loop)**：生成蓝图后自动发起认知审计，若检测到中性标题、缺少因果过渡或证据不足，自动触发自愈补丁（Auto-patching）完成二轮修复。
+### 1. Dynamic Grounded Cognitive Planner
+- **Dual Input (Prompt + Reference Documents)**: Accepts a one-sentence natural language goal or grounds logic in external reference documents (`--input-doc notes.md`).
+- **Entity & Metric Extraction**: Automatically parses numbers, organizational levels, and operational pain points from unstructured text (e.g., `418 systems`, `71 modules`, `80% overhead`, `shifting 7:2:1 to 4:3:3`).
+- **Self-Correction Refinement Loop**: Automatically runs cognitive audits on generated blueprints. If passive titles, missing transitions, or insufficient evidence are detected, the engine triggers self-healing patches to reach an A-grade standard before rendering.
 
-### 2. 深度语义认知审计器 (Deep Semantic Cognitive Auditor)
-- **6 大因果本体修辞分类**：严格审计页间连接词在 `contrast`（对立冲突）、`causality`（因果推演）、`breakthrough`（方案突破）、`progression`（递进深化）、`evidence`（硬核实证）、`action`（决议行动）六大修辞本体的咬合与多样性。
-- **顶层主旨离心漂移检测**：自动提取主旨关键词，核验每一页的向心力，杜绝跑题与信息孤岛。
-- **Smoking Gun 铁证加权**：多维识别百分比、比率、工时、延迟等硬核数据，杜绝定性空洞口号。
-- **受众疑虑对抗与闭环**：核验方案是否正面击穿痛点，收尾页是否坚决闭环目标行动决策。
-- **可插拔 LLM 裁判**：提供 `llm_judge_fn` 钩子，支持规则本体与大模型裁判协同。
+### 2. Deep Semantic Cognitive Auditor
+- **6 Causal Rhetoric Ontologies**: Evaluates transitional conjunctions across `contrast`, `causality`, `breakthrough`, `progression`, `evidence`, and `action`.
+- **Core Thesis Centroid Drift Detection**: Computes semantic overlap between individual slide content and the overarching thesis to prevent narrative drift.
+- **Smoking Gun Evidence Weighting**: Evaluates quantitative metrics (percentages, ratios, latency benchmarks, cost reductions) and pedagogical examples to prevent empty slogans.
+- **Audience Objection Resolution**: Checks whether the narrative directly resolves audience doubts and concludes with a definitive call to action.
+- **Pluggable LLM Judge**: Supports hybrid rule-based and LLM-as-a-judge validation via the `llm_judge_fn` hook.
 
-### 3. 十五大高阶原生图元组件库 (15 Infographic Primitives)
-拒绝大段无聊文本，内置 15 大工业级图表化与数据组件元语：
-- 🏗️ **产品/技术架构堆叠图 (Architecture Stacks)**：分层底板、微服务组件卡片、分类标签。
-- 🍱 **Bento 多栏对比卡片 (Bento Grid Cards)**：2/3/4 栏对比、高亮方案框、要点列表。
-- 📊 **KPI 核心指标大字报 (Metric Spotlight)**：超大字体数值、同环比标签、下钻说明。
-- ⏱️ **横向推进时间轴与里程碑 (Timeline Roadmap)**：节点圆环、连接轴线、阶段交付清单。
-- 🎯 **2x2 战略矩阵与象限 (Matrix 2x2)**：技术广度 × 价值链控制力等四象限分布图与原则卡。
-- 🪜 **多维成熟度阶梯模型 (Maturity Ladder)**：四级演进台阶、抓手、指标与全生命周期安全底线。
-- 📈 **三道地平线发展模型 (Three Horizons)**：H1成熟效率、H2流程突破、H3模式验证分池治理。
-- 🔀 **跨层级/跨组织映射对比表 (Cross Mapping)**：双向对齐箭头、标杆实践对比、落地机制责任链。
-- 🏁 **收官要点速览 (Summary Takeaways)**：胶囊编号卡片与战略决策建议。
-- 🖼️ **高保真标题封面卡 (Cover Hero)**：分类徽章、主副标题与作者元数据。
-- 📋 **规整数据与能力对比表 (Standard Table) [v3.0]**：原生 PowerPoint/HTML 斑马纹双色规整数据矩阵。
-- 📊 **原生矢量数据图表 (Data Chart) [v3.0]**：基于 `CategoryChartData` 的原生矢量柱状图、折线图与饼图（可在 Office/Keynote 中直接改数据）。
-- 📑 **多栏并列内容卡片 (Content Columns) [v3.0]**：2~4 栏并列卡片，配备分类胶囊与清单要点。
-- 💬 **金句引用与破局卡片 (Keynote Quote) [v3.0]**：大师名言/核心洞见视觉居中强化与 Key Takeaway 启示。
-- 🔄 **横向流程推进步骤 (Process Flow) [v3.0]**：带序号胶囊与阶段推演的横向流程图。
+### 3. 15 High-Fidelity Layout Primitives
+Say goodbye to boring text slides. Built-in layout primitives include (see [Blueprint Specification](docs/en/blueprint_specification.md)):
+- 🏗️ **Architecture Stacks (`architecture_stack`)**: Multi-layer foundation slabs, component cards, and categorization tags.
+- 🍱 **Bento Grid Cards (`bento_cards`)**: 2, 3, or 4 column comparative cards with highlight accents and bullet points.
+- 📊 **Metric Spotlight (`metric_spotlight`)**: High-impact metrics with large numerals, delta indicators, and sub-labels.
+- ⏱️ **Timeline Roadmap (`timeline`)**: Horizontal progression nodes, connectors, and delivery deliverables.
+- 🎯 **Strategic 2x2 Matrix (`matrix_2x2`)**: Four-quadrant distribution (e.g., Technical Breadth vs. Value Control) with quadrant strategy cards.
+- 🪜 **Maturity Ladder (`maturity_ladder`)**: Multi-level evolutionary stairs with targets, drivers, metrics, and security baselines.
+- 📈 **Three Horizons Curve (`horizons_curve`)**: H1 core efficiency, H2 process breakthroughs, H3 business model validation.
+- 🔀 **Cross Mapping Matrix (`cross_mapping`)**: Bi-directional alignment arrows, current pain vs. target solution, and accountability chains.
+- 🏁 **Summary Takeaways (`summary`)**: Sequenced action items and strategic resolutions.
+- 🖼️ **Cover Hero Card (`cover`)**: Category badge, primary title, subtitle, and metadata.
+- 📋 **Standard Data Table (`standard_table`)**: Alternating zebra-striped rows with clean headers and status indicators.
+- 📊 **Native Vector Data Chart (`data_chart`)**: Native PowerPoint vector charts powered by `CategoryChartData` (clustered column, line, pie) that remain fully editable in Office/Keynote.
+- 📑 **Content Columns (`content_columns`)**: 2 to 4 parallel cards with category capsules and bullet points.
+- 💬 **Keynote Hero Quote (`keynote_quote`)**: Centered typography spotlight for insights, expert citations, and key takeaways.
+- 🔄 **Process Flow (`process_flow`)**: Horizontal multi-step workflow with sequence numbers and milestone descriptions.
 
-### 4. 母版 AST 深度逆向解构引擎 (Deep Master AST Decompiler)
-- **母版槽位绝对坐标 AST 提取**：深度遍历 Slide Masters 与 Layouts，提取 `Title`、`Body`、`Subtitle`、`Footer` 的绝对坐标（英寸）与相对网格尺寸。
-- **自动明亮/暗黑主题模式识别**：智能检测背景与形状亮度，自适应判定 `theme_mode` 并映射高对比度文字与卡片配色。
-- **嵌入式高清视觉与 Logo 提取**：自动导出母版与页面中嵌入的图片与矢量 Logo 至 `.undoppt/assets/`。
+### 4. Deep Master AST Decompiler (Undo Engine)
+- **Placeholder Coordinate Extraction**: Traverses Slide Masters and Layouts to calculate absolute coordinates (inches) and grid bounds for `Title`, `Body`, `Subtitle`, and `Footer`.
+- **Automatic Theme Mode Detection**: Computes canvas and shape luminance to classify presentations into `light` or `dark` mode and maps contrasting typography palettes.
+- **Embedded Media & Logo Export**: Extracts raster images and vector logos embedded in corporate master decks into `.undoppt/assets/`.
 
-### 5. 双端极简交付与认知自省 (Dual-Format Delivery & Notes Inspection)
-- **PowerPoint PPTX**：100% 原生矢量形状、规整表格与矢量图表，可在 Microsoft PowerPoint / Apple Keynote 中自由二次编辑，**绝不贴图**；自动将单页使命、因果转折和核心证据注入底层 Speaker Notes 演讲备注。
-- **单文件自包含 HTML**：将演示文稿打包为单个 `.html` 文件，内置精美排版、键盘导航（←/→/Space/F 全屏）、进度条，按 `N` 键滑出认知动力学抽屉，**双击即播，零依赖，极度易于分发**。
+### 5. Dual-Format Delivery & Cognitive Inspection
+- **PowerPoint PPTX**: 100% native vector shapes, formatted tables, and vector charts editable in Microsoft PowerPoint and Apple Keynote (**never static images**); automatically injects slide missions, transitions, and talking points into PowerPoint Speaker Notes.
+- **Single-File Standalone HTML**: Bundles presentations into a single, self-contained HTML file featuring Tailwind CSS, keyboard shortcuts (`←`/`→`/`Space`/`F`), progress bars, and an `N`-key slide-out Cognitive Inspector drawer (**zero dependencies, double-click to present**).
 
-### 6. 毫秒级双向协同感知 (Always-in-Sync)
-- 每一轮对话伊始，优先运行 **Sync Watcher**，在 `<10ms` 内完成 SHA-256 指纹比对。
-- 若用户在外部对 PPTX 进行了手动修改（如调整标题、删减节点、微调颜色），智能体自动生成 AST 差异分析，并在回复开始前主动告知用户：“*检测到您在本地修改了第 3 页，已同步更新意图...*”，真正实现人机并肩共创。
+### 6. Sub-10ms Always-in-Sync Collaboration
+- At the start of each dialogue turn, the **Sync Watcher** checks SHA-256 fingerprints in `<10ms`.
+- If a human expert edits the PPTX externally (adjusting text, deleting cards, or changing colors), the agent computes an AST diff and acknowledges the changes before responding, achieving true human-in-the-loop pair authoring.
 
 ---
 
-## 📁 目录结构
+## 📁 Repository Structure
 
 ```text
 undoPPT/
-├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.1.0)
-├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (3.1.0)
-│   ├── cognitive_planner.py        # 6 大场景通用解耦认知规划器与自愈修正循环 (v3.1.0)
-│   ├── semantic_auditor.py         # 场景感知语义因果认知审计器 (修辞/离心/实证/疑虑)
-│   ├── content_auditor.py          # 15 大图元 10 维认知质量与容量预算综合审计器
-│   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
-│   ├── vision_extractor.py         # 视觉启发式解析器
-│   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
-│   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉)
-│   └── sync_watcher.py             # 毫秒级指纹追踪与语义 AST 差异对比器
-├── presets/                        # 4 大工业级预设设计系统 (含 content_budget 预算规则)
-│   ├── modern_bento.json           # 现代企业 Bento 卡片 (默认)
-│   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
-│   ├── tech_keynote.json           # 科技暗黑大屏展演
-│   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件 (15/15 passing)
+├── .agents/skills/undo-ppt/         # Workspace Agent Skill registration
+│   └── SKILL.md                    # Super Skill specification and SOP (v3.1.0)
+├── core/                           # Python automation core engine
+│   ├── __init__.py                 # Version export (3.1.0)
+│   ├── cognitive_planner.py        # 6-scenario decoupled cognitive planner & self-healing loop
+│   ├── semantic_auditor.py         # Scenario-aware semantic & causal rhetoric auditor
+│   ├── content_auditor.py          # 15-primitive 10-dimension quality & budget auditor
+│   ├── undo_engine.py              # Master AST slot decompiler & theme/asset extractor
+│   ├── vision_extractor.py         # Visual heuristic analyzer
+│   ├── pptx_builder.py             # 15-primitive native vector PPTX builder (charts, tables, notes)
+│   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer)
+│   └── sync_watcher.py             # Sub-10ms fingerprint tracking & AST diff comparator
+├── docs/                           # Complete technical documentation suite
+│   └── en/                         # English documentation
+│       ├── blueprint_specification.md # 15-primitive JSON Schema reference and examples
+│       ├── cli_reference.md        # Complete CLI command reference & options
+│       ├── architecture.md         # Engine internals, data flow, and pipeline deep-dive
+│       └── agent_integration.md    # Integration guide for Cursor, Claude, Codex, Windsurf, etc.
+├── presets/                        # 4 industrial preset design systems & content budgets
+│   ├── modern_bento.json           # Modern enterprise bento grid (default)
+│   ├── consulting_minimalist.json  # High-density management consulting
+│   ├── tech_keynote.json           # Dark mode tech conference keynote
+│   └── enterprise_architecture.json# Systems architecture & engineering container
+├── tests/                          # Automated unit and integration test suite (15/15 passing)
 │   └── test_engine.py
-├── output/                         # 最终交付物目录
-│   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)
-│   └── presentation.html           # 单文件自包含 HTML (含认知抽屉)
-├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
-├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
-├── DESIGN_PHILOSOPHY.md            # 核心设计哲学与 Agent-Skill 协同白皮书 (v3.1.0)
-├── README.md                       # 本说明文档
-└── CHANGELOG.md                    # 语义化版本变更记录
+├── output/                         # Output delivery directory
+│   ├── presentation.pptx           # Editable vector PPTX (with Speaker Notes)
+│   └── presentation.html           # Standalone single-file HTML (with Cognitive Inspector)
+├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
+├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
+├── DESIGN_PHILOSOPHY.md            # Whitepaper: Design philosophy & architecture synergy (English)
+├── DESIGN_PHILOSOPHY_zh.md         # Whitepaper: Design philosophy & architecture synergy (Chinese)
+├── README.md                       # Main project documentation (English default)
+├── README_zh.md                    # Chinese documentation
+├── CONTRIBUTING.md                 # Contribution guidelines
+└── CHANGELOG.md                    # Semantic version changelog
 ```
 
 ---
 
-## 🚀 快速上手 (CLI Quickstart)
+## 🚀 CLI Quickstart
 
-### 1. 环境依赖
-仅需 Python 3.10+ 及 `python-pptx`：
+For full flag definitions and options, see [CLI Reference](docs/en/cli_reference.md).
+
+### 1. Requirements
+Requires Python 3.10+ and `python-pptx`:
 ```bash
-pip install python-pptx
+pip install -r requirements.txt
 ```
 
-### 2. 自主规划与生成 (Plan & Generate)
-支持一句话输入，可选挂载事实参考文档：
+### 2. Autonomous Planning & Generation
 ```bash
-# 规划高分蓝图 (支持参考文档摄取与自愈修正)
-python3 cli.py plan --prompt "某大型制造企业数字化战略规划" [--input-doc doc.md]
+# Plan a validated blueprint (supports reference document grounding & self-correction)
+python3 cli.py plan --prompt "Enterprise AI Agent Strategy" [--input-doc doc.md]
 
-# 一键端到端极速交付 (规划 -> 事实锚定 -> 审计 -> 双端构建)
-python3 cli.py generate --prompt "某大型制造企业数字化战略规划" [--input-doc doc.md] [--template /path/to/template.pptx]
+# End-to-end one-shot generation (Plan -> Ground -> Audit -> Dual-format Build)
+python3 cli.py generate --prompt "Enterprise AI Agent Strategy" [--input-doc doc.md] [--template /path/to/template.pptx]
 ```
 
-### 3. 内容质量与深度语义因果审计 (Audit)
-在生成前对蓝图进行严格的结构质量与语义修辞审计（综合分 + 结构分 + 语义分 + 4大子项）：
+### 3. Cognitive Quality & Causal Auditing
+Audit a blueprint before rendering (produces Overall, Structural, and Semantic scores):
 ```bash
 python3 cli.py audit --blueprint .undoppt/blueprint.json
 ```
 
-### 4. 解析提取用户模板母版 (Undo)
-深度解构企业 PPTX 模板母版、槽位坐标、明暗主题与多媒体资产：
+### 4. Template Master Decompilation (Undo)
+Decompile an enterprise PowerPoint template into reusable design tokens:
 ```bash
 python3 cli.py undo --template /path/to/company_template.pptx --out .undoppt/design_tokens.json
 ```
 
-### 5. 基于蓝图与规范渲染 (Build)
+### 5. Render Deliverables from Blueprint (Build)
 ```bash
 python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json --format all
 ```
 
-### 6. 毫秒级协同感知与 Diff 检查 (Sync)
-当您在本地用 PowerPoint 或 Keynote 修改了交付物后，检查改动：
+### 6. Real-Time Collaboration & Diff Detection (Sync)
+Detect changes after manually modifying slides in PowerPoint or Keynote:
 ```bash
 python3 cli.py sync --target output/presentation.pptx
 ```
 
----
-
-## 🤖 在各大主流 AI Agent（Cursor、Claude Code、Codex、Windsurf、WorkBuddy 等）中使用
-
-本项目支持在各大主流 AI Agent 环境中无缝挂载使用（按市场普及度排序）：
-1. **Cursor / Claude Code / OpenAI Codex**：克隆到对应 Agent 的标准 skills 路径（如 `~/.claude/skills/undo-ppt` 或工作区 `.agents/skills/undo-ppt`）；
-2. **Windsurf / Trae**：在当前项目根目录 `.agents/skills/undo-ppt/` 或全局配置中直接挂载；
-3. **腾讯 WorkBuddy / 办公智能体平台**：作为办公自动化或企业自定义工作流 Skill 直接导入；
-4. **Google Antigravity**：支持工作区 `.agents/skills/undo-ppt/SKILL.md` 与全局 `~/.gemini/config/skills/undo-ppt/SKILL.md` 双重感知；
-5. **OpenCode** 等开源智能体：直接识别根目录 `SKILL.md` 规范。
-
-在任意对话中，只需自然表达您的 PPT 诉求即可触发：
-> *“帮我准备一份面向管理层的企业级 AI 战略规划汇报，我有一个公司的模板 PPT。”*
-
-Skill 会自动进入 **Rhythm A 深度引导流程**：
-1. **认知契约与深度探针**：主动澄清核心论题、受众立场偏好、认知差与终局行动目标；
-2. **模板解构与规范学习**：接收并解析您的模板，提炼色彩与版式规范；
-3. **蓝图编排与质量审计**：规划每页的图表化元语并执行 10 维内容质量动力学审核；
-4. **双模交付**：交付内置演讲备注的 PPTX + 内置认知动力学抽屉的单文件 HTML；
-5. **实时协同**：感知您的每一次本地手动调整并持续保持同频！
-
----
-
-## 🧪 自动化测试验证
-
-运行单元与集成测试套件：
+### 7. Run Demo Showcase
 ```bash
-python3 -m unittest discover -s tests -v
+python3 cli.py demo
 ```
 
 ---
 
-## 📄 License & 版本演进
+## 🤖 AI Agent Integration
 
-- 遵循 **MIT License** 开放许可。
-- 遵循 [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html) 规范，详见 [CHANGELOG.md](CHANGELOG.md)。
+`undoPPT` runs seamlessly inside all major developer AI agents (see [Agent Integration Guide](docs/en/agent_integration.md)):
+
+1. **Cursor / Claude Code / OpenAI Codex**: Clone into standard skills directory (`~/.claude/skills/undo-ppt` or workspace `.agents/skills/undo-ppt`);
+2. **Windsurf / Trae**: Register under `.agents/skills/undo-ppt/` or global configuration;
+3. **Tencent WorkBuddy / Enterprise Platforms**: Import as a custom corporate automation skill;
+4. **Google Antigravity**: Supported via workspace `.agents/skills/undo-ppt/SKILL.md` or global `~/.gemini/config/skills/undo-ppt/SKILL.md`;
+5. **OpenCode & Open Source Agents**: Discovered via root `SKILL.md`.
+
+Once loaded, trigger the skill naturally in conversation:
+> *"Help me create an enterprise AI strategy proposal for the board. I have attached our company PPT template."*
+
+The skill executes the **Rhythm A Deep Guided SOP**:
+1. **Cognitive Contract Probe**: Gathers core thesis, audience stance, knowledge delta, and desired action;
+2. **Template Deconstruction**: Decompiles the template into typography, palettes, and slot bounds;
+3. **Blueprint Composition & QA**: Maps content to 15 layout primitives and executes 10-dimension cognitive quality audits;
+4. **Dual-Format Delivery**: Produces editable PPTX (with speaker notes) and standalone HTML (with `N`-key inspector);
+5. **Continuous Sync**: Senses and respects manual edits made by the human presenter.
+
+---
+
+## 📚 Detailed Documentation Suite
+
+- 📖 [Design Philosophy Whitepaper](DESIGN_PHILOSOPHY.md) ([Chinese Version](DESIGN_PHILOSOPHY_zh.md))
+- 📐 [Blueprint Specification (15 Layout Primitives)](docs/en/blueprint_specification.md)
+- 💻 [CLI Command Reference](docs/en/cli_reference.md)
+- 🏗️ [Engine Architecture Deep Dive](docs/en/architecture.md)
+- 🔌 [AI Agent Integration Guide](docs/en/agent_integration.md)
+- 🤝 [Contributing Guide](CONTRIBUTING.md)
+
+---
+
+## 🧪 Automated Testing
+
+Run the full unit and regression test suite:
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+All 15 test suites pass cleanly across Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+
+---
+
+## 📄 License & Semantic Versioning
+
+- Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+- Adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html). See [CHANGELOG.md](CHANGELOG.md).

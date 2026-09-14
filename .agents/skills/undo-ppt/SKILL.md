@@ -13,7 +13,7 @@ description: >-
 
 # undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.1.0)
 
-`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](file:///Users/liuweigang/undoPPT/DESIGN_PHILOSOPHY.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
+`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](../../../DESIGN_PHILOSOPHY.md) / [中文白皮书](../../../DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](../../../docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
 
 ---
 
@@ -186,3 +186,4 @@ python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 # 7. 一键运行端到端示范流水线
 python3 "<SKILL_ROOT>/cli.py" demo
 ```
+

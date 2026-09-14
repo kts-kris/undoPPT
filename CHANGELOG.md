@@ -5,9 +5,18 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [3.1.0] - 2026-09-12
+## [3.1.0] - 2026-09-14
 
 ### Added
+- **Comprehensive English Documentation Suite**:
+  - Full English default `README.md` with bilingual toggle linking to `README_zh.md`.
+  - Complete English translation of the Design Philosophy Whitepaper (`DESIGN_PHILOSOPHY.md`) with bilingual toggle linking to `DESIGN_PHILOSOPHY_zh.md`.
+  - In-depth technical guides under `docs/en/`:
+    - `docs/en/blueprint_specification.md`: Full JSON Schema reference and examples for all 15 layout primitives.
+    - `docs/en/cli_reference.md`: Comprehensive CLI command manual with parameter breakdowns.
+    - `docs/en/architecture.md`: Architectural deep-dive covering decoupled cognition, pipelines, and modules.
+    - `docs/en/agent_integration.md`: AI Agent orchestration guide across Cursor, Claude Code, OpenAI Codex, Windsurf, Trae, WorkBuddy, Google Antigravity, and OpenCode.
+  - Open-source contributing guide (`CONTRIBUTING.md`).
 - **Design Philosophy & Architecture Synergy Whitepaper (`DESIGN_PHILOSOPHY.md`)**:
   - Released comprehensive whitepaper formalizing the foundational manifesto: *"PPT is not an art album, but an audience-centric cognitive reshaping and decision intervention project."*
   - Explicitly defined the operational boundaries between **AI Agent** (Soft Cognition: Q1-Q4 contract probe, 6-scenario routing, 15-primitive blueprint authoring, intent reflection) and **undoPPT Skill** (Hard Enforcement: master AST decompilation, mathematical layout, native vector charts/tables, 10-dimension dual auditing, SHA-256 sync sensing).

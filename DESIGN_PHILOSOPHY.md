@@ -1,160 +1,168 @@
-# undoPPT 设计哲学与架构协同白皮书 (Design Philosophy & Architecture Synergy)
+<div align="center">
 
-> **版本**：v3.1.0  
-> **定位**：新一代演示文稿智能解构与重构超级智能体（undoPPT Super Skill）核心设计规范与质量工程纲领。  
-> **核心宣言**：*“PPT 的本质不是美术画册，而是以受众为中心的认知重塑与决策干预工程。”*
+# undoPPT Design Philosophy & Architecture Synergy Whitepaper
 
----
+[English](DESIGN_PHILOSOPHY.md) | [简体中文](DESIGN_PHILOSOPHY_zh.md)
 
-## 1. 行业痛点：为什么传统方式做不好 PPT？
+</div>
 
-在现代办公与技术演进中，制作一份专业演示文稿始终面临两大极端路线的严重缺陷：
-
-```
-┌──────────────────────────────────────┐     ┌──────────────────────────────────────┐
-│       极端路线 A：纯 AI Agent / LLM    │     │      极端路线 B：传统模版 / 纯代码规则  │
-├──────────────────────────────────────┤     ├──────────────────────────────────────┤
-│ ❌ 算不好几何坐标与像素，频繁排版越界 │     │ ❌ 静态占位符替换，千篇一律无灵魂    │
-│ ❌ 输出欲望强烈，PPT 当成 Word 写     │     │ ❌ 缺乏因果推演逻辑，无法触达受众心智│
-│ ❌ 只能生成死板切图，无法二次编辑     │     │ ❌ 遇到非通用商业场景（如教育）直接瘫痪│
-│ ❌ 无法生成 Office/Keynote 原生矢量图表 │   │ ❌ 无法理解非结构化业务背景与人类意图│
-└──────────────────────────────────────┘     └──────────────────────────────────────┘
-```
-
-为了终结这一困局，`undoPPT` 提出了**“软性认知与硬性约束解耦”**的系统架构：
-- **大模型长于高维语义推理、意图洞察与业务咨询，但极不擅长算像素坐标与严格的物理排版；**
-- **工程引擎长于母版逆向、几何数学排版、数据图表矢量构建与规则质检，但缺乏对受众心智的敏锐感知。**
-
-因此，`undoPPT` 将两者的职责边界做出了清晰、彻底的划分。
+> **Version**: v3.1.0  
+> **Positioning**: Core design specifications and quality engineering manifesto for the next-generation presentation deconstruction & re-engineering super agent (undoPPT Super Skill).  
+> **Core Manifesto**: *“A presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.”*
 
 ---
 
-## 2. 职责分工矩阵：Agent 管什么 vs Skill 管什么？
+## 1. Industry Dilemma: Why Traditional Approaches Fail at Presentations
 
+In modern productivity and software engineering, crafting high-stakes professional presentations has historically been trapped between two flawed extremes:
+
+```text
+┌───────────────────────────────────────────┐     ┌───────────────────────────────────────────┐
+│     Extreme Route A: Pure AI Agent / LLM  │     │ Extreme Route B: Legacy Template / Rules  │
+├───────────────────────────────────────────┤     ├───────────────────────────────────────────┤
+│ ❌ Incapable of calculating coordinates   │     │ ❌ Static placeholder fills, lifeless     │
+│ ❌ Unchecked verbosity, treats PPT as Doc │     │ ❌ Lacks causal narrative progression     │
+│ ❌ Outputs raster bitmaps, non-editable   │     │ ❌ Paralyzed outside generic corporate deck│
+│ ❌ Cannot generate native vector charts   │     │ ❌ Blind to unstructured business context │
+└───────────────────────────────────────────┘     └───────────────────────────────────────────┘
 ```
+
+To resolve this dilemma, `undoPPT` establishes an architecture based on **Decoupling Soft Cognition from Hard Enforcement**:
+- **Large Language Models (LLMs)** excel at high-dimensional semantic reasoning, intent discernment, and strategic consulting, but are fundamentally unreliable at calculating pixel coordinates and enforcing physical layout geometry.
+- **Deterministic Engineering Engines** excel at AST template decompilation, geometric math, native vector chart compilation, and rule-based QA, but lack empathy for audience psychology and narrative flow.
+
+Therefore, `undoPPT` defines an explicit, uncompromising separation of concerns between the two layers.
+
+---
+
+## 2. Division of Responsibility Matrix: Agent vs. Skill
+
+```text
                 ┌─────────────────────────────────────────────────────────┐
-                │                     AI AGENT (大脑)                     │
-                │   • 认知契约探针 (Q1~Q4)   • 6大场景原型识别与路由       │
-                │   • 事实文档提炼与归纳     • 15大图元叙事编排 (Blueprint)│
-                │   • 人机意图反思与动态同频                               │
+                │                     AI AGENT (Brain)                    │
+                │   • Cognitive Contract Probe (Q1-Q4)                    │
+                │   • 6-Scenario Archetype Routing                        │
+                │   • Fact Ingestion & Entity Extraction                  │
+                │   • 15-Primitive Narrative Composition (blueprint.json) │
+                │   • Human-in-the-Loop Intent Alignment & Reflection     │
                 └───────────────────────────┬─────────────────────────────┘
-                                            │ 交付协议: blueprint.json
+                                            │ Delivery Protocol: blueprint.json
                                             ▼
                 ┌─────────────────────────────────────────────────────────┐
-                │                  undoPPT SKILL (执行底座)                │
-                │   • 母版 AST 逆向解构     • 10维双重认知质量审计器       │
-                │   • 15大原生矢量图元渲染  • 坐标尺寸计算与设计系统穿透   │
-                │   • 原生可编辑图表与表格  • 毫秒级文件指纹与 Diff 侦测  │
-                └───────────────────────────┘
+                │                 undoPPT SKILL (Engine)                  │
+                │   • Master Template AST Decompilation (Undo Engine)     │
+                │   • 10-Dimension Dual Cognitive Quality Auditing        │
+                │   • 15 Native Vector Layout Renderers (PPTX & HTML)     │
+                │   • Geometry Calculation & Design Token Enforcement     │
+                │   • Sub-10ms SHA-256 Fingerprint & AST Diff Sensing     │
+                └─────────────────────────────────────────────────────────┘
 ```
 
-### 2.1 哪些是 AI Agent 负责的？（软性认知中枢、主编与咨询顾问）
-Agent 负责高自由度、需要深度理解业务上下文的认知工作：
+### 2.1 What is the AI Agent Responsible For? (Cognitive Core, Chief Editor & Strategic Consultant)
+The Agent handles high-freedom, context-heavy cognitive tasks that demand deep semantic understanding:
 
-1. **认知契约探针（Cognitive Contract Probe，Q1~Q4）**：
-   - 拒绝审讯式对话，以资深管理咨询顾问的视角引导用户澄清四大认知底座：
-     - **Q1 核心主旨**：排除枝节干扰，整套方案最核心的一句观点（Core Thesis）；
-     - **Q2 受众画像与立场**：汇报对象持什么态度、防范什么风险、核心诉求是什么；
-     - **Q3 认知差与盲区痛点**：对方已知什么（Baseline）vs 未知盲区与深层痛点（Knowledge Delta）；
-     - **Q4 终局行动转化**：汇报结束后，希望对方在认知上理解什么、心理上相信什么、当场做出什么决策（Act）。
-2. **场景原型研判与路由（Scenario Routing）**：
-   - 智能识别 6 大场景原型（战略规划、技术架构、产品路演、个人履历、教育教学、通用政企汇报），匹配相应场景的受众心智预期。
-3. **事实提炼与 15 大图元叙事蓝图编排（Blueprint Composition）**：
-   - 将用户提供的复杂事实长文（`--input-doc`）或多轮沟通内容，归纳提炼为严格遵循规约的 `blueprint.json`；
-   - 为每一页量身打造：
-     - **行动结论式标题（Action Titles）**：杜绝“现状分析”等中性被动词，采用“痛点：...”或“成效：...”观点先行；
-     - **叙事节奏节拍（Narrative Arc）**：合理安排 `hook ➔ conflict ➔ breakthrough ➔ evidence ➔ progression ➔ call_to_action`；
-     - **显式因果修辞（Transitions）**：页间必须具备转折连词，杜绝信息孤岛；
-     - **单页纯粹使命（Mission）**：一页承担一个唯一认知职责；
-     - **核心实证（Core Evidence）**：提炼量化数据（百分比、比率、延迟）或代表性教学范例。
-4. **人类意图对齐与反思（Human-in-the-loop Alignment）**：
-   - 当人类专家在本地修改了 PPT 文件后，Agent 结合差异分析理解修改背后的动机，并在后续轮次保持同频进化。
-
----
-
-### 2.2 哪些是 undoPPT Skill 引擎负责的？（硬性执行底座、几何排版与规则红线）
-Skill 引擎充当高精度排版物理流水线与独立质检员，坚决接管大模型做不好的底层确定性工作：
-
-1. **母版 AST 深度逆向解构（Undo Engine）**：
-   - 深度解构用户的企业 PPTX 模板，解析 Slide Masters、Layouts、标题/正文/副标题槽位的绝对坐标（英寸）与相对网格比例；
-   - 自动检测背景与形状的明暗度（Canvas Luminance），推导 `dark` 或 `light` 视觉系统；
-   - 自动提取内嵌的高清多媒体与矢量 Logo 至本地缓存。
-2. **设计系统穿透与信息预算（Design Tokens & Content Budgets）**：
-   - 集中管控主色、辅助色、对比表面色、边框阴影以及字体阶梯；
-   - 严厉把控信息容量预算红线（如卡片 ≤ 4 张、架构层级 ≤ 4 层、表格行数 ≤ 8 行、图表维度 ≤ 8 项）。
-3. **100% 原生双端矢量物理渲染（PPTX & HTML Builders）**：
-   - **绝不贴图**：基于 `python-pptx` 构建原生自适应矢量矩形、卡片、徽章与文字框；
-   - **原生可编辑图表**：基于 `CategoryChartData` 构造原生柱状图、折线图、饼图，用户在 Office / Keynote 中**直接双击即可修改底层数据**；
-   - **原生规范表格**：自动计算列宽、单元格留白与交替斑马纹；
-   - **演讲备注自动化注入**：将单页使命、因果转折和口播讲稿写入底层 Speaker Notes，赋能脱稿演讲；
-   - **单文件 HTML 编译**：生成内置 Tailwind、全屏演示与按 `N` 键滑出认知动力学抽屉的零依赖文件。
-4. **10 维双重认知审计器（Content & Semantic Auditors）**：
-   - 独立于大模型执行客观质量打分：结构红线检查 + 深度因果修辞审计 + 主旨向心力算法 + 实证加权计算，输出结构化体检报告。
-5. **毫秒级协同感知（Sync Watcher）**：
-   - 基于 SHA-256 算法，`<10ms` 监测外部文件修改并生成结构化 Diff。
+1. **Cognitive Contract Probe (Q1–Q4)**:
+   - Rather than conducting an interrogative questionnaire, the Agent acts as a senior management consultant to clarify four cognitive pillars:
+     - **Q1 Core Message**: Stripping away noise, what is the single central thesis (Core Thesis)?
+     - **Q2 Audience Profile & Stance**: Who is the audience, what risks do they fear, and what do they prioritize?
+     - **Q3 Knowledge Delta & Blindspots**: What does the audience already know (Baseline) vs. what critical blindspots and pain points do they have (Knowledge Delta)?
+     - **Q4 Final Target Action**: After the presentation, what should the audience understand, believe, and immediately decide or execute (Act)?
+2. **Scenario Archetype Classification & Routing**:
+   - Intelligently recognizes 6 universal scenario archetypes (`strategic_planning`, `tech_architecture`, `product_pitch`, `personal_resume`, `education_training`, `general_informative`) to align with audience expectations.
+3. **Fact Ingestion & 15-Primitive Blueprint Composition**:
+   - Distills unstructured text (`--input-doc`) and conversation history into a strictly typed `blueprint.json`;
+   - Ensures each slide features:
+     - **Action Titles**: Replaces passive titles with conclusion-first claims ("Pain Point: ..." or "Impact: ...");
+     - **Narrative Arc**: Sequences slides through `hook ➔ conflict ➔ breakthrough ➔ evidence ➔ progression ➔ call_to_action`;
+     - **Explicit Causal Transitions**: Embeds transitional conjunctions between slides to eliminate isolated information silos;
+     - **Single Slide Responsibility (Mission)**: Each slide fulfills exactly one cognitive objective;
+     - **Smoking Gun Evidence**: Anchors claims with quantitative metrics (percentages, ratios, latency) or pedagogical case studies.
+4. **Human-in-the-Loop Alignment & Reflection**:
+   - When human experts edit files locally, the Agent uses diff analysis to infer user intent and adapts subsequent rounds cooperatively.
 
 ---
 
-## 3. 为什么这么设计？（设计哲学与架构权衡）
+### 2.2 What is the undoPPT Skill Engine Responsible For? (Hard Execution Foundation, Geometry & Quality Gates)
+The Skill engine acts as an automated precision typesetting pipeline and independent quality inspector:
 
-本设计确立了三大核心哲学准则：
-
-### 原则一：软认知与硬约束解耦 (Soft Cognition vs. Hard Enforcement)
-大模型是**“思考者（Thinker）”**，而不是**“几何渲染器（Renderer）”**。
-让大模型直接手写 PPT XML 或盲猜像素坐标，必然导致元素错位、文字溢出与灾难性视觉崩塌。`undoPPT` 确立了统一的交付协议——**15 大图元 JSON Blueprint**。Agent 负责产出逻辑无懈可击的数据蓝图，Skill 引擎负责精准无误地将其在物理坐标系中装配呈现。
-
-### 原则二：结构反向塑造内容 (Structure Forces Brevity)
-大模型具有天然的“信息膨胀倾向”，如果给它自由排版空间，它就会把 PPT 变成长篇报告。
-`undoPPT` **不提供任何“自由大段文本”的版式**。引擎只提供 15 种高阶图元（Bento 卡片、流程流、规整表格、矢量图表等），每种图元的数据字段受到严格约束（例如 Bento 仅允许 2~4 个 cards，每张卡仅支持 tag/title/desc/bullets）。**版式模具的刚性，倒逼 Agent 在撰写内容时必须极度凝练，彻底消灭“文字垃圾桶”。**
-
-### 原则三：永远保留人类干预权 (Always-in-Sync)
-传统 AI PPT 工具的最大痛点是“一次性交付”：用户一旦手动调整了 PPT，就无法继续借助 AI 迭代；再次生成又会覆盖掉人类的心血。
-`undoPPT` 的设计哲学是将人类专家视为最终决策者。原生矢量对象确保人类能自由二次编辑，而 Sync Watcher 哨兵确保智能体能在毫秒级感知人类的每一次手动微调，形成并肩共创的正向飞轮。
+1. **Deep Master AST Decompiler (Undo Engine)**:
+   - Traverses Slide Masters and Layouts to extract coordinates (in inches) and relative grid proportions for `Title`, `Body`, `Subtitle`, and `Footer` placeholders;
+   - Computes canvas luminance to classify the visual style as `dark` or `light` mode;
+   - Exports embedded high-resolution raster images and vector logos to `.undoppt/assets/`.
+2. **Design Token Enforcement & Content Budgets**:
+   - Centralizes palettes, secondary colors, contrasting surface tones, border radii, and typographic hierarchies;
+   - Enforces content budget limits (e.g., cards ≤ 4, architecture layers ≤ 4, table rows ≤ 8, chart categories ≤ 8).
+3. **100% Native Dual-Format Vector Physical Rendering (PPTX & HTML Builders)**:
+   - **Zero Bitmaps**: Assembles vector shapes, cards, badges, and text frames using `python-pptx`;
+   - **Native Editable Charts**: Uses `CategoryChartData` for clustered columns, lines, and pie charts. Users can double-click charts in PowerPoint or Keynote to modify underlying spreadsheet values directly;
+   - **Formatted Data Tables**: Automatically calculates column widths, cell paddings, and alternating zebra stripes;
+   - **Automated Speaker Notes Injection**: Writes slide missions, rhetorical transitions, and conversational talking points into PowerPoint Speaker Notes;
+   - **Single-File Standalone HTML**: Compiles self-contained HTML with Tailwind CSS, full-screen presentation mode, and a slide-out Cognitive Inspector drawer triggered by the `N` key.
+4. **10-Dimension Dual Cognitive Quality Auditor (Content & Semantic Auditors)**:
+   - Evaluates blueprints independently of the LLM: verifies structural redlines, rhetorical transitions, thesis centroid alignment, and empirical evidence weights.
+5. **Sub-10ms Always-in-Sync Watcher**:
+   - Uses SHA-256 fingerprinting to detect external edits in `<10ms` and generates semantic AST diffs.
 
 ---
 
-## 4. 如何保障最终产出“符合要求的 PPT”？（五重确定性闭环）
+## 3. Why This Design? (Core Principles & Architectural Tradeoffs)
 
-`undoPPT` 构建了从需求输入到最终双端交付的**五重确定性闭环机制**，确保每一次产出都具备咨询级专业度：
+### Principle 1: Soft Cognition vs. Hard Enforcement
+Large Language Models are **Thinkers**, not **Geometric Renderers**.  
+Prompting an LLM to generate raw PPTX XML or guess pixel coordinates inevitably yields overflowing text, overlapping bounding boxes, and visual breakdown. `undoPPT` introduces the **15-Primitive JSON Blueprint** as an immutable contract. The Agent produces structured data; the Skill engine mounts it onto a coordinate grid deterministically.
+
+### Principle 2: Structure Forces Brevity
+LLMs have an inherent tendency to output expansive walls of text when unconstrained.  
+`undoPPT` provides **zero free-form text layouts**. The engine offers only 15 high-fidelity infographic primitives (Bento cards, process flows, structured tables, vector charts, etc.), each with strict schema constraints (e.g., Bento requires 2–4 cards, each with tag/title/desc/bullets). **The rigidity of the layout primitives forces the Agent to distill ideas into crisp, high-density insights.**
+
+### Principle 3: Always Preserve Human Intervention Agency (Always-in-Sync)
+Traditional AI presentation tools operate as one-way black boxes: once a user edits a generated slide, AI iteration breaks, and regenerating overwrites all manual refinements.  
+`undoPPT` treats the human expert as the ultimate decision-maker. Native vector shapes enable unconstrained manual adjustments in Office/Keynote, while the Sync Watcher senses modifications in milliseconds to keep the human and AI in lockstep.
+
+---
+
+## 4. Guaranteeing Quality: The 5-Layer Certainty Closed-Loop Framework
+
+`undoPPT` incorporates a **5-Layer Quality Assurance Closed-Loop** from user input to final delivery:
 
 ```mermaid
 flowchart LR
-    A[第1重: 认知契约先行] -->|防跑题与自嗨| B[第2重: 15大图元约束]
-    B -->|防文字垃圾桶| C[第3重: 设计规范与预算]
-    C -->|防视觉混乱| D[第4重: 10维双重审计与自愈]
-    D -->|防逻辑断裂| E[第5重: 矢量原生双端交付]
-    E -->|防无法修改与忘词| F[产出卓越演示文稿]
+    A[Layer 1: Cognitive Contract] -->|Eliminates Ramble| B[Layer 2: 15-Primitive Schema]
+    B -->|Eliminates Text Dumps| C[Layer 3: Design Tokens & Budgets]
+    C -->|Eliminates Visual Chaos| D[Layer 4: Dual Audit & Self-Healing]
+    D -->|Eliminates Broken Logic| E[Layer 5: Native Vector Deliverables]
+    E -->|Enables Editability & Cues| F[Consulting-Grade Presentation]
 ```
 
-### 第 1 重保障：认知契约先行 —— 从源头杜绝“无效自嗨与信息偏题”
-- 严格遵循 Q1~Q4 认知底座探针，不进入无准备的盲目生成；
-- 审计器中的 **“主旨向心力算法”** 会对全篇单页核心词汇与顶层 `core_thesis` 进行语义交集核验，一旦单页出现离心漂移，立即告警并扣分。
+### Layer 1: Cognitive Contract First — Prevents Off-Topic Rambling
+- Adheres to Q1–Q4 probes before any generation starts;
+- The **Thesis Centroid Drift Algorithm** checks the semantic intersection between slide keywords and the top-level `core_thesis`, flagging slides that drift away from the core goal.
 
-### 第 2 重保障：15 大图元强类型约束 —— 从结构上杜绝“文字垃圾桶”
-- 每一页必须映射至 15 种标准图元之一；
-- 强制包含 `action_title`（结论先行）、`mission`（单页使命）与 `transition`（因果连词）；
-- 彻底摒弃通篇无意义的装饰性图形与假大空口号，全篇由结构化论据支撑。
+### Layer 2: 15-Primitive Strong Type Constraint — Prevents Wall-of-Text Slides
+- Every slide must conform to one of the 15 standard layout schemas;
+- Mandates `action_title` (conclusion-first), `mission` (single responsibility), and `transition` (causal bridge);
+- Eliminates meaningless decorative clutter in favor of structured evidence.
 
-### 第 3 重保障：Design Tokens 强穿透 —— 从视觉上保障“母版一致与呼吸感”
-- 严格依托母版或现代 Bento / 科技暗黑 Presets 控制调色板、圆角和字体；
-- 哪怕中途切换企业主色调，蓝图语义内容零改动，底座自动根据 Design Tokens 重新排版渲染，永远保有专业设计团队出品的网格呼吸感。
+### Layer 3: Design Tokens Penetration — Guarantees Visual Cohesion
+- Controls palettes, radii, and typography using master templates or preset themes (`modern_bento`, `consulting_minimalist`, `tech_keynote`, `enterprise_architecture`);
+- Changing brand themes dynamically updates the presentation without requiring semantic edits in the blueprint.
 
-### 第 4 重保障：10 维双重审计与自愈循环 —— 自带“交付前质检机”
-在蓝图提交渲染前，必须通过 `cli.py audit` 的双重体检：
-- **结构红线**：卡片数、层级数、表格行列数是否超标？标题是否属于被动命名？
-- **语义因果**：页间是否具有因果、对立、突破修辞？是否包含百分比/延迟等硬核证据或教学实证？受众痛点是否正面击穿？
-- **自愈修正闭环（Self-Correction Loop）**：评分低于 85 分时，系统自动识别问题点并生成补丁修复，直到评级达到优秀才进入构建阶段。
+### Layer 4: 10-Dimension Dual Auditing & Self-Correction Loop — Automated Pre-Delivery QA
+Before rendering, blueprints pass through `cli.py audit`:
+- **Structural Constraints**: Verifies card counts, architecture layers, table dimensions, and headline phrasing;
+- **Semantic Rhetoric**: Evaluates causal, contrast, and breakthrough conjunctions, checks for hard evidence (percentages, metrics, case studies), and confirms audience objection resolution;
+- **Self-Correction Refinement Loop**: If the audit score drops below 85, the engine automatically patches weaknesses until the blueprint achieves an excellent rating.
 
-### 第 5 重保障：双端原生可编辑与演讲备注注入 —— 从落地场景保障“真正可用”
-- **彻底可改**：交付物 100% 为原生矢量形状、表格与原生数据图表，用户无需任何插件即可在 PowerPoint / Keynote 中二次微调；
-- **演讲兜底**：每一页的底层 Speaker Notes 自动注入该页的认知使命、因果过渡提示词和场景化口播台词，打开“演讲者视图”即可从容脱稿开讲。
+### Layer 5: Native Vector Deliverables & Speaker Notes Injection — Real-World Usability
+- **Fully Editable**: 100% vector shapes, tables, and charts editable directly in PowerPoint and Keynote without third-party plugins;
+- **Presentation Safety Net**: Slide missions, causal transition prompts, and conversational talking points are embedded into PowerPoint Speaker Notes, enabling confident delivery.
 
 ---
 
-## 5. 总结
+## 5. Summary
 
-在 `undoPPT` 的世界里：
-- **Agent 是军师和编剧**，专心揣摩受众心理、梳理叙事节奏、推演严谨逻辑；
-- **Skill 引擎是导演和舞台搭建师**，以像素级的工程纪律执行母版复刻、图元装配、质量质检与物理渲染。
+Within `undoPPT`:
+- **The AI Agent is the Strategist and Screenwriter**, analyzing audience mindsets, pacing narrative flow, and establishing rigorous logic;
+- **The Skill Engine is the Director and Stage Builder**, executing template replication, primitive assembly, quality auditing, and physical rendering with engineering precision.
 
-两者的完美协同，让演示文稿的创作彻底从“碰运气的盲盒生成”，蜕变为“高度确定性的认知工程交付”。
+This collaboration transforms presentation authoring from a hit-or-miss generative experiment into an **audited, deterministic cognitive engineering pipeline**.
