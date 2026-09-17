@@ -277,7 +277,7 @@ def cmd_build(args):
 
     if args.format in ("pptx", "all"):
         pptx_out = os.path.join(out_dir, "presentation.pptx")
-        build_presentation(blueprint, tokens, pptx_out)
+        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None))
         watcher.record_baseline(pptx_out)
         print(f"[✓] PPTX generated successfully: {pptx_out}")
 
@@ -357,7 +357,7 @@ def cmd_generate(args):
     if args.format in ("pptx", "all"):
         pptx_out = os.path.join(out_dir, "presentation.pptx")
         print("[3/4] Rendering Native Vector PPTX (with Speaker Notes injected)...")
-        build_presentation(blueprint, tokens, pptx_out)
+        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None))
         watcher.record_baseline(pptx_out)
 
     if args.format in ("html", "all"):
@@ -501,6 +501,7 @@ def main():
     p_gen.add_argument("--template", default=None, help="Optional template .pptx to deconstruct")
     p_gen.add_argument("--tokens", default="presets/modern_bento.json", help="Design tokens JSON path")
     p_gen.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
+    p_gen.add_argument("--transition", choices=["fade", "push", "wipe", "none"], default=None, help="Slide transition effect (default: fade)")
     p_gen.add_argument("--out", default="output", help="Output directory")
 
     # undo
@@ -513,6 +514,7 @@ def main():
     p_build.add_argument("--blueprint", required=True, help="Path to slides_blueprint.json")
     p_build.add_argument("--tokens", default="presets/modern_bento.json", help="Path to design_tokens.json")
     p_build.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
+    p_build.add_argument("--transition", choices=["fade", "push", "wipe", "none"], default=None, help="Slide transition effect (default: fade)")
     p_build.add_argument("--out", default="output", help="Output directory")
 
     # audit

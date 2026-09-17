@@ -20,6 +20,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.oxml import parse_xml
 from pptx.util import Inches, Pt
 
 
@@ -1746,7 +1747,35 @@ def _inject_cognitive_notes(slide, slide_data: Dict[str, Any], contract: Optiona
             pass
 
 
-def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str) -> str:
+def _apply_slide_transition(slide, effect: str = "fade"):
+    """Inject standard OOXML slide transition element into slide in CT_Slide schema order."""
+    if not effect or effect == "none":
+        return
+
+    # Clean existing transition if any
+    for child in list(slide._element):
+        if child.tag.endswith("transition"):
+            slide._element.remove(child)
+
+    effect_xml_map = {
+        "fade": '<p:transition xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" spd="fast" advClick="1"><p:fade/></p:transition>',
+        "push": '<p:transition xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" spd="fast" advClick="1"><p:push dir="l"/></p:transition>',
+        "wipe": '<p:transition xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" spd="fast" advClick="1"><p:wipe dir="r"/></p:transition>',
+    }
+    xml_str = effect_xml_map.get(effect, effect_xml_map["fade"])
+    try:
+        transition_elm = parse_xml(xml_str)
+        insert_idx = len(slide._element)
+        for i, child in enumerate(slide._element):
+            if child.tag.endswith("timing") or child.tag.endswith("extLst"):
+                insert_idx = i
+                break
+        slide._element.insert(insert_idx, transition_elm)
+    except Exception:
+        pass
+
+
+def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str, default_transition: Optional[str] = None) -> str:
     """Compile blueprint into a clean vector PowerPoint presentation."""
     prs = Presentation()
     # 16:9 standard dimensions
@@ -1755,11 +1784,15 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str)
 
     contract = None
     slides = []
+    global_transition = "fade"
     if isinstance(blueprint, dict):
         contract = blueprint.get("contract")
         slides = blueprint.get("slides", [])
+        global_transition = blueprint.get("presentation_config", {}).get("transition_effect", "fade")
     elif isinstance(blueprint, list):
         slides = blueprint
+
+    active_default_transition = default_transition or global_transition
 
     for idx, slide_data in enumerate(slides):
         layout_type = slide_data.get("layout_type", "bento_cards")
@@ -1770,6 +1803,11 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str)
         slide_contract = contract if idx == 0 else None
         _inject_cognitive_notes(current_slide, slide_data, contract=slide_contract)
 
+        # Apply slide transition (v3.2)
+        slide_trans = slide_data.get("transition_effect", active_default_transition)
+        _apply_slide_transition(current_slide, slide_trans)
+
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     prs.save(output_path)
     return output_path
+

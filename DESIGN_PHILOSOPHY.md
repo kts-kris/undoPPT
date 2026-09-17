@@ -119,7 +119,21 @@ LLMs have an inherent tendency to output expansive walls of text when unconstrai
 Traditional AI presentation tools operate as one-way black boxes: once a user edits a generated slide, AI iteration breaks, and regenerating overwrites all manual refinements.  
 `undoPPT` treats the human expert as the ultimate decision-maker. Native vector shapes enable unconstrained manual adjustments in Office/Keynote, while the Sync Watcher senses modifications in milliseconds to keep the human and AI in lockstep.
 
+### Principle 4: Truth-in-Evidence & Anti-Buzzword Discipline
+A critical failure of AI-generated content is hiding conceptual vacuum behind pompous buzzwords ("不仅是X更是Y", "closed-loop flywheels", "5 battlefronts").  
+`undoPPT` enforces an **uncompromising anti-buzzword discipline and truth-in-evidence standard**:
+- **Deterministic Blacklist Interception**: Automated regex filtering blocks empty jargon and formulaic AI clichés;
+- **Empirical Rigor**: Disallow fabricated benchmarks or fake precision. If empirical proof is missing, explicit labels like `[Pending Verification]` or `[Design Assumption]` are mandatory;
+- **6 Archetype Red Lines**: Tech architecture mandates latency distributions (P50/P99) and rollback gates; product decks mandate unit economics; strategic plans require explicit not-to-do lists.
+
+### Principle 5: Motion as Cognitive Pacing (Cognitive Restraint)
+Presentation animation commonly degrades into circus-like acrobatics or vanishes entirely into lifeless static cards.  
+`undoPPT` mandates that **motion exists solely to guide audience attention and pace cognitive disclosure**:
+- **Restrained Transitions**: Subtle slide transitions (`fade` / `push`) rather than distracting rotations or acrobatics;
+- **Primitive Staged Reveals**: Bento cards stagger in, architecture stacks assemble from bottom-up, maturity ladders climb step-by-step. The standalone HTML deck supports spacebar sub-step presentation mode, while PPTX maintains universal compatibility.
+
 ---
+
 
 ## 4. Guaranteeing Quality: The 5-Layer Certainty Closed-Loop Framework
 

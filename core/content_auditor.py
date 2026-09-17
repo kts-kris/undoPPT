@@ -13,6 +13,7 @@ Audits presentation blueprints against the 10 Core Content Quality Metrics:
   10. Inter-slide rhetorical transitions and causality (Q10)
 """
 
+import json
 import re
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -26,6 +27,15 @@ class ContentAuditor:
         "简介", "背景", "概览", "介绍", "现状", "思考", "分析", "总结",
         "overview", "background", "introduction", "status", "architecture", "summary"
     ]
+
+    BUZZWORD_PATTERNS = [
+        (re.compile(r"不仅[是为能有].*?更[是为能有]", re.IGNORECASE), "不仅是...更是... (AI特征套话，建议直接陈述事实机制)"),
+        (re.compile(r"(闭环|抓手|赋能|打法|颗粒度|底层逻辑|盘活|解构|破局)", re.IGNORECASE), "空洞管理黑话 (缺乏具体操作动词，建议改为'构建/降低/交付/量化')"),
+        (re.compile(r"为什么.*凭什么.*怎么做", re.IGNORECASE), "口号式设问句式 (建议替换为明确的业务论断或行动结论)"),
+        (re.compile(r"\d+大战场|\d+维路径", re.IGNORECASE), "虚夸式宏大叙事套话 (建议具体说明执行领域或交付模块)"),
+    ]
+
+    VALID_TRANSITIONS = {"fade", "push", "wipe", "none"}
 
     def __init__(self, tokens: Optional[Dict[str, Any]] = None, llm_judge_fn: Optional[Callable] = None):
         self.tokens = tokens or {}
@@ -213,6 +223,38 @@ class ContentAuditor:
                     "message": f"第 {page_num} 页标题 '{title}' 属于中性被动命名。建议采用观点先行/行动结论式标题(Action Title)(Q8)。"
                 })
                 deduction += 2
+
+            # Anti-Pattern & Buzzword check (v3.2)
+            slide_text_corpus = " ".join([
+                str(slide.get("title", "")),
+                str(slide.get("action_title", "")),
+                str(slide.get("subtitle", "")),
+                str(slide.get("mission", "")),
+                str(slide.get("transition", "")),
+                str(slide.get("core_evidence", "")),
+                json.dumps(slide, ensure_ascii=False)
+            ])
+            buzzword_found = False
+            for pattern, desc in self.BUZZWORD_PATTERNS:
+                m = pattern.search(slide_text_corpus)
+                if m:
+                    findings.append({
+                        "level": "warning",
+                        "code": f"BUZZWORD_DETECTED_P{page_num}",
+                        "message": f"第 {page_num} 页检测到空洞 AI 套话/黑话：'{m.group()}'（{desc}）。请遵循场景避坑红线，替换为具体事实机制与量化动作。"
+                    })
+                    if not buzzword_found:
+                        deduction += 2
+                        buzzword_found = True
+
+            # Transition effect validity check (v3.2)
+            trans = slide.get("transition_effect")
+            if trans and trans not in self.VALID_TRANSITIONS:
+                findings.append({
+                    "level": "warning",
+                    "code": f"INVALID_TRANSITION_P{page_num}",
+                    "message": f"第 {page_num} 页切页动效 '{trans}' 无效。支持：{', '.join(sorted(self.VALID_TRANSITIONS))}。"
+                })
 
             # Q7: Information Density budget check
             if layout in ("bento_cards",):

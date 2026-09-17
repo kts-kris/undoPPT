@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -14,17 +14,18 @@
 </div>
 
 > **“Cognitive Contract • Master Decompilation • Graphic Reconstruction • Zero-Friction Delivery • Always-in-Sync”**  
-> 📖 **Deep Dive**: [undoPPT Design Philosophy & Architecture Synergy Whitepaper](DESIGN_PHILOSOPHY.md) ([简体中文](DESIGN_PHILOSOPHY_zh.md)) — Formalizing the collaboration boundaries between the AI Agent brain and the Skill execution engine through a 5-layer quality assurance closed-loop.
+> 📖 **Deep Dive**: [undoPPT Design Philosophy & Architecture Synergy Whitepaper](DESIGN_PHILOSOPHY.md) ([简体中文](DESIGN_PHILOSOPHY_zh.md)) — Formalizing the collaboration boundaries between the AI Agent brain and the Skill execution engine through a 5-layer quality assurance closed-loop.  
+> 📋 **PRD Specification**: [undoPPT v3.2.0 Scenario Red Lines & Motion Architecture PRD](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md) | [6-Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, and one-way generation without feedback loops.**
 
 ---
 
-## 🧠 Core Highlights: 15 High-Fidelity Primitives & 6-Scenario Decoupled Engine (v3.1.0)
+## 🧠 Core Highlights: 15 Primitives, Scenario Anti-Pattern Red Lines & Motion Architecture (v3.2.0)
 
 In corporate strategy, technical architecture, commercial pitch decks, educational lectures, and executive debriefs, **a presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.**
 
-`undoPPT v3.1.0` eliminates all hardcoded domain assumptions, introducing generic support for **6 universal scenario archetypes** and expanding to **15 high-fidelity infographic primitives**:
+`undoPPT v3.2.0` incorporates cutting-edge agent skill practices, establishing strict anti-pattern discipline and progressive presentation motion:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -46,11 +47,14 @@ In corporate strategy, technical architecture, commercial pitch decks, education
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+- 🚫 **Scenario Anti-Pattern Red Lines & Buzzword Interception**: Official anti-pattern specification ([scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)) and deterministic regex filtering blocking hollow AI clichés (*"不仅是X更是Y"*, *"闭环/抓手/赋能/打法"*), disallowing fabricated benchmarks or fake precision ([PRD_v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)).
+- 🎬 **Motion & Staged Progression Architecture**: Native PPTX slide transitions via standard OOXML (`<p:transition>`, default smooth `fade`); standalone HTML presentation mode with interactive step disclosure (`S` key / `Step: ON/OFF` button to progressively reveal primitive components via spacebar for live pitches).
 - 🤖 **Autonomous Cognitive Planner (`cli.py plan` / `cli.py generate`)**: Synthesizes a structured Cognitive Contract, narrative arcs, 15 layout primitives, and complete spoken scripts from a single prompt or reference document across 6 scenarios.
 - 📊 **15 Layout Primitives & Native Vector Charts**: Generates native PowerPoint vector charts (clustered column, line, pie), formatted tables, bento card grids, quote cards, and horizontal process workflows. See [Blueprint Specification](docs/en/blueprint_specification.md).
 - 💡 **Automated Content & Semantic Auditing (`cli.py audit`)**: Audits slides across 10 structural and semantic dimensions, balancing quantitative enterprise metrics with qualitative educational case studies.
 - 🎙️ **Automated Speaker Notes Injection**: Slide missions, rhetorical transition phrases, and conversational talking points are compiled directly into PowerPoint Speaker Notes.
 - 🔍 **HTML Cognitive Inspector Drawer (`N` key)**: Press `N` in the standalone HTML presentation to inspect underlying slide objectives, causal transitions, and argument hierarchies.
+
 
 ---
 

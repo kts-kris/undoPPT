@@ -42,8 +42,17 @@ description: >-
    - 数据与表现 (v3.0)：`standard_table`, `data_chart`, `content_columns`, `keynote_quote`, `process_flow`
 
 4. **100% 原生双端高精交付**
-   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象，可在 PowerPoint/Keynote 中直接二次编辑；自动注入场景演讲口播备注（Speaker Notes）。
-   - **HTML**: 单文件自包含 HTML，内置 Tailwind CSS、键盘导航（←/→/Space/F 全屏）；按 `N` 键弹出认知动力学抽屉（Cognitive Inspector）。
+   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象，可在 PowerPoint/Keynote 中直接二次编辑；自动注入场景演讲口播备注（Speaker Notes）；默认注入平滑淡入淡出切页过渡（`<p:transition>`）。
+   - **HTML**: 单文件自包含 HTML，内置 Tailwind CSS、键盘导航（←/→/Space/F 全屏）；按 `N` 键弹出认知动力学抽屉（Cognitive Inspector）；支持空格键步进展开图元内部组件。
+
+5. **场景避坑红线与真实性底线（Anti-Pattern Red Lines & Truth-in-Evidence）**
+   - **严禁空洞 AI 黑话**：禁止“不仅是X更是Y”、“X是Y”、“闭环/抓手/赋能/打法/颗粒度/底层逻辑”等无实质信息套话堆砌。
+   - **真实性铁律**：严禁伪造 Benchmark 或虚构指标数据；缺乏实测数据时显式标注 `[待实测]` 或 `[设计预估]`。
+   - **6 大场景硬约束**：技术架构必写 SLA/延迟分布 (P50/P99) 与回滚路径；商业路演必推导单客经济模型；战略规划必有明确“不做清单 (Not-to-do list)”。详见 [场景避坑红线手册](docs/en/scenario_anti_patterns.md)。
+
+6. **动效服务于认知展开（Motion as Cognitive Pacing）**
+   - 坚决杜绝杂耍式动效；动效唯一宗旨是辅助受众聚焦。
+   - 支持全局/单页切片过渡（`fade` / `push` / `wipe`）；图元支持时序认知步进（Bento 错落淡入、架构栈底层向上装配、阶梯逐级攀升）。
 
 ---
 

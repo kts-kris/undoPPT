@@ -897,6 +897,16 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       pointer-events: auto;
       z-index: 10;
     }}
+    .staged-hidden {{
+      opacity: 0 !important;
+      transform: translateY(12px) !important;
+      pointer-events: none !important;
+    }}
+    .staged-visible {{
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      transition: opacity 0.35s ease, transform 0.35s ease !important;
+    }}
     /* Aspect Ratio 16:9 canvas container */
     .aspect-16-9 {{
       aspect-ratio: 16 / 9;
@@ -945,6 +955,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     <span id="slide-indicator" class="font-mono font-medium text-slate-300">1 / {total_slides}</span>
     <button id="next-btn" class="hover:text-blue-400 transition-colors px-1" title="Next Slide (→ / Space / PageDown)">▶</button>
     <div class="h-3 w-[1px] bg-slate-600"></div>
+    <button id="step-btn" class="hover:text-blue-400 transition-colors" title="Toggle Staged Step Mode (S)">Step: OFF</button>
     <button id="notes-btn" class="hover:text-blue-400 transition-colors" title="Toggle Cognitive Notes (N)">Notes (N)</button>
     <button id="overview-btn" class="hover:text-blue-400 transition-colors" title="Overview (O)">Overview</button>
     <button id="fs-btn" class="hover:text-blue-400 transition-colors" title="Toggle Fullscreen (F)">Fullscreen</button>
@@ -957,6 +968,8 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
 
   <script>
     let currentSlide = 0;
+    let stepMode = false;
+    let currentStep = 0;
     const total = {total_slides};
     const slides = document.querySelectorAll('.slide');
     const indicator = document.getElementById('slide-indicator');
@@ -966,17 +979,47 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     const noteMission = document.getElementById('note-mission');
     const noteTransition = document.getElementById('note-transition');
     const noteEvidence = document.getElementById('note-evidence');
+    const stepBtn = document.getElementById('step-btn');
 
     function toggleNotes() {{
       drawer.classList.toggle('hidden');
     }}
 
-    function updateCognitiveNotes(slideEl) {{
-      if (!slideEl) return;
-      noteArc.textContent = (slideEl.dataset.arc || 'N/A').toUpperCase();
-      noteMission.textContent = slideEl.dataset.mission || '（本页未指定具体使命）';
-      noteTransition.textContent = slideEl.dataset.transition || '（开篇立论 / 无前序转折）';
-      noteEvidence.textContent = slideEl.dataset.evidence || '（未单独分级核心论据）';
+    function toggleStepMode() {{
+      stepMode = !stepMode;
+      if (stepBtn) {{
+        stepBtn.textContent = stepMode ? 'Step: ON' : 'Step: OFF';
+        stepBtn.classList.toggle('text-blue-400', stepMode);
+      }}
+      resetStagedElements();
+    }}
+
+    function getStagedElements(slideEl) {{
+      if (!slideEl) return [];
+      const candidates = slideEl.querySelectorAll('.grid > div, .flex-col > .flex, tbody tr, .space-y-4 > div');
+      return Array.from(candidates).filter(el => el.offsetHeight > 20 && !el.closest('header') && !el.closest('footer'));
+    }}
+
+    function resetStagedElements() {{
+      const currentSlideEl = slides[currentSlide];
+      const items = getStagedElements(currentSlideEl);
+      if (stepMode && items.length > 1) {{
+        currentStep = 0;
+        items.forEach((item, idx) => {{
+          if (idx === 0) {{
+            item.classList.remove('staged-hidden');
+            item.classList.add('staged-visible');
+          }} else {{
+            item.classList.remove('staged-visible');
+            item.classList.add('staged-hidden');
+          }}
+        }});
+      }} else {{
+        items.forEach(item => {{
+          item.classList.remove('staged-hidden');
+          item.classList.add('staged-visible');
+        }});
+      }}
     }}
 
     function showSlide(index) {{
@@ -995,18 +1038,33 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       indicator.textContent = `${{currentSlide + 1}} / ${{total}}`;
       progress.style.width = `${{((currentSlide + 1) / total) * 100}}%`;
       updateCognitiveNotes(slides[currentSlide]);
+      resetStagedElements();
+    }}
+
+    function nextStepOrSlide() {{
+      if (stepMode) {{
+        const items = getStagedElements(slides[currentSlide]);
+        if (items.length > 1 && currentStep < items.length - 1) {{
+          currentStep++;
+          items[currentStep].classList.remove('staged-hidden');
+          items[currentStep].classList.add('staged-visible');
+          return;
+        }}
+      }}
+      showSlide(currentSlide + 1);
     }}
 
     // Navigation events
     document.getElementById('prev-btn').addEventListener('click', () => showSlide(currentSlide - 1));
     document.getElementById('next-btn').addEventListener('click', () => showSlide(currentSlide + 1));
+    if (stepBtn) stepBtn.addEventListener('click', toggleStepMode);
     document.getElementById('notes-btn').addEventListener('click', toggleNotes);
     document.getElementById('close-drawer-btn').addEventListener('click', () => drawer.classList.add('hidden'));
 
     document.addEventListener('keydown', (e) => {{
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {{
         e.preventDefault();
-        showSlide(currentSlide + 1);
+        nextStepOrSlide();
       }} else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {{
         e.preventDefault();
         showSlide(currentSlide - 1);
@@ -1014,6 +1072,8 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         toggleFullscreen();
       }} else if (e.key === 'n' || e.key === 'N') {{
         toggleNotes();
+      }} else if (e.key === 's' || e.key === 'S') {{
+        toggleStepMode();
       }}
     }});
 
@@ -1031,6 +1091,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
 
     // Initial render
     showSlide(0);
+
   </script>
 </body>
 </html>

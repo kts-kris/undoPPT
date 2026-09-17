@@ -5,7 +5,30 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.2.0] - 2026-09-17
+
+### Added
+- **Scenario Anti-Pattern Red Lines System & PRD Release (`docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md`)**:
+  - Published comprehensive v3.2 PRD and official engineering specification handbook (`docs/en/scenario_anti_patterns.md`).
+  - Strict code-level interception of formulaic AI buzzwords and management jargon (`BUZZWORD_PATTERNS` in `core/content_auditor.py`) such as *"不仅是X更是Y"*, *"闭环/抓手/赋能/打法/颗粒度/底层逻辑/盘活/解构/破局"*.
+  - Enforced truth-in-evidence discipline: disallowing fabricated metrics and ungrounded claims, with mandatory `[待实测]` or `[设计预估]` tags for assumptions.
+  - Formulated scenario-specific red lines for all 6 archetypes (strategy trade-offs, architecture latency/rollback gates, pitch deck unit economics, resume STAR bounds, pedagogical misconception contrasts, informative accountability WBS).
+- **Motion & Staged Progression Architecture (Level 1 & Level 2)**:
+  - **Native PPTX Slide Transitions (`core/pptx_builder.py`)**: Injected standard OOXML `<p:transition>` (supporting `fade`, `push`, `wipe`, `none`), guaranteeing 100% native slide-level transition playback in PowerPoint, Keynote, and WPS.
+  - **HTML Staged Step Presentation Mode (`core/html_builder.py`)**: Added interactive step mode (`Step: ON/OFF` button, toggled via `S` key). Pressing Spacebar reveals primitive child components (Bento cards, architecture layers, timeline milestones) step-by-step to command audience attention before advancing to the next slide.
+  - Extended Blueprint schema with optional `transition_effect` and `motion` metadata.
+  - Added CLI flag `--transition {fade,push,wipe,none}` to `cli.py generate` and `cli.py build`.
+- **Design Philosophy Principles 4 & 5 (`DESIGN_PHILOSOPHY.md` & `DESIGN_PHILOSOPHY_zh.md`)**:
+  - Principle 4: Truth-in-Evidence & Anti-Buzzword Discipline.
+  - Principle 5: Motion as Cognitive Pacing (Cognitive Restraint).
+
+### Changed
+- Bumped engine version to `3.2.0` across `core/__init__.py`, `docs/`, `SKILL.md`, and test suites.
+
+---
+
 ## [3.1.0] - 2026-09-14
+
 
 ### Added
 - **Comprehensive English Documentation Suite**:

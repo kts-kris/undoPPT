@@ -443,6 +443,59 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(os.path.exists(out_pptx))
         self.assertTrue(os.path.exists(out_html))
 
+    def test_anti_buzzword_and_scenario_redlines(self):
+        """Test ContentAuditor intercepts prohibited AI buzzwords and invalid transitions."""
+        auditor = ContentAuditor()
+        bad_bp = {
+            "slides": [
+                {
+                    "layout_type": "bento_cards",
+                    "action_title": "不仅是技术创新，更是战略打法与闭环",
+                    "mission": "说明为什么凭什么怎么做",
+                    "cards": [{"title": "抓手", "desc": "赋能业务底层逻辑，盘活颗粒度"}]
+                }
+            ]
+        }
+        res = auditor.audit(bad_bp)
+        codes = [f["code"] for f in res["findings"]]
+        self.assertTrue(any("BUZZWORD_DETECTED" in c for c in codes), "Should detect buzzwords")
+
+    def test_slide_transitions_and_motion(self):
+        """Test slide transitions are properly injected in PPTX and step mode is in HTML."""
+        bp = {
+            "presentation_config": {
+                "transition_effect": "fade"
+            },
+            "slides": [
+                {
+                    "layout_type": "bento_cards",
+                    "title": "测试过渡",
+                    "transition_effect": "push",
+                    "cards": [{"title": "卡片1", "desc": "内容1"}, {"title": "卡片2", "desc": "内容2"}]
+                }
+            ]
+        }
+        out_pptx = os.path.join(self.test_dir, "trans_test.pptx")
+        out_html = os.path.join(self.test_dir, "trans_test.html")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        build_standalone_html(bp, self.sample_tokens, out_html)
+
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertTrue(os.path.exists(out_html))
+
+        # Check PPTX contains transition in slide XML
+        prs = Presentation(out_pptx)
+        slide_elm = prs.slides[0]._element
+        has_trans = any(child.tag.endswith("transition") for child in slide_elm)
+        self.assertTrue(has_trans, "Slide should contain a transition element in OOXML")
+
+        # Check HTML contains step-btn and staged classes
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_text = f.read()
+        self.assertIn("step-btn", html_text)
+        self.assertIn("staged-hidden", html_text)
+
 
 if __name__ == "__main__":
     unittest.main()
+

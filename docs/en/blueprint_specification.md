@@ -51,8 +51,11 @@ Every slide object **must** include the following standard metadata attributes, 
 | `core_evidence` | `string` | Primary quantitative proof (e.g. `94.8%`, `4x efficiency`) or definitive case study. |
 | `title` | `string` | Visual primary slide headline. |
 | `subtitle` | `string` | Contextual subtitle or framing statement. |
+| `transition_effect` | `string` (optional) | Slide transition animation: `"fade"` (default), `"push"`, `"wipe"`, or `"none"`. |
+| `motion` | `object` (optional) | Primitive-level staged reveal config: `{"staged_reveal": true, "stagger_delay_ms": 150}`. |
 
 ---
+
 
 ## 3. The 15 Layout Primitives
 
