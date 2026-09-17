@@ -53,8 +53,11 @@ Every slide object **must** include the following standard metadata attributes, 
 | `subtitle` | `string` | Contextual subtitle or framing statement. |
 | `transition_effect` | `string` (optional) | Slide transition animation: `"fade"` (default), `"push"`, `"wipe"`, or `"none"`. |
 | `motion` | `object` (optional) | Primitive-level staged reveal config: `{"staged_reveal": true, "stagger_delay_ms": 150}`. |
+| `sandbox` | `object` (optional) | Active Decision Sandbox config: `{"enabled": true, "scenarios": { "conservative": {...}, "aggressive": {...} }}`. |
+| `hud_notes` | `object` (optional) | Presenter HUD coaching notes: `{"objection_defense": [{"skepticism": "...", "counter": "..."}]}`. |
 
 ---
+
 
 
 ## 3. The 15 Layout Primitives

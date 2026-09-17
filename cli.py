@@ -144,7 +144,48 @@ DEMO_BLUEPRINT = {
                     "delta": "缩减 90% 工时",
                     "desc": "从原始需求录入到 PPTX 与单文件 HTML 双格式产出的全流程耗时。"
                 }
-            ]
+            ],
+            "sandbox": {
+                "enabled": True,
+                "scenarios": {
+                    "conservative": {
+                        "metrics": [
+                            {"value": "86.5%", "delta": "稳健保底"},
+                            {"value": "95.0%", "delta": "基线复刻"},
+                            {"value": "<15ms", "delta": "常规延迟"},
+                            {"value": "120s", "delta": "平稳交付"}
+                        ]
+                    },
+                    "baseline": {
+                        "metrics": [
+                            {"value": "94.8%", "delta": "38.2% 同比提升"},
+                            {"value": "99.2%", "delta": "母版规范强穿透"},
+                            {"value": "<8ms", "delta": "SHA-256 毫秒级"},
+                            {"value": "45s", "delta": "效率提升 400%"}
+                        ]
+                    },
+                    "aggressive": {
+                        "metrics": [
+                            {"value": "99.1%", "delta": "极限压测"},
+                            {"value": "99.9%", "delta": "像素级克隆"},
+                            {"value": "<3ms", "delta": "内存即时"},
+                            {"value": "18s", "delta": "代际碾压"}
+                        ]
+                    }
+                }
+            },
+            "hud_notes": {
+                "objection_defense": [
+                    {
+                        "skepticism": "94.8% 的自主完成率是否仅限于标准简单场景？",
+                        "counter": "涵盖 6 大复杂原型与 15 类图元，结合 AST 自愈循环，全量压测已验证包含长长尾边界场景。"
+                    },
+                    {
+                        "skepticism": "本地 PPTX 协同感知是否会引入过高系统开销？",
+                        "counter": "采用纯 Python 增量哈希比对与轻量 AST 差异提取，全过程耗时控制在 8ms 以内，对宿主机资源零感知。"
+                    }
+                ]
+            }
         },
         {
             "layout_type": "data_chart",
@@ -431,6 +472,10 @@ def cmd_sync(args):
         if res.get("details"):
             for d in res["details"]:
                 print(f"    - {d}")
+        if res.get("intent_reflection"):
+            iref = res["intent_reflection"]
+            print(f"    [🧠 Strategic Intent] {iref.get('strategic_intent')}")
+            print(f"    [🤝 Suggested Posture] {iref.get('suggested_agent_posture')}")
     else:
         print(f"[✓] File is in SYNC with agent baseline: {target}")
 

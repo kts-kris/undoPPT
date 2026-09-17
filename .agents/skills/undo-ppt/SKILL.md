@@ -1,19 +1,19 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.1.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.3.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 6 archetypes (strategy, tech architecture, pitch deck, resume, education/training, general informative) with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows);
-  (3) native editable vector PPTX with speaker notes and single-file standalone HTML with Cognitive Inspector (N key);
+  (3) native editable vector PPTX with speaker notes & ECMA-376 timing sequences, and single-file standalone HTML with Cognitive Inspector (N key) and Live Presenter HUD (P key);
   (4) 10-dimension content quality protocol with scenario-aware rhetorical causal audit (cli.py audit);
-  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher (cli.py sync);
-  (6) strict Agent-Skill synergy adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
+  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher with strategic intent reflection (cli.py sync);
+  (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.1.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.3.0)
 
-`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](../../../DESIGN_PHILOSOPHY.md) / [中文白皮书](../../../DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](../../../docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注）与零依赖单文件 HTML（内置 `N` 键认知动力学抽屉），支持全生命周期双向协同感知。
+`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面彻底解耦领域硬编码，支持战略规划、技术架构、产品路演、个人履历、教育培训、通用汇报等 **6 大通用场景原型**。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](../../../DESIGN_PHILOSOPHY.md) / [中文白皮书](../../../DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](../../../docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
 ---
 
@@ -42,17 +42,22 @@ description: >-
    - 数据与表现 (v3.0)：`standard_table`, `data_chart`, `content_columns`, `keynote_quote`, `process_flow`
 
 4. **100% 原生双端高精交付**
-   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象，可在 PowerPoint/Keynote 中直接二次编辑；自动注入场景演讲口播备注（Speaker Notes）；默认注入平滑淡入淡出切页过渡（`<p:transition>`）。
-   - **HTML**: 单文件自包含 HTML，内置 Tailwind CSS、键盘导航（←/→/Space/F 全屏）；按 `N` 键弹出认知动力学抽屉（Cognitive Inspector）；支持空格键步进展开图元内部组件。
+   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象，可在 PowerPoint/Keynote 中直接二次编辑；自动注入场景演讲口播备注（Speaker Notes）；注入 ECMA-376 `<p:timing>` 原生时序序列，在 Office 中实现原生单击步进进入；默认注入平滑淡入淡出切页过渡（`<p:transition>`）。
+   - **HTML**: 单文件自包含 HTML，内置 Tailwind CSS、键盘导航（←/→/Space/F 全屏）；按 `P` 键激活现场演播双重视野中枢（Presenter HUD，含认知罗盘、因果提词器与质疑应对弹药库）；按 `N` 键弹出认知动力学抽屉（Cognitive Inspector）；内嵌活动决策推演沙盒（Active Sandbox，支持情景切换与架构下钻）。
 
 5. **场景避坑红线与真实性底线（Anti-Pattern Red Lines & Truth-in-Evidence）**
    - **严禁空洞 AI 黑话**：禁止“不仅是X更是Y”、“X是Y”、“闭环/抓手/赋能/打法/颗粒度/底层逻辑”等无实质信息套话堆砌。
    - **真实性铁律**：严禁伪造 Benchmark 或虚构指标数据；缺乏实测数据时显式标注 `[待实测]` 或 `[设计预估]`。
-   - **6 大场景硬约束**：技术架构必写 SLA/延迟分布 (P50/P99) 与回滚路径；商业路演必推导单客经济模型；战略规划必有明确“不做清单 (Not-to-do list)”。详见 [场景避坑红线手册](docs/en/scenario_anti_patterns.md)。
+   - **6 大场景硬约束**：技术架构必写 SLA/延迟分布 (P50/P99) 与回滚路径；商业路演必推导单客经济模型；战略规划必有明确“不做清单 (Not-to-do list)”。详见 [场景避坑红线手册](../../../docs/en/scenario_anti_patterns.md)。
 
-6. **动效服务于认知展开（Motion as Cognitive Pacing）**
-   - 坚决杜绝杂耍式动效；动效唯一宗旨是辅助受众聚焦。
-   - 支持全局/单页切片过渡（`fade` / `push` / `wipe`）；图元支持时序认知步进（Bento 错落淡入、架构栈底层向上装配、阶梯逐级攀升）。
+6. **图元内生语义动力学（Semantic Kinetic Physics）**
+   - 坚决杜绝杂耍式动效；动效根据 15 大图元语义拓扑内生装配（架构栈自下而上扎根、时间轴脉冲流光穿透、KPI 跑数物理锁定、阶梯动能攀升）。
+   - 动效时序与 `narrative_arc` 叙事节奏自适应锚定（冲突 250ms 紧凑、突破光晕扩散、实证平缓跑数）。
+   - 支持全局/单页切片过渡（`fade` / `push` / `wipe`）。
+
+7. **活动决策沙盒与意图反思（Active Sandbox & Intent Reflection）**
+   - 告别单向死板宣讲：高管现场打断提问时，通过情景切换 Tab（保守/基准/激进）动态重算 KPI 与图表，点击架构栈即可下钻查看微服务 SLA 与故障域。
+   - `SyncWatcher` 具备战略意图反思引擎，捕获人类专家在 Office/Keynote 中修改数值与结构的深层战略动机。
 
 ---
 
@@ -160,8 +165,8 @@ python3 "<SKILL_ROOT>/cli.py" audit --blueprint .undoppt/blueprint.json --tokens
 python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --tokens presets/modern_bento.json --format all --out output
 ```
 交付产物：
-- `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注）
-- `output/presentation.html`（单文件自包含、Tailwind 排版、`N` 键认知抽屉）
+- `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注、ECMA-376 `<p:timing>` 原生时序步进）
+- `output/presentation.html`（单文件自包含、Tailwind 排版、`P` 键演播中枢 HUD、`N` 键认知抽屉、情景切换决策沙盒）
 
 ### 阶段 5 · 协同感知与意图对齐 (Sync Watcher)
 在后续每轮用户发言开始时：

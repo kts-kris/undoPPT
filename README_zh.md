@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -15,15 +15,15 @@
 
 > **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**  
 > 📖 **深度阅读**：[《undoPPT 设计哲学与架构协同白皮书》](DESIGN_PHILOSOPHY_zh.md)（[English](DESIGN_PHILOSOPHY.md)）—— 彻底厘清 Agent 认知大脑与 Skill 执行底座的协同分工与五重质量保障闭环。  
-> 📋 **PRD 需求文档**：[《undoPPT v3.2.0 场景避坑红线与动效呈现 PRD》](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md) | [《6大场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
+> 📋 **PRD 需求文档**：[《undoPPT v3.3.0 动效全能进化与活动决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《6大场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
 
 ---
 
-## 🧠 核心升级：15 大图元、6 大场景避坑红线与动效呈现架构 (v3.2.0)
+## 🧠 核心升级：15 大图元、动效全能进化与活动决策推演沙盒 (v3.3.0)
 
-在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.2.0` 全面汲取前沿 Skill 实践，沉淀严密的场景避坑红线与步进动效体系：
+在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.3.0` 全面汲取前沿 Skill 实践并实现六大突破性超越：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -45,12 +45,15 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀 6 大场景避坑红线手册（[scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准（[PRD_v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)）。
-- 🎬 **动效呈现与步进式时序架构**：PPTX 自动注入标准 OOXML 原生切页过渡（`<p:transition>`，默认淡入淡出 `fade`）；单文件 HTML 原生支持 `S` 键开启步进演讲模式（空格键时序逐个展开图元组件，现场演示提供聚焦引导）。
+- 🎬 **PPTX 原生 OOXML `<p:timing>` 动效时序生成**：自动构建 ECMA-376 时间节点树，在 Office / Keynote / WPS 中获得原生单击步进进入效果（Click-to-advance sequence），全面看齐并超越外部引擎。
+- ⚡ **15 大图元内生语义动力学与节拍时钟**：架构栈自底向上沉稳装配、时间轴流光粒子点亮、KPI 跑数物理锁定（0% -> 94.8%），叙事弧线自适应节奏控制（冲突 250ms 紧迫切入、突破光晕扩散、实证平缓跑数）。
+- 🎙️ **现场演播双重视野中枢 (Live Presenter HUD，按 `P` 键)**：单文件 HTML 按 `P` 键激活现场中枢，内嵌认知罗盘（主旨与受众立场向心力）、因果提词器（切页口播连词）与评委质疑应对弹药库（典型发难与权威解题对策）。
+- 🎛️ **活动决策推演沙盒 (Active Sandbox & 架构下钻)**：支持现场切换“保守 / 基准 / 突破”情景并动态重绘 KPI 跑表与图表；架构栈支持点击微服务组件即刻弹出技术规格（SLA 目标、P99、容灾回滚机制与故障隔离）。
+- 🧠 **跨工具链毫秒级意图反思飞轮 (`cli.py sync`)**：`SyncWatcher` 升级语义反思引擎，捕获人类专家在 Office/Keynote 中修改数值与结构的深层战略动机，指导 AI 智能体保持意图并肩同频。
+- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀 6 大场景避坑红线手册（[scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准。
 - 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、15 大信息图元与完备演讲脚本，支持 6 大场景自适应。
-- 📊 **15 大信息图元与原生矢量图表**：新增原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。详见 [图元蓝图规约手册](docs/en/blueprint_specification.md)。
+- 📊 **15 大信息图元与原生矢量图表**：原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。详见 [图元蓝图规约手册](docs/en/blueprint_specification.md)。
 - 💡 **自动化内容与因果审计 (`cli.py audit`)**：内置场景感知审计器，兼顾商业量化数据与教学定性范例，实时评分并给出整改建议。
-- 🎙️ **PPTX 原生演讲备注注入**：单页使命（Mission）、承上启下连词（Transition）与核心证据（Core Evidence）自动编译进 PowerPoint Speaker Notes，自适应口播口吻。
 - 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。
 
 

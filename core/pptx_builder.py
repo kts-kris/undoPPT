@@ -1775,6 +1775,172 @@ def _apply_slide_transition(slide, effect: str = "fade"):
         pass
 
 
+def _inject_slide_element_timings(slide, slide_data: Dict[str, Any], tokens: Dict[str, Any], shape_groups: Optional[List[List[int]]] = None):
+    """Inject standard ECMA-376 OOXML <p:timing> sequence for native click-to-advance animations in Office/Keynote."""
+    layout_type = slide_data.get("layout_type", "")
+    if layout_type == "cover":
+        return
+
+    # Clean existing timing if any
+    for child in list(slide._element):
+        if child.tag.endswith("timing"):
+            slide._element.remove(child)
+
+    groups = shape_groups
+    if not groups:
+        # Auto-cluster content shapes (EPIC-02 Semantic Dynamics)
+        content_shapes = []
+        for s in slide.shapes:
+            # Ignore full bleed background
+            if s.left == 0 and s.top == 0 and s.width >= Inches(13):
+                continue
+            # Ignore header (title / subtitle / tag)
+            if s.top < Inches(1.8):
+                continue
+            content_shapes.append(s)
+
+        if not content_shapes:
+            return
+
+        # Semantic ordering and clustering based on layout type
+        if layout_type in ("architecture_stack", "cross_mapping"):
+            # Vertical clustering (by top)
+            raw_groups: List[List[Any]] = []
+            # For architecture_stack, bottom-up assembly (largest top first)
+            reverse_order = (layout_type == "architecture_stack")
+            sorted_shapes = sorted(content_shapes, key=lambda s: s.top, reverse=reverse_order)
+            for s in sorted_shapes:
+                matched = False
+                for g in raw_groups:
+                    if abs(g[0].top - s.top) < Inches(0.8):
+                        g.append(s)
+                        matched = True
+                        break
+                if not matched:
+                    raw_groups.append([s])
+            groups = [[s.shape_id for s in g] for g in raw_groups]
+        elif layout_type == "matrix_2x2":
+            # 4 quadrants: Top-Left, Top-Right, Bottom-Left, Bottom-Right
+            raw_groups = []
+            for s in sorted(content_shapes, key=lambda s: (s.top, s.left)):
+                matched = False
+                for g in raw_groups:
+                    if abs(g[0].left - s.left) < Inches(1.0) and abs(g[0].top - s.top) < Inches(1.0):
+                        g.append(s)
+                        matched = True
+                        break
+                if not matched:
+                    raw_groups.append([s])
+            groups = [[s.shape_id for s in g] for g in raw_groups]
+        elif layout_type in ("standard_table", "data_chart"):
+            # Single main unit
+            groups = [[s.shape_id for s in content_shapes]]
+        else:
+            # Horizontal clustering (by left) for bento_cards, metric_spotlight, timeline, process_flow, content_columns, maturity_ladder, horizons_curve, summary
+            raw_groups = []
+            for s in sorted(content_shapes, key=lambda s: s.left):
+                matched = False
+                for g in raw_groups:
+                    if abs(g[0].left - s.left) < Inches(0.6):
+                        g.append(s)
+                        matched = True
+                        break
+                if not matched:
+                    raw_groups.append([s])
+            groups = [[s.shape_id for s in g] for g in raw_groups]
+
+    if not groups or len(groups) <= 1:
+        return
+
+    # Narrative arc duration adaptation (EPIC-03)
+    arc = slide_data.get("narrative_arc", "progression")
+    dur_map = {
+        "conflict": 250,
+        "breakthrough": 400,
+        "evidence": 600,
+        "progression": 400,
+        "hook": 300,
+        "call_to_action": 350
+    }
+    dur_ms = dur_map.get(arc, 400)
+
+    # Build XML
+    step_pars = []
+    curr_id = 3
+    for shape_ids in groups:
+        step_id = curr_id
+        curr_id += 1
+        shape_pars = []
+        for spid in shape_ids:
+            p_id = curr_id; s_id = curr_id + 1; a_id = curr_id + 2
+            curr_id += 3
+            sp_xml = f"""<p:par xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+              <p:cTn id="{p_id}" fill="hold">
+                <p:stCondLst><p:cond delay="0"/></p:stCondLst>
+                <p:childTnLst>
+                  <p:set>
+                    <p:cBhvr>
+                      <p:cTn id="{s_id}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>
+                      <p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl>
+                      <p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst>
+                    </p:cBhvr>
+                    <p:to><p:strVal val="visible"/></p:to>
+                  </p:set>
+                  <p:animEffect transition="in" filter="fade">
+                    <p:cBhvr>
+                      <p:cTn id="{a_id}" dur="{dur_ms}"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>
+                      <p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl>
+                    </p:cBhvr>
+                  </p:animEffect>
+                </p:childTnLst>
+              </p:cTn>
+            </p:par>"""
+            shape_pars.append(sp_xml)
+
+        shapes_joined = "\n".join(shape_pars)
+        step_xml = f"""<p:par xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+          <p:cTn id="{step_id}" fill="hold">
+            <p:stCondLst><p:cond delay="0"/></p:stCondLst>
+            <p:childTnLst>
+              {shapes_joined}
+            </p:childTnLst>
+          </p:cTn>
+        </p:par>"""
+        step_pars.append(step_xml)
+
+    all_steps_xml = "\n".join(step_pars)
+    timing_xml = f"""<p:timing xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+      <p:tnLst>
+        <p:par>
+          <p:cTn id="1" dur="indefinite" restart="always" nodeType="tmRoot">
+            <p:childTnLst>
+              <p:seq concurrent="1" nextAc="seek">
+                <p:cTn id="2" dur="indefinite" nodeType="mainSeq">
+                  <p:childTnLst>
+                    {all_steps_xml}
+                  </p:childTnLst>
+                </p:cTn>
+                <p:prevCondLst><p:cond evt="onPrev" delay="0"/></p:prevCondLst>
+                <p:nextCondLst><p:cond evt="onNext" delay="0"/></p:nextCondLst>
+              </p:seq>
+            </p:childTnLst>
+          </p:cTn>
+        </p:par>
+      </p:tnLst>
+    </p:timing>"""
+
+    try:
+        timing_elm = parse_xml(timing_xml)
+        insert_idx = len(slide._element)
+        for i, child in enumerate(slide._element):
+            if child.tag.endswith("extLst"):
+                insert_idx = i
+                break
+        slide._element.insert(insert_idx, timing_elm)
+    except Exception:
+        pass
+
+
 def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str, default_transition: Optional[str] = None) -> str:
     """Compile blueprint into a clean vector PowerPoint presentation."""
     prs = Presentation()
@@ -1785,10 +1951,13 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
     contract = None
     slides = []
     global_transition = "fade"
+    motion_pace = "staged"
     if isinstance(blueprint, dict):
         contract = blueprint.get("contract")
         slides = blueprint.get("slides", [])
-        global_transition = blueprint.get("presentation_config", {}).get("transition_effect", "fade")
+        cfg = blueprint.get("presentation_config", {})
+        global_transition = cfg.get("transition_effect", "fade")
+        motion_pace = cfg.get("motion_pace", "staged")
     elif isinstance(blueprint, list):
         slides = blueprint
 
@@ -1806,6 +1975,11 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
         # Apply slide transition (v3.2)
         slide_trans = slide_data.get("transition_effect", active_default_transition)
         _apply_slide_transition(current_slide, slide_trans)
+
+        # Apply slide element timings (v3.3)
+        slide_pace = slide_data.get("motion_pace", motion_pace)
+        if slide_pace != "instant":
+            _inject_slide_element_timings(current_slide, slide_data, tokens)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     prs.save(output_path)

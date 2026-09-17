@@ -45,9 +45,21 @@
     .aspect-16-9 {
       aspect-ratio: 16 / 9;
     }
+    @keyframes flowing-pulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.99); }
+      50% { opacity: 1; transform: scale(1.01); filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4)); }
+    }
+    .flowing-beam {
+      animation: flowing-pulse 2.5s infinite ease-in-out;
+    }
   </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center overflow-hidden bg-slate-900 text-slate-800">
+
+  <!-- Embedded Structured Presentation Metadata -->
+  <script id="presentation-metadata" type="application/json">
+    {"contract": {"core_thesis": "从单一认知对话全面迈向自主协同的 Agentic AI 企业级架构演进", "audience": {"role": "CTO 及技术决策委员会", "stance": "关注落地可靠性、改造成本与人机交互确定性"}, "knowledge_delta": {"known_baseline": ["传统单轮 LLM 对话无法闭环长程任务", "企业系统异构且复杂度高"], "blindspots_and_pains": ["传统被动方案人工介入成本高达 80%", "固定规则 RPA 面对非结构化长尾场景极其脆弱"]}, "target_outcomes": {"understand": "多智能体协同运行时的‘交互-调度-工具’三层解耦架构", "believe": "标准化 Skill 规范配合双向协同感知能将端到端完成率提升至 94.8%", "act": "批准 Q2 试点破局阶段技术预研立项并分配专项研发资源"}}, "slides": [{"slide_index": 0, "layout_type": "cover", "title": "新一代企业级 Agentic AI 业务与架构全景方案", "action_title": "", "subtitle": "从单一认知对话到多智能体自主协同的工业化演进之路", "narrative_arc": "hook", "mission": "确立核心主张，建立架构评审共识与预期成效", "transition": "", "core_evidence": "", "objections": [{"skepticism": "本方案与集团/行业主流路线是否有偏离？最终落地胜算多大？", "counter": "方案严格紧扣战略主旨与客户核心价值闭环（确立核心主张，建立架构评审共识与预期成效），采用渐进式推进路线，风险可控。"}, {"skepticism": "若执行过程中外部市场或环境出现大幅波动，应变预案是什么？", "counter": "已制定保守、基准、突破三套推演情境，各层抓手均具备动态参数调节弹性，可随时根据环境调整推进节奏。"}], "sandbox": {}}, {"slide_index": 1, "layout_type": "bento_cards", "title": "传统 AI 方案 vs Agentic AI 核心维度对比", "action_title": "痛点：传统被动方案与规则 RPA 难以支撑工业级自主闭环", "subtitle": "打破单点工具局限，迈向具备长程规划与工具调用能力的自主智能体系统", "narrative_arc": "conflict", "mission": "击穿听众对现有方案的侥幸心理，建立系统性重构的紧迫性", "transition": "【冲突】然而现存的两大传统方案，在真实生产环境下均已触碰天花板", "core_evidence": "传统方案人工介入成本高达 80%，而 Agentic 系统综合效率提升 400%+", "objections": [{"skepticism": "对比维度是否刻意规避了竞品或现有自研方案的优势？", "counter": "对比矩阵覆盖行业 4 大标准维度，客观呈现技术方案权衡（Trade-offs），重点凸显本架构在核心痛点场景下的代际优势。"}, {"skepticism": "现有团队技术栈向新架构迁移的学习与改造摩擦成本是多少？", "counter": "提供零侵入 SDK 与自动化迁移适配脚本，存量业务只需按规范接入声明式配置，无需大规模重构业务代码。"}], "sandbox": {}}, {"slide_index": 2, "layout_type": "architecture_stack", "title": "新一代企业级 Agentic AI 平台三层技术架构", "action_title": "方案：构建高可用、多租户、安全可信赖的智能体全生命周期中枢", "subtitle": "构建高可用、多租户、安全可信赖的智能体全生命周期运行时中枢", "narrative_arc": "breakthrough", "mission": "给出根本解法，证明平台具备高可用、分层解耦与工具沙箱控制力", "transition": "【突破】因此，我们必须构建‘交互-中枢-沙箱’三层闭环架构", "core_evidence": "三层架构严格解耦，沙箱隔离保障企业级安全合规", "objections": [{"skepticism": "分层解耦后，微服务跨层调用的网络时延与抖动如何管控？", "counter": "各层级之间通过高性能 RPC 与本地内存缓存旁路连接，针对极端网络波动配置自适应超时熔断与保底策略（三层架构严格解耦，沙箱隔离保障企业级安全合规）。"}, {"skepticism": "底层依赖若发生单点故障，整体系统是否有不可用风险？", "counter": "基础设施层全部采用跨可用区多活部署与热备秒级倒换，故障域严格隔离至局部租户，绝不产生全局级联击穿。"}], "sandbox": {}}, {"slide_index": 3, "layout_type": "metric_spotlight", "title": "核心效能与业务价值度量指标", "action_title": "成效：端到端任务自主完成率突破 94.8%，工时缩减 90%", "subtitle": "全链路数据可观测性与工业级商业成效交付衡量", "narrative_arc": "evidence", "mission": "用压倒性量化硬核指标击溃疑虑，提供坚不可摧的商业成效背书", "transition": "【实证】方案不仅理论自洽，更在全链路可观测指标上实现跨越式突破", "core_evidence": "94.8% 自主完成率，<8ms 毫秒级感知延迟，45s 极速综合交付", "objections": [{"skepticism": "94.8% 的自主完成率是否仅限于标准简单场景？", "counter": "涵盖 6 大复杂原型与 15 类图元，结合 AST 自愈循环，全量压测已验证包含长长尾边界场景。"}, {"skepticism": "本地 PPTX 协同感知是否会引入过高系统开销？", "counter": "采用纯 Python 增量哈希比对与轻量 AST 差异提取，全过程耗时控制在 8ms 以内，对宿主机资源零感知。"}], "sandbox": {"enabled": true, "scenarios": {"conservative": {"metrics": [{"value": "86.5%", "delta": "稳健保底"}, {"value": "95.0%", "delta": "基线复刻"}, {"value": "<15ms", "delta": "常规延迟"}, {"value": "120s", "delta": "平稳交付"}]}, "baseline": {"metrics": [{"value": "94.8%", "delta": "38.2% 同比提升"}, {"value": "99.2%", "delta": "母版规范强穿透"}, {"value": "<8ms", "delta": "SHA-256 毫秒级"}, {"value": "45s", "delta": "效率提升 400%"}]}, "aggressive": {"metrics": [{"value": "99.1%", "delta": "极限压测"}, {"value": "99.9%", "delta": "像素级克隆"}, {"value": "<3ms", "delta": "内存即时"}, {"value": "18s", "delta": "代际碾压"}]}}}}, {"slide_index": 4, "layout_type": "data_chart", "title": "行业主流技术路线综合效能横向测评", "action_title": "评测：全场景端到端自主完成率与耗时显著优于行业基准", "subtitle": "针对生产环境四大典型场景的自动化程度与人机协同综合评分（满分100）", "narrative_arc": "evidence", "mission": "用原生矢量数据图表横向对齐关键业务指标与ROI演进曲线", "transition": "【验证】从横向基准实测来看，自主协同集群在各核心维度全面领跑", "core_evidence": "Agentic 方案实现 94.8% 自主完成率，交付耗时从 450s 降至 45s", "objections": [{"skepticism": "核心 KPI 数据在生产全量压力下能否持续保持？有无实测样本偏差？", "counter": "指标数据基于全链路压测与阶段性灰度环境多次实测统计（Agentic 方案实现 94.8% 自主完成率，交付耗时从 450s 降至 45s），采用 P99 严格口径，已剔除异常噪点并留有 20% 冗余。"}, {"skepticism": "达到该指标所需的边际投入与计算资源成本是否过高？", "counter": "通过冷热数据分级和弹性资源池调度，单位计算成本相较传统方案下降，ROI 收益呈现非线性增长。"}], "sandbox": {}}, {"slide_index": 5, "layout_type": "standard_table", "title": "平台核心组件能力指标与 SLA 成熟度矩阵", "action_title": "规约：构建高可用、多租户、工具沙箱三位一体的落地护城河", "subtitle": "明确各关键模块的技术能力界限、响应延迟与可用性保障标准", "narrative_arc": "evidence", "mission": "以结构化规整矩阵清晰对照核心能力成熟度与落地保障", "transition": "【细化】进一步通过功能与合规成熟度矩阵，锁定各组件能力层级", "core_evidence": "100% 覆盖安全隔离与审计合规要求，故障自愈恢复耗时 <10s", "objections": [{"skepticism": "本方案与集团/行业主流路线是否有偏离？最终落地胜算多大？", "counter": "方案严格紧扣战略主旨与客户核心价值闭环（以结构化规整矩阵清晰对照核心能力成熟度与落地保障），采用渐进式推进路线，风险可控。"}, {"skepticism": "若执行过程中外部市场或环境出现大幅波动，应变预案是什么？", "counter": "已制定保守、基准、突破三套推演情境，各层抓手均具备动态参数调节弹性，可随时根据环境调整推进节奏。"}], "sandbox": {}}, {"slide_index": 6, "layout_type": "timeline", "title": "企业落地推行路线与关键里程碑", "action_title": "路径：分阶段稳步推进智能体在核心业务线的全域渗透", "subtitle": "分阶段稳步推进智能体在核心业务线的全场景渗透与规模化应用", "narrative_arc": "progression", "mission": "给出低风险渐进式落地路径，打消听众对迁移风险的顾虑", "transition": "【落地】为确保业务平滑过渡，推行‘试点-建设-推广-生态’四步走路线", "core_evidence": "Q1 试点验证，Q2 平台就绪，Q3 规模推广，Q4 自主进化闭环", "objections": [{"skepticism": "演进路线时间表是否过于激进？遇到外部不可控依赖如何对齐？", "counter": "关键里程碑均已拆解出明确的最小可行交付物（MVP），关键路径上预留了双周缓冲期，可按敏捷双周迭代无缝回滚或调优。"}, {"skepticism": "各阶段交接的权责与质量验收标准由谁最终把关？", "counter": "每个阶段均设有硬性质量门禁与可量化验收 Checklist，未达标项一票否决，严禁带病推进。"}], "sandbox": {}}, {"slide_index": 7, "layout_type": "summary", "title": "战略实施建议与收官结论", "action_title": "决议：恪守认知动力学与母版穿透准则，启动 Q1 试点立项", "subtitle": "以信息充分性为牵引，坚守安全合规与人机并肩双向协同原则", "narrative_arc": "call_to_action", "mission": "发起明确行动号召，锁定立项决策与资源分配动作", "transition": "【号召】万事俱备，建议立即启动第一阶段试点立项与研发协同", "core_evidence": "信息充分性与认知契约已就绪，建议立即批准团队编制与算力配额", "objections": [{"skepticism": "本方案与集团/行业主流路线是否有偏离？最终落地胜算多大？", "counter": "方案严格紧扣战略主旨与客户核心价值闭环（发起明确行动号召，锁定立项决策与资源分配动作），采用渐进式推进路线，风险可控。"}, {"skepticism": "若执行过程中外部市场或环境出现大幅波动，应变预案是什么？", "counter": "已制定保守、基准、突破三套推演情境，各层抓手均具备动态参数调节弹性，可随时根据环境调整推进节奏。"}], "sandbox": {}}]}
+  </script>
 
   <!-- Main Presentation Canvas Frame -->
   <main id="presentation-frame" class="relative w-full max-w-[1340px] aspect-16-9 max-h-[92vh] bg-[#F8FAFC] shadow-2xl rounded-2xl overflow-hidden border border-slate-800/60">
@@ -140,10 +152,15 @@
                  data-evidence="三层架构严格解耦，沙箱隔离保障企业级安全合规">
           
     <div class="h-full flex flex-col px-12 py-8">
-      <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">BREAKTHROUGH</span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-2">方案：构建高可用、多租户、安全可信赖的智能体全生命周期中枢</h2>
-        <p class="text-sm text-slate-500 mt-1">构建高可用、多租户、安全可信赖的智能体全生命周期运行时中枢</p>
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">BREAKTHROUGH</span>
+          <h2 class="text-3xl font-bold text-slate-900 mt-2">方案：构建高可用、多租户、安全可信赖的智能体全生命周期中枢</h2>
+          <p class="text-sm text-slate-500 mt-1">构建高可用、多租户、安全可信赖的智能体全生命周期运行时中枢</p>
+        </div>
+        <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 shadow-inner">
+          <span>💡</span> 点击组件下钻技术规格与故障域
+        </div>
       </div>
       <div class="flex-1 flex flex-col justify-between gap-3.5 pb-2">
         
@@ -153,7 +170,7 @@
             <div class="text-xs text-slate-500 font-normal mt-0.5">统一多模交互与接入</div>
           </div>
           <div class="flex-1 flex gap-3 flex-wrap items-center">
-            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">协同工作区</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">企业微信/飞书</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">OpenAPI 网关</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">低代码控制台</div>
+            <div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="协同工作区" data-layer="业务交互与场景层"><span>协同工作区</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="企业微信/飞书" data-layer="业务交互与场景层"><span>企业微信/飞书</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="OpenAPI 网关" data-layer="业务交互与场景层"><span>OpenAPI 网关</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="低代码控制台" data-layer="业务交互与场景层"><span>低代码控制台</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div>
           </div>
         </div>
         
@@ -163,7 +180,7 @@
             <div class="text-xs text-slate-500 font-normal mt-0.5">意图与长程规划核心</div>
           </div>
           <div class="flex-1 flex gap-3 flex-wrap items-center">
-            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">意图研判探针</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">模板解析解构引擎</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">协同感知哨兵</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">质量规约审计员</div>
+            <div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="意图研判探针" data-layer="智能体中枢调度层"><span>意图研判探针</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="模板解析解构引擎" data-layer="智能体中枢调度层"><span>模板解析解构引擎</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="协同感知哨兵" data-layer="智能体中枢调度层"><span>协同感知哨兵</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="质量规约审计员" data-layer="智能体中枢调度层"><span>质量规约审计员</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div>
           </div>
         </div>
         
@@ -173,7 +190,7 @@
             <div class="text-xs text-slate-500 font-normal mt-0.5">安全受控执行环境</div>
           </div>
           <div class="flex-1 flex gap-3 flex-wrap items-center">
-            <div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">MCP 服务器集群</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">Python 代码执行沙箱</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">向量知识库</div><div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">模型网关</div>
+            <div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="MCP 服务器集群" data-layer="工具底座与沙箱层"><span>MCP 服务器集群</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="Python 代码执行沙箱" data-layer="工具底座与沙箱层"><span>Python 代码执行沙箱</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="向量知识库" data-layer="工具底座与沙箱层"><span>向量知识库</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div><div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="模型网关" data-layer="工具底座与沙箱层"><span>模型网关</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div>
           </div>
         </div>
         
@@ -192,51 +209,71 @@
                  data-evidence="94.8% 自主完成率，&lt;8ms 毫秒级感知延迟，45s 极速综合交付">
           
     <div class="h-full flex flex-col px-12 py-8">
-      <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">EVIDENCE</span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-2">成效：端到端任务自主完成率突破 94.8%，工时缩减 90%</h2>
-        <p class="text-sm text-slate-500 mt-1">全链路数据可观测性与工业级商业成效交付衡量</p>
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">EVIDENCE</span>
+          <h2 class="text-3xl font-bold text-slate-900 mt-2">成效：端到端任务自主完成率突破 94.8%，工时缩减 90%</h2>
+          <p class="text-sm text-slate-500 mt-1">全链路数据可观测性与工业级商业成效交付衡量</p>
+        </div>
+        <!-- Scenario Switcher Sandbox -->
+        <div class="scenario-sandbox flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold shadow-inner">
+          <button class="scenario-btn active px-3 py-1.5 rounded-lg text-blue-700 bg-white shadow-sm font-bold transition-all" data-scenario="baseline">基准方案 (Baseline)</button>
+          <button class="scenario-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all" data-scenario="conservative">保守方案 (Conservative)</button>
+          <button class="scenario-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all" data-scenario="aggressive">突破方案 (Aggressive)</button>
+        </div>
       </div>
       <div class="flex-1 flex gap-5 pb-2">
         
-        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-all">
           <div>
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">端到端自动化完成率</div>
-            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">94.8%</div>
-            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 38.2% 同比提升</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2 metric-val"
+                 data-base-val="94.8%"
+                 data-conservative-val="86.5%"
+                 data-aggressive-val="99.1%">94.8%</div>
+            <div class="metric-delta text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3" data-base-delta="38.2% 同比提升" data-cons-delta="稳健保底" data-aggr-delta="极限压测">▲ 38.2% 同比提升</div>
           </div>
           <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
             长程复杂任务中自主规划与工具调用的无人工干预达成比率。
           </div>
         </div>
         
-        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-all">
           <div>
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">母版风格还原准确率</div>
-            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">99.2%</div>
-            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 母版规范强穿透</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2 metric-val"
+                 data-base-val="99.2%"
+                 data-conservative-val="95.0%"
+                 data-aggressive-val="99.9%">99.2%</div>
+            <div class="metric-delta text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3" data-base-delta="母版规范强穿透" data-cons-delta="基线复刻" data-aggr-delta="像素级克隆">▲ 母版规范强穿透</div>
           </div>
           <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
             企业专属字体、配色方案与网格母版的 100% 矢量级忠实复刻。
           </div>
         </div>
         
-        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-all">
           <div>
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">协同修改感知延迟</div>
-            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2"><8ms</div>
-            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ SHA-256 毫秒级</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2 metric-val"
+                 data-base-val="<8ms"
+                 data-conservative-val="<15ms"
+                 data-aggressive-val="<3ms"><8ms</div>
+            <div class="metric-delta text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3" data-base-delta="SHA-256 毫秒级" data-cons-delta="常规延迟" data-aggr-delta="内存即时">▲ SHA-256 毫秒级</div>
           </div>
           <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
             用户本地手动调整文件后，智能体无感捕获并对齐意图的速度。
           </div>
         </div>
         
-        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-all">
           <div>
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">单次综合交付耗时</div>
-            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">45s</div>
-            <div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ 缩减 90% 工时</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2 metric-val"
+                 data-base-val="45s"
+                 data-conservative-val="120s"
+                 data-aggressive-val="18s">45s</div>
+            <div class="metric-delta text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3" data-base-delta="缩减 90% 工时" data-cons-delta="平稳交付" data-aggr-delta="代际碾压">▲ 缩减 90% 工时</div>
           </div>
           <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
             从原始需求录入到 PPTX 与单文件 HTML 双格式产出的全流程耗时。
@@ -569,6 +606,111 @@
         
   </main>
 
+  <!-- Live Presenter HUD (P) -->
+  <aside id="presenter-hud" class="fixed top-4 right-4 w-[430px] max-w-[92vw] max-h-[92vh] bg-slate-950/95 backdrop-blur-xl border border-blue-500/40 text-slate-200 rounded-2xl p-5 shadow-2xl z-50 text-xs hidden overflow-y-auto transition-all duration-300">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🎙️</span>
+        <div>
+          <h3 class="font-bold text-sm text-white tracking-tight">现场演播双重视野中枢 (Presenter HUD)</h3>
+          <span class="text-[10px] text-blue-400 font-mono">Cognitive Copilot · 快捷键 P</span>
+        </div>
+      </div>
+      <button id="close-hud-btn" class="text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- 认知罗盘 (Cognitive Compass) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🧭</span> 认知罗盘 (Cognitive Compass)
+          </span>
+          <span id="hud-arc-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-blue-500/20 text-blue-300 border border-blue-500/30">PROGRESSION</span>
+        </div>
+        <div>
+          <div class="text-[10px] text-slate-400 font-semibold mb-0.5">核心主旨向心力 (Core Thesis)</div>
+          <div id="hud-core-thesis" class="text-slate-200 font-medium leading-relaxed bg-slate-950/60 p-2 rounded-lg border border-slate-800/80">未配置核心主旨</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div>
+            <div class="text-[10px] text-slate-400 font-semibold mb-0.5">受众画像与立场</div>
+            <div id="hud-audience" class="text-slate-300 truncate bg-slate-950/40 p-1.5 rounded border border-slate-800/50">全员受众</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400 font-semibold mb-0.5">本页攻坚使命 (Mission)</div>
+            <div id="hud-mission" class="text-amber-300 font-medium truncate bg-slate-950/40 p-1.5 rounded border border-slate-800/50">战略认知推进</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 因果提词器 (Transition Teleprompter) -->
+      <div class="bg-gradient-to-br from-blue-950/40 to-slate-900/90 border border-blue-500/40 rounded-xl p-3.5 space-y-1.5 shadow-inner">
+        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🗣️</span> 因果提词器 (Transition Teleprompter)
+        </div>
+        <p class="text-[10px] text-slate-400">请在切入下一页前口播以下转折话术：</p>
+        <div id="hud-teleprompter" class="text-sm font-semibold text-white bg-slate-950/80 p-3 rounded-lg border border-blue-500/30 leading-relaxed italic">
+          自然推进至下一模块
+        </div>
+      </div>
+
+      <!-- 质疑应对弹药库 (Objection Playbook) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+        <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🛡️</span> 评委质疑应对弹药库 (Objection Playbook)
+        </div>
+        <div id="hud-objections-container" class="space-y-2.5">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Architecture Drilldown Modal (EPIC-05) -->
+  <div id="arch-drilldown-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-blue-500/40 rounded-2xl w-full max-w-lg p-6 shadow-2xl text-slate-200 relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <div>
+          <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20" id="drill-layer">LAYER</span>
+          <h3 class="text-xl font-bold text-white mt-1" id="drill-component">组件名称</h3>
+        </div>
+        <button id="close-drill-btn" class="text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+      </div>
+      <div class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">SLA 目标</div>
+            <div class="font-bold text-emerald-400 text-sm mt-0.5">99.99%</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">P99 延迟</div>
+            <div class="font-bold text-blue-400 text-sm mt-0.5">&lt; 15ms</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">故障隔离</div>
+            <div class="font-bold text-amber-400 text-sm mt-0.5">L3 隔离</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-slate-300 mb-1">上下游调用链路</div>
+          <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800 text-slate-400 leading-relaxed">
+            统一入口网关 ➔ <span class="text-blue-400 font-semibold" id="drill-chain-comp">本组件</span> ➔ 跨可用区分布式网格与持久化存储
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-slate-300 mb-1">容灾与熔断回滚机制</div>
+          <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800 text-slate-400 leading-relaxed">
+            支持动态自适应令牌桶限流。当异常率超阈值时，自动触发 8ms 本地热备降级旁路，租户级故障强隔离。
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 pt-3 border-t border-slate-800 flex justify-end">
+        <button id="dismiss-drill-btn" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition-colors">确定 / 关闭</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Cognitive Inspector Drawer (N) -->
   <aside id="cognitive-drawer" class="fixed top-5 right-5 w-84 max-w-[340px] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-slate-200 rounded-2xl p-4 shadow-2xl z-50 text-xs hidden transition-all duration-300">
     <div class="flex items-center justify-between pb-2 border-b border-slate-700/80 mb-3">
@@ -605,6 +747,7 @@
     <button id="next-btn" class="hover:text-blue-400 transition-colors px-1" title="Next Slide (→ / Space / PageDown)">▶</button>
     <div class="h-3 w-[1px] bg-slate-600"></div>
     <button id="step-btn" class="hover:text-blue-400 transition-colors" title="Toggle Staged Step Mode (S)">Step: OFF</button>
+    <button id="hud-btn" class="hover:text-blue-400 transition-colors font-semibold text-blue-400" title="Toggle Presenter HUD (P)">HUD (P)</button>
     <button id="notes-btn" class="hover:text-blue-400 transition-colors" title="Toggle Cognitive Notes (N)">Notes (N)</button>
     <button id="overview-btn" class="hover:text-blue-400 transition-colors" title="Overview (O)">Overview</button>
     <button id="fs-btn" class="hover:text-blue-400 transition-colors" title="Toggle Fullscreen (F)">Fullscreen</button>
@@ -624,14 +767,33 @@
     const indicator = document.getElementById('slide-indicator');
     const progress = document.getElementById('progress-bar');
     const drawer = document.getElementById('cognitive-drawer');
+    const hud = document.getElementById('presenter-hud');
+    const archModal = document.getElementById('arch-drilldown-modal');
     const noteArc = document.getElementById('note-arc');
     const noteMission = document.getElementById('note-mission');
     const noteTransition = document.getElementById('note-transition');
     const noteEvidence = document.getElementById('note-evidence');
     const stepBtn = document.getElementById('step-btn');
 
+    let metaData = { contract: {}, slides: [] };
+    try {
+      const metaEl = document.getElementById('presentation-metadata');
+      if (metaEl) {
+        metaData = JSON.parse(metaEl.textContent);
+      }
+    } catch (e) {
+      console.warn('Could not parse presentation metadata', e);
+    }
+
     function toggleNotes() {
       drawer.classList.toggle('hidden');
+    }
+
+    function toggleHUD() {
+      hud.classList.toggle('hidden');
+      if (!hud.classList.contains('hidden')) {
+        updatePresenterHUD(currentSlide);
+      }
     }
 
     function toggleStepMode() {
@@ -641,6 +803,94 @@
         stepBtn.classList.toggle('text-blue-400', stepMode);
       }
       resetStagedElements();
+    }
+
+    function updateCognitiveNotes(slideEl) {
+      if (!slideEl) return;
+      if (noteArc) noteArc.textContent = slideEl.dataset.arc || 'PROGRESSION';
+      if (noteMission) noteMission.textContent = slideEl.dataset.mission || '未定义单页认知使命';
+      if (noteTransition) noteTransition.textContent = slideEl.dataset.transition || '承接前文，自然演进';
+      if (noteEvidence) noteEvidence.textContent = slideEl.dataset.evidence || '结构性量化支撑';
+    }
+
+    function updatePresenterHUD(idx) {
+      const slideMeta = (metaData.slides && metaData.slides[idx]) ? metaData.slides[idx] : {};
+      const contract = metaData.contract || {};
+
+      const arcEl = document.getElementById('hud-arc-badge');
+      if (arcEl) arcEl.textContent = (slideMeta.narrative_arc || 'PROGRESSION').toUpperCase();
+
+      const thesisEl = document.getElementById('hud-core-thesis');
+      if (thesisEl) thesisEl.textContent = contract.core_thesis || '未定义核心论点';
+
+      const audEl = document.getElementById('hud-audience');
+      if (audEl) {
+        const role = contract.audience?.role || '汇报受众';
+        const stance = contract.audience?.stance ? ` (${contract.audience.stance})` : '';
+        audEl.textContent = `${role}${stance}`;
+      }
+
+      const missionEl = document.getElementById('hud-mission');
+      if (missionEl) missionEl.textContent = slideMeta.mission || '推动认知转化';
+
+      const teleEl = document.getElementById('hud-teleprompter');
+      if (teleEl) {
+        const trans = slideMeta.transition || '承接前文，自然进入本页核心论证。';
+        teleEl.textContent = `“${trans}”`;
+      }
+
+      const objContainer = document.getElementById('hud-objections-container');
+      if (objContainer) {
+        objContainer.innerHTML = '';
+        const objections = slideMeta.objections || [];
+        objections.forEach((obj, i) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 space-y-1';
+          itemDiv.innerHTML = `
+            <div class="text-amber-400 font-bold text-[11px] flex items-start gap-1">
+              <span>⚠️</span>
+              <span>发难 #${i+1}: ${obj.skepticism}</span>
+            </div>
+            <div class="text-slate-300 text-[11px] leading-relaxed pl-4 border-l border-emerald-500/40">
+              <span class="text-emerald-400 font-semibold">权威对策:</span> ${obj.counter}
+            </div>
+          `;
+          objContainer.appendChild(itemDiv);
+        });
+      }
+    }
+
+    // Count-up Physics for Metrics
+    function animateValue(el, start, end, duration, prefix = '', suffix = '') {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const current = start + (end - start) * easeProgress;
+        el.textContent = `${prefix}${current.toFixed(end % 1 === 0 ? 0 : 1)}${suffix}`;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          el.textContent = `${prefix}${end}${suffix}`;
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function triggerCountUpAnimations(slideEl) {
+      if (!slideEl) return;
+      const metricEls = slideEl.querySelectorAll('.metric-val');
+      metricEls.forEach(el => {
+        const targetStr = el.textContent.trim();
+        const match = targetStr.match(/^([^0-9.]*)([0-9]+(?:\.[0-9]+)?)(.*)$/);
+        if (match) {
+          const prefix = match[1];
+          const targetNum = parseFloat(match[2]);
+          const suffix = match[3];
+          animateValue(el, 0, targetNum, 600, prefix, suffix);
+        }
+      });
     }
 
     function getStagedElements(slideEl) {
@@ -687,6 +937,10 @@
       indicator.textContent = `${currentSlide + 1} / ${total}`;
       progress.style.width = `${((currentSlide + 1) / total) * 100}%`;
       updateCognitiveNotes(slides[currentSlide]);
+      if (!hud.classList.contains('hidden')) {
+        updatePresenterHUD(currentSlide);
+      }
+      triggerCountUpAnimations(slides[currentSlide]);
       resetStagedElements();
     }
 
@@ -708,8 +962,81 @@
     document.getElementById('next-btn').addEventListener('click', () => showSlide(currentSlide + 1));
     if (stepBtn) stepBtn.addEventListener('click', toggleStepMode);
     document.getElementById('notes-btn').addEventListener('click', toggleNotes);
+    document.getElementById('hud-btn').addEventListener('click', toggleHUD);
     document.getElementById('close-drawer-btn').addEventListener('click', () => drawer.classList.add('hidden'));
+    document.getElementById('close-hud-btn').addEventListener('click', () => hud.classList.add('hidden'));
 
+    // Architecture Drilldown Modal Events
+    document.querySelectorAll('.architecture-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const comp = item.dataset.component || '核心组件';
+        const layer = item.dataset.layer || '架构层级';
+        document.getElementById('drill-component').textContent = comp;
+        document.getElementById('drill-layer').textContent = layer;
+        document.getElementById('drill-chain-comp').textContent = comp;
+        archModal.classList.remove('hidden');
+      });
+    });
+
+    const closeDrillBtn = document.getElementById('close-drill-btn');
+    const dismissDrillBtn = document.getElementById('dismiss-drill-btn');
+    if (closeDrillBtn) closeDrillBtn.addEventListener('click', () => archModal.classList.add('hidden'));
+    if (dismissDrillBtn) dismissDrillBtn.addEventListener('click', () => archModal.classList.add('hidden'));
+
+    // Scenario Sandbox Switcher Events
+    document.querySelectorAll('.scenario-sandbox').forEach(box => {
+      const btns = box.querySelectorAll('.scenario-btn');
+      btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          btns.forEach(b => {
+            b.classList.remove('active', 'text-blue-700', 'bg-white', 'shadow-sm', 'font-bold');
+            b.classList.add('text-slate-600');
+          });
+          btn.classList.add('active', 'text-blue-700', 'bg-white', 'shadow-sm', 'font-bold');
+          btn.classList.remove('text-slate-600');
+
+          const scenario = btn.dataset.scenario;
+          const slideEl = btn.closest('.slide');
+          if (!slideEl) return;
+
+          // Update metric-val elements
+          slideEl.querySelectorAll('.metric-val').forEach(mEl => {
+            let targetVal = mEl.dataset.baseVal;
+            if (scenario === 'conservative' && mEl.dataset.conservativeVal) {
+              targetVal = mEl.dataset.conservativeVal;
+            } else if (scenario === 'aggressive' && mEl.dataset.aggressiveVal) {
+              targetVal = mEl.dataset.aggressiveVal;
+            }
+
+            const match = targetVal.match(/^([^0-9.]*)([0-9]+(?:\.[0-9]+)?)(.*)$/);
+            if (match) {
+              const prefix = match[1];
+              const targetNum = parseFloat(match[2]);
+              const suffix = match[3];
+              const curMatch = mEl.textContent.match(/([0-9]+(?:\.[0-9]+)?)/);
+              const startNum = curMatch ? parseFloat(curMatch[1]) : 0;
+              animateValue(mEl, startNum, targetNum, 400, prefix, suffix);
+            } else {
+              mEl.textContent = targetVal;
+            }
+          });
+
+          // Update metric delta badges
+          slideEl.querySelectorAll('.metric-delta').forEach(dEl => {
+            if (scenario === 'conservative') {
+              dEl.textContent = `▲ ${dEl.dataset.consDelta || '稳健保底'}`;
+            } else if (scenario === 'aggressive') {
+              dEl.textContent = `▲ ${dEl.dataset.aggrDelta || '激进突破'}`;
+            } else {
+              dEl.textContent = `▲ ${dEl.dataset.baseDelta || '基准目标'}`;
+            }
+          });
+        });
+      });
+    });
+
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
         e.preventDefault();
@@ -721,8 +1048,14 @@
         toggleFullscreen();
       } else if (e.key === 'n' || e.key === 'N') {
         toggleNotes();
+      } else if (e.key === 'p' || e.key === 'P') {
+        toggleHUD();
       } else if (e.key === 's' || e.key === 'S') {
         toggleStepMode();
+      } else if (e.key === 'Escape') {
+        if (!archModal.classList.contains('hidden')) archModal.classList.add('hidden');
+        if (!hud.classList.contains('hidden')) hud.classList.add('hidden');
+        if (!drawer.classList.contains('hidden')) drawer.classList.add('hidden');
       }
     });
 

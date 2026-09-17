@@ -132,7 +132,21 @@ Presentation animation commonly degrades into circus-like acrobatics or vanishes
 - **Restrained Transitions**: Subtle slide transitions (`fade` / `push`) rather than distracting rotations or acrobatics;
 - **Primitive Staged Reveals**: Bento cards stagger in, architecture stacks assemble from bottom-up, maturity ladders climb step-by-step. The standalone HTML deck supports spacebar sub-step presentation mode, while PPTX maintains universal compatibility.
 
+### Principle 6: Semantic Kinetic Physics
+Legacy AI tools force LLMs to guess bounding-box coordinates and hardcode flight paths for every button and textbox.  
+`undoPPT` establishes that **topology determines physics and semantics dictate gravity**:
+- Each of the 15 layout primitives inherently encodes its own cognitive physical behaviors (architecture stacks lock bottom-up, timeline beams ignite stage nodes sequentially, metric counters count up with precision, matrix quadrants focus deliberately);
+- The AI Agent expends zero tokens on micro-coordinates; the engine maps narrative arcs directly to kinetic physics.
+
+### Principle 7: Elevating Static Slideware to an Active Decision Sandbox
+The fatal vulnerability of traditional presentations is instant collapse when an executive questions hypothetical parameters.  
+`undoPPT` transforms standalone HTML decks into an **Active Decision Sandbox**:
+- Interactive scenario tabs (Conservative / Baseline / Aggressive) and sensitivity sliders recompute chart trajectories and KPIs dynamically in real-time;
+- Clickable architecture drilldowns pop up SLA boundaries and failure domains;
+- Equips speakers with a **Live Presenter HUD** (`P` key) featuring a Cognitive Radar, Transition Teleprompter, and an Objection & Defense Playbook.
+
 ---
+
 
 
 ## 4. Guaranteeing Quality: The 5-Layer Certainty Closed-Loop Framework

@@ -5,6 +5,41 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.3.0] - 2026-09-17
+
+### Added
+- **Kinetic Dynamics & Decision Sandbox PRD Release (`docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md`)**:
+  - Published comprehensive v3.3 PRD and engineering architecture specification covering EPIC-01 through EPIC-06.
+  - Formalized the transition from static presentation slides to semantic kinetic dynamics and live executive decision sandboxes.
+- **PPTX Standard ECMA-376 OOXML `<p:timing>` Sequences (`core/pptx_builder.py`)**:
+  - Implemented compliant OOXML `<p:timing>` element builder for native PowerPoint click-to-advance sequence animations without any external plugins.
+  - Intelligently clusters content shapes (Bento cards, layers, metric cards, timeline milestones) and binds them to sequential click-advance time nodes.
+  - Fully matches `open-kimi-ppt-skill`'s element animation capability while remaining 100% self-contained in pure Python with zero headless browser dependencies.
+- **15 Layout Primitives Semantic Dynamics & Causal Timing**:
+  - **Architecture Stacks (`architecture_stack`)**: Bottom-up gravitational assembly (infrastructure layers lock first, intermediate coordination layers expand, top-level gateways spotlighted).
+  - **KPI Spotlight (`metric_spotlight`)**: Web count-up physics with cubic-bezier easeOut (0% -> 94.8%) and dynamic delta badge updates.
+  - **Timeline & Process Flow (`timeline` / `process_flow`)**: Flowing light beam pulse animation (`flowing-beam`).
+  - **Causal Timing Clock**: Adaptive animation pacing tied to `narrative_arc` (conflict 250ms snappy, breakthrough 400ms radial glow, evidence 600ms firm count-up).
+- **Live Presenter HUD (`P` Key / Cognitive Copilot in HTML)**:
+  - Single-file HTML now embeds **Presenter HUD** (toggled via `P` key or bottom navigation button):
+    - **Cognitive Compass (认知罗盘)**: Real-time tracking of Q1-Q4 Cognitive Contract, core thesis anchor, audience stance, and current slide mission.
+    - **Transition Teleprompter (因果提词器)**: High-visibility rhetorical teleprompter providing precise voiceover cues before advancing.
+    - **Objection Playbook (质疑应对弹药库)**: Dynamic skeptical challenge and smoking-gun counter-defense pairings synthesized from slide evidence or custom `hud_notes`.
+- **Active Decision Sandbox (活动决策推演沙盒) & Architecture Drilldown**:
+  - **Scenario Switcher Tab**: Dynamic switching between *Conservative (保守)*, *Baseline (基准)*, and *Aggressive (突破)* scenarios with real-time recalculation and smooth count-up transitions.
+  - **Architecture Drilldown Modal**: Click any microservice component in architecture stacks to view SLA targets (99.99%), P99 latency (<15ms), upstream/downstream calling chain, and disaster recovery fallback routes.
+- **Bi-directional Strategic Intent Reflection Engine (`core/sync_watcher.py`)**:
+  - Added `analyze_intent_diff` to infer the human expert's underlying strategic intent (performance elevation, scope focusing, posture change) from local manual modifications in PowerPoint or JSON.
+  - Integrated intent deductions into `cli.py sync` to automatically guide the next-turn AI Agent posture.
+- **Design Philosophy Principles 6 & 7 (`DESIGN_PHILOSOPHY.md` & `DESIGN_PHILOSOPHY_zh.md`)**:
+  - Principle 6: Semantic Kinetic Physics (*"结构决定动效，语义赋予重力"*).
+  - Principle 7: Active Decision Sandbox (*"从单向灌输蜕变为现场拍板的推演沙盒"*).
+
+### Changed
+- Bumped engine version to `3.3.0` across `core/__init__.py`, `SKILL.md`, `.agents/skills/undo-ppt/SKILL.md`, and test suites.
+
+---
+
 ## [3.2.0] - 2026-09-17
 
 ### Added

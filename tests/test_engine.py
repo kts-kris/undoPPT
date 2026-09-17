@@ -13,7 +13,7 @@ from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.html_builder import build_standalone_html
 from core.pptx_builder import build_presentation
-from core.sync_watcher import SyncWatcher, compute_file_hash
+from core.sync_watcher import SyncWatcher, compute_file_hash, analyze_intent_diff
 from core.undo_engine import extract_template_tokens, save_tokens
 from core.vision_extractor import create_tokens_from_style_spec
 
@@ -494,6 +494,147 @@ class TestUndoPPTEngine(unittest.TestCase):
             html_text = f.read()
         self.assertIn("step-btn", html_text)
         self.assertIn("staged-hidden", html_text)
+
+    def test_pptx_ooxml_timing_sequence(self):
+        """Test standard ECMA-376 OOXML <p:timing> generation in PPTX (EPIC-01 & EPIC-02)."""
+        bp = {
+            "presentation_config": {
+                "transition_effect": "fade",
+                "motion_pace": "staged"
+            },
+            "slides": [
+                {"layout_type": "cover", "title": "Cover Slide"},
+                {
+                    "layout_type": "bento_cards",
+                    "title": "Bento Analysis",
+                    "narrative_arc": "conflict",
+                    "cards": [
+                        {"title": "方案 A", "desc": "痛点说明"},
+                        {"title": "方案 B", "desc": "瓶颈说明"}
+                    ]
+                },
+                {
+                    "layout_type": "architecture_stack",
+                    "title": "Tech Architecture",
+                    "narrative_arc": "breakthrough",
+                    "layers": [
+                        {"name": "网关层", "items": ["API 网关"]},
+                        {"name": "业务层", "items": ["调度引擎"]}
+                    ]
+                }
+            ]
+        }
+        out_pptx = os.path.join(self.test_dir, "timing_test.pptx")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        self.assertTrue(os.path.exists(out_pptx))
+
+        prs = Presentation(out_pptx)
+        self.assertEqual(len(prs.slides), 3)
+
+        # Slide 0 (cover) should not have timing sequence
+        slide0_tags = [c.tag.split("}")[-1] for c in prs.slides[0]._element]
+        self.assertNotIn("timing", slide0_tags)
+
+        # Slide 1 and Slide 2 should have valid OOXML timing node
+        slide1_tags = [c.tag.split("}")[-1] for c in prs.slides[1]._element]
+        self.assertIn("timing", slide1_tags)
+        slide2_tags = [c.tag.split("}")[-1] for c in prs.slides[2]._element]
+        self.assertIn("timing", slide2_tags)
+
+        # Test instant motion_pace disables timing
+        bp_instant = dict(bp)
+        bp_instant["presentation_config"] = {"motion_pace": "instant"}
+        out_instant = os.path.join(self.test_dir, "instant_test.pptx")
+        build_presentation(bp_instant, self.sample_tokens, out_instant)
+        prs_instant = Presentation(out_instant)
+        slide1_instant_tags = [c.tag.split("}")[-1] for c in prs_instant.slides[1]._element]
+        self.assertNotIn("timing", slide1_instant_tags)
+
+    def test_html_presenter_hud_and_sandbox(self):
+        """Test Live Presenter HUD (P key) and Active Decision Sandbox in HTML (EPIC-04 & EPIC-05)."""
+        bp = {
+            "contract": {
+                "core_thesis": "架构驱动业务百倍增长",
+                "audience": {"role": "技术评委会", "stance": "严苛审视SLA与成本"}
+            },
+            "slides": [
+                {
+                    "layout_type": "architecture_stack",
+                    "title": "分布式微服务架构",
+                    "mission": "证明系统高可用",
+                    "transition": "【承接】由此可见基础设施稳固，接下来看性能数据",
+                    "layers": [{"name": "路由层", "items": ["Envoy", "Traefik"]}]
+                },
+                {
+                    "layout_type": "metric_spotlight",
+                    "title": "核心效能大字报",
+                    "mission": "用实测数据证明吞吐达标",
+                    "transition": "【号召】建议立即启动立项",
+                    "core_evidence": "P99 < 5ms, 99.999% 可用性",
+                    "metrics": [
+                        {"label": "可用性", "value": "99.99%", "delta": "+0.8%"},
+                        {"label": "QPS", "value": "50000", "delta": "+40%"}
+                    ],
+                    "sandbox": {
+                        "enabled": True,
+                        "scenarios": {
+                            "conservative": {"metrics": [{"value": "99.9%"}, {"value": "35000"}]},
+                            "aggressive": {"metrics": [{"value": "99.999%"}, {"value": "80000"}]}
+                        }
+                    },
+                    "hud_notes": {
+                        "objection_defense": [
+                            {"skepticism": "如何保障极端断网下的数据一致性？", "counter": "依靠 Raft 共识协议与本地事务回滚日志"}
+                        ]
+                    }
+                }
+            ]
+        }
+        out_html = os.path.join(self.test_dir, "hud_sandbox_test.html")
+        build_standalone_html(bp, self.sample_tokens, out_html)
+        self.assertTrue(os.path.exists(out_html))
+
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_text = f.read()
+
+        # Presenter HUD markup & shortcut checks
+        self.assertIn("presenter-hud", html_text)
+        self.assertIn("hud-btn", html_text)
+        self.assertIn("架构驱动业务百倍增长", html_text)
+        self.assertIn("技术评委会", html_text)
+        self.assertIn("如何保障极端断网下的数据一致性？", html_text)
+        self.assertIn("Raft 共识协议", html_text)
+
+        # Active Decision Sandbox checks
+        self.assertIn("scenario-sandbox", html_text)
+        self.assertIn("data-conservative-val=\"99.9%\"", html_text)
+        self.assertIn("data-aggressive-val=\"99.999%\"", html_text)
+
+        # Architecture drilldown modal check
+        self.assertIn("arch-drilldown-modal", html_text)
+        self.assertIn("architecture-item", html_text)
+
+    def test_sync_watcher_intent_reflection(self):
+        """Test SyncWatcher semantic intent reflection engine (EPIC-06)."""
+        old_blueprint = {
+            "slides": [
+                {"title": "旧方案架构体系", "cards": [{"title": "C1"}, {"title": "C2"}, {"title": "C3"}]},
+                {"title": "性能初测", "metrics": [{"label": "SLA", "value": "95.0%"}]}
+            ]
+        }
+        new_blueprint = {
+            "slides": [
+                {"title": "下一代自研突破架构", "cards": [{"title": "C1"}]},
+                {"title": "极致性能承诺", "metrics": [{"label": "SLA", "value": "99.99%"}]}
+            ]
+        }
+
+        res = analyze_intent_diff(old_blueprint, new_blueprint)
+        self.assertIn("strategic_intent", res)
+        self.assertIn("suggested_agent_posture", res)
+        self.assertTrue(len(res["detected_modifications"]) >= 2)
+        self.assertTrue(len(res["intent_breakdown"]) >= 2)
+        self.assertIn("激进化", res["suggested_agent_posture"])
 
 
 if __name__ == "__main__":

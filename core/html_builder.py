@@ -57,7 +57,7 @@ def _render_architecture_stack_html(slide: Dict[str, Any], tokens: Dict[str, Any
         desc = layer.get("desc", "")
         items = layer.get("items", [])
         items_html = "".join([
-            f'<div class="flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-400 transition-colors">{item}</div>'
+            f'<div class="architecture-item flex-1 min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-center text-sm font-semibold text-slate-800 shadow-sm hover:border-blue-500 hover:bg-blue-50/70 hover:shadow-md cursor-pointer transition-all flex items-center justify-center gap-1.5 group" data-component="{html.escape(item)}" data-layer="{html.escape(name)}"><span>{item}</span><span class="text-[10px] text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">🔍</span></div>'
             for item in items[:5]
         ])
 
@@ -77,10 +77,15 @@ def _render_architecture_stack_html(slide: Dict[str, Any], tokens: Dict[str, Any
 
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
-      <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
-        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+          <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+          <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+        </div>
+        <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 shadow-inner">
+          <span>💡</span> 点击组件下钻技术规格与故障域
+        </div>
       </div>
       <div class="flex-1 flex flex-col justify-between gap-3.5 pb-2">
         {"".join(layers_html)}
@@ -136,26 +141,65 @@ def _render_bento_cards_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> s
 
 
 def _render_metric_spotlight_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
+    import re
     title = slide.get("action_title") or slide.get("title", "核心业绩指标衡量")
     subtitle = slide.get("subtitle", "")
     metrics = slide.get("metrics", [])
     p = tokens.get("palette", {})
     tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "KPI DASHBOARD")
+    sandbox_cfg = slide.get("sandbox", {})
 
     metrics_html = []
-    for m in metrics[:4]:
+    for idx, m in enumerate(metrics[:4]):
         label = m.get("label", "核心指标")
-        val = m.get("value", "99.9%")
-        delta = m.get("delta", "")
+        val = str(m.get("value", "99.9%"))
+        delta = str(m.get("delta", ""))
         desc = m.get("desc", "")
 
-        delta_html = f'<div class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3">▲ {delta}</div>' if delta else ""
+        # Compute scenario variations from sandbox config or derive dynamically
+        cons_val = None
+        aggr_val = None
+        cons_delta = None
+        aggr_delta = None
+        if sandbox_cfg and sandbox_cfg.get("scenarios"):
+            sc_cons = sandbox_cfg["scenarios"].get("conservative", {}).get("metrics", [])
+            if idx < len(sc_cons):
+                cons_val = sc_cons[idx].get("value")
+                cons_delta = sc_cons[idx].get("delta")
+            sc_aggr = sandbox_cfg["scenarios"].get("aggressive", {}).get("metrics", [])
+            if idx < len(sc_aggr):
+                aggr_val = sc_aggr[idx].get("value")
+                aggr_delta = sc_aggr[idx].get("delta")
+
+        if not cons_val or not aggr_val:
+            num_match = re.search(r"([0-9]+(?:\.[0-9]+)?)", val)
+            if num_match:
+                num = float(num_match.group(1))
+                prefix = val[:num_match.start(1)]
+                suffix = val[num_match.end(1):]
+                c_num = round(num * 0.88, 1) if num > 1 else round(num * 0.9, 2)
+                a_num = round(min(100.0, num * 1.15) if "%" in suffix else num * 1.25, 1)
+                cons_val = f"{prefix}{c_num:g}{suffix}"
+                aggr_val = f"{prefix}{a_num:g}{suffix}"
+            else:
+                cons_val = val
+                aggr_val = val
+
+        if not cons_delta:
+            cons_delta = "稳健保底"
+        if not aggr_delta:
+            aggr_delta = "激进突破"
+
+        delta_html = f'<div class="metric-delta text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full inline-block mb-3" data-base-delta="{delta}" data-cons-delta="{cons_delta}" data-aggr-delta="{aggr_delta}">▲ {delta if delta else "基准目标"}</div>'
 
         metrics_html.append(f"""
-        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex-1 flex flex-col justify-between bg-white border border-slate-200 rounded-xl p-7 shadow-sm hover:shadow-md transition-all">
           <div>
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{label}</div>
-            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2">{val}</div>
+            <div class="text-5xl font-extrabold text-blue-600 font-mono tracking-tight mb-2 metric-val"
+                 data-base-val="{val}"
+                 data-conservative-val="{cons_val}"
+                 data-aggressive-val="{aggr_val}">{val}</div>
             {delta_html}
           </div>
           <div class="text-xs text-slate-500 border-t border-slate-100 pt-3 leading-relaxed">
@@ -166,10 +210,18 @@ def _render_metric_spotlight_html(slide: Dict[str, Any], tokens: Dict[str, Any])
 
     return f"""
     <div class="h-full flex flex-col px-12 py-8">
-      <div class="mb-5">
-        <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
-        <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+          <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+          <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+        </div>
+        <!-- Scenario Switcher Sandbox -->
+        <div class="scenario-sandbox flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold shadow-inner">
+          <button class="scenario-btn active px-3 py-1.5 rounded-lg text-blue-700 bg-white shadow-sm font-bold transition-all" data-scenario="baseline">基准方案 (Baseline)</button>
+          <button class="scenario-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all" data-scenario="conservative">保守方案 (Conservative)</button>
+          <button class="scenario-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all" data-scenario="aggressive">突破方案 (Aggressive)</button>
+        </div>
       </div>
       <div class="flex-1 flex gap-5 pb-2">
         {"".join(metrics_html)}
@@ -825,6 +877,73 @@ HTML_RENDERERS = {
 }
 
 
+def _generate_default_objections(slide: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Synthesize high-conviction objection & defense pairings based on slide layout & evidence."""
+    hud = slide.get("hud_notes", {})
+    if hud and hud.get("objection_defense"):
+        return hud.get("objection_defense")
+
+    l_type = slide.get("layout_type", "")
+    evidence = slide.get("core_evidence", "")
+    mission = slide.get("mission", "")
+
+    if l_type == "architecture_stack":
+        return [
+            {
+                "skepticism": "分层解耦后，微服务跨层调用的网络时延与抖动如何管控？",
+                "counter": f"各层级之间通过高性能 RPC 与本地内存缓存旁路连接，针对极端网络波动配置自适应超时熔断与保底策略{f'（{evidence}）' if evidence else ''}。"
+            },
+            {
+                "skepticism": "底层依赖若发生单点故障，整体系统是否有不可用风险？",
+                "counter": "基础设施层全部采用跨可用区多活部署与热备秒级倒换，故障域严格隔离至局部租户，绝不产生全局级联击穿。"
+            }
+        ]
+    elif l_type in ("metric_spotlight", "data_chart"):
+        return [
+            {
+                "skepticism": "核心 KPI 数据在生产全量压力下能否持续保持？有无实测样本偏差？",
+                "counter": f"指标数据基于全链路压测与阶段性灰度环境多次实测统计{f'（{evidence}）' if evidence else ''}，采用 P99 严格口径，已剔除异常噪点并留有 20% 冗余。"
+            },
+            {
+                "skepticism": "达到该指标所需的边际投入与计算资源成本是否过高？",
+                "counter": "通过冷热数据分级和弹性资源池调度，单位计算成本相较传统方案下降，ROI 收益呈现非线性增长。"
+            }
+        ]
+    elif l_type in ("timeline", "process_flow"):
+        return [
+            {
+                "skepticism": "演进路线时间表是否过于激进？遇到外部不可控依赖如何对齐？",
+                "counter": "关键里程碑均已拆解出明确的最小可行交付物（MVP），关键路径上预留了双周缓冲期，可按敏捷双周迭代无缝回滚或调优。"
+            },
+            {
+                "skepticism": "各阶段交接的权责与质量验收标准由谁最终把关？",
+                "counter": "每个阶段均设有硬性质量门禁与可量化验收 Checklist，未达标项一票否决，严禁带病推进。"
+            }
+        ]
+    elif l_type in ("bento_cards", "matrix_2x2", "cross_mapping"):
+        return [
+            {
+                "skepticism": "对比维度是否刻意规避了竞品或现有自研方案的优势？",
+                "counter": "对比矩阵覆盖行业 4 大标准维度，客观呈现技术方案权衡（Trade-offs），重点凸显本架构在核心痛点场景下的代际优势。"
+            },
+            {
+                "skepticism": "现有团队技术栈向新架构迁移的学习与改造摩擦成本是多少？",
+                "counter": "提供零侵入 SDK 与自动化迁移适配脚本，存量业务只需按规范接入声明式配置，无需大规模重构业务代码。"
+            }
+        ]
+    else:
+        return [
+            {
+                "skepticism": "本方案与集团/行业主流路线是否有偏离？最终落地胜算多大？",
+                "counter": f"方案严格紧扣战略主旨与客户核心价值闭环{f'（{mission}）' if mission else ''}，采用渐进式推进路线，风险可控。"
+            },
+            {
+                "skepticism": "若执行过程中外部市场或环境出现大幅波动，应变预案是什么？",
+                "counter": "已制定保守、基准、突破三套推演情境，各层抓手均具备动态参数调节弹性，可随时根据环境调整推进节奏。"
+            }
+        ]
+
+
 def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str) -> str:
     """Generate a single-file standalone HTML presentation with zero external dependencies."""
     p = tokens.get("palette", {})
@@ -838,6 +957,11 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     elif isinstance(blueprint, list):
         slides = blueprint
 
+    presentation_meta = {
+        "contract": contract or {},
+        "slides": []
+    }
+
     for idx, slide_data in enumerate(slides):
         l_type = slide_data.get("layout_type", "bento_cards")
         renderer = HTML_RENDERERS.get(l_type, _render_bento_cards_html)
@@ -847,6 +971,20 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         mission_attr = html.escape(str(slide_data.get("mission", "")), quote=True)
         transition_attr = html.escape(str(slide_data.get("transition", "")), quote=True)
         evidence_attr = html.escape(str(slide_data.get("core_evidence", "")), quote=True)
+
+        presentation_meta["slides"].append({
+            "slide_index": idx,
+            "layout_type": l_type,
+            "title": slide_data.get("title", ""),
+            "action_title": slide_data.get("action_title", ""),
+            "subtitle": slide_data.get("subtitle", ""),
+            "narrative_arc": slide_data.get("narrative_arc", "progression"),
+            "mission": slide_data.get("mission", ""),
+            "transition": slide_data.get("transition", ""),
+            "core_evidence": slide_data.get("core_evidence", ""),
+            "objections": _generate_default_objections(slide_data),
+            "sandbox": slide_data.get("sandbox", {})
+        })
 
         slides_content_list.append(f"""
         <!-- Slide {idx+1} -->
@@ -862,6 +1000,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
 
     slides_blob = "\n".join(slides_content_list)
     total_slides = len(slides)
+    meta_json = json.dumps(presentation_meta, ensure_ascii=False)
 
     # Compile entire HTML bundle
     html_content = f"""<!DOCTYPE html>
@@ -911,14 +1050,131 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     .aspect-16-9 {{
       aspect-ratio: 16 / 9;
     }}
+    @keyframes flowing-pulse {{
+      0%, 100% {{ opacity: 0.5; transform: scale(0.99); }}
+      50% {{ opacity: 1; transform: scale(1.01); filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4)); }}
+    }}
+    .flowing-beam {{
+      animation: flowing-pulse 2.5s infinite ease-in-out;
+    }}
   </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center overflow-hidden bg-slate-900 text-slate-800">
+
+  <!-- Embedded Structured Presentation Metadata -->
+  <script id="presentation-metadata" type="application/json">
+    {meta_json}
+  </script>
 
   <!-- Main Presentation Canvas Frame -->
   <main id="presentation-frame" class="relative w-full max-w-[1340px] aspect-16-9 max-h-[92vh] bg-[#F8FAFC] shadow-2xl rounded-2xl overflow-hidden border border-slate-800/60">
     {slides_blob}
   </main>
+
+  <!-- Live Presenter HUD (P) -->
+  <aside id="presenter-hud" class="fixed top-4 right-4 w-[430px] max-w-[92vw] max-h-[92vh] bg-slate-950/95 backdrop-blur-xl border border-blue-500/40 text-slate-200 rounded-2xl p-5 shadow-2xl z-50 text-xs hidden overflow-y-auto transition-all duration-300">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-base">🎙️</span>
+        <div>
+          <h3 class="font-bold text-sm text-white tracking-tight">现场演播双重视野中枢 (Presenter HUD)</h3>
+          <span class="text-[10px] text-blue-400 font-mono">Cognitive Copilot · 快捷键 P</span>
+        </div>
+      </div>
+      <button id="close-hud-btn" class="text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- 认知罗盘 (Cognitive Compass) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🧭</span> 认知罗盘 (Cognitive Compass)
+          </span>
+          <span id="hud-arc-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-blue-500/20 text-blue-300 border border-blue-500/30">PROGRESSION</span>
+        </div>
+        <div>
+          <div class="text-[10px] text-slate-400 font-semibold mb-0.5">核心主旨向心力 (Core Thesis)</div>
+          <div id="hud-core-thesis" class="text-slate-200 font-medium leading-relaxed bg-slate-950/60 p-2 rounded-lg border border-slate-800/80">未配置核心主旨</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div>
+            <div class="text-[10px] text-slate-400 font-semibold mb-0.5">受众画像与立场</div>
+            <div id="hud-audience" class="text-slate-300 truncate bg-slate-950/40 p-1.5 rounded border border-slate-800/50">全员受众</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400 font-semibold mb-0.5">本页攻坚使命 (Mission)</div>
+            <div id="hud-mission" class="text-amber-300 font-medium truncate bg-slate-950/40 p-1.5 rounded border border-slate-800/50">战略认知推进</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 因果提词器 (Transition Teleprompter) -->
+      <div class="bg-gradient-to-br from-blue-950/40 to-slate-900/90 border border-blue-500/40 rounded-xl p-3.5 space-y-1.5 shadow-inner">
+        <div class="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🗣️</span> 因果提词器 (Transition Teleprompter)
+        </div>
+        <p class="text-[10px] text-slate-400">请在切入下一页前口播以下转折话术：</p>
+        <div id="hud-teleprompter" class="text-sm font-semibold text-white bg-slate-950/80 p-3 rounded-lg border border-blue-500/30 leading-relaxed italic">
+          自然推进至下一模块
+        </div>
+      </div>
+
+      <!-- 质疑应对弹药库 (Objection Playbook) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2.5">
+        <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🛡️</span> 评委质疑应对弹药库 (Objection Playbook)
+        </div>
+        <div id="hud-objections-container" class="space-y-2.5">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Architecture Drilldown Modal (EPIC-05) -->
+  <div id="arch-drilldown-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-blue-500/40 rounded-2xl w-full max-w-lg p-6 shadow-2xl text-slate-200 relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+        <div>
+          <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20" id="drill-layer">LAYER</span>
+          <h3 class="text-xl font-bold text-white mt-1" id="drill-component">组件名称</h3>
+        </div>
+        <button id="close-drill-btn" class="text-slate-400 hover:text-white px-2 py-1 rounded-lg hover:bg-slate-800 transition-colors">✕</button>
+      </div>
+      <div class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">SLA 目标</div>
+            <div class="font-bold text-emerald-400 text-sm mt-0.5">99.99%</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">P99 延迟</div>
+            <div class="font-bold text-blue-400 text-sm mt-0.5">&lt; 15ms</div>
+          </div>
+          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-400">故障隔离</div>
+            <div class="font-bold text-amber-400 text-sm mt-0.5">L3 隔离</div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-slate-300 mb-1">上下游调用链路</div>
+          <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800 text-slate-400 leading-relaxed">
+            统一入口网关 ➔ <span class="text-blue-400 font-semibold" id="drill-chain-comp">本组件</span> ➔ 跨可用区分布式网格与持久化存储
+          </div>
+        </div>
+        <div>
+          <div class="text-[11px] font-bold text-slate-300 mb-1">容灾与熔断回滚机制</div>
+          <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800 text-slate-400 leading-relaxed">
+            支持动态自适应令牌桶限流。当异常率超阈值时，自动触发 8ms 本地热备降级旁路，租户级故障强隔离。
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 pt-3 border-t border-slate-800 flex justify-end">
+        <button id="dismiss-drill-btn" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition-colors">确定 / 关闭</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Cognitive Inspector Drawer (N) -->
   <aside id="cognitive-drawer" class="fixed top-5 right-5 w-84 max-w-[340px] bg-slate-900/95 backdrop-blur-md border border-slate-700/80 text-slate-200 rounded-2xl p-4 shadow-2xl z-50 text-xs hidden transition-all duration-300">
@@ -956,6 +1212,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     <button id="next-btn" class="hover:text-blue-400 transition-colors px-1" title="Next Slide (→ / Space / PageDown)">▶</button>
     <div class="h-3 w-[1px] bg-slate-600"></div>
     <button id="step-btn" class="hover:text-blue-400 transition-colors" title="Toggle Staged Step Mode (S)">Step: OFF</button>
+    <button id="hud-btn" class="hover:text-blue-400 transition-colors font-semibold text-blue-400" title="Toggle Presenter HUD (P)">HUD (P)</button>
     <button id="notes-btn" class="hover:text-blue-400 transition-colors" title="Toggle Cognitive Notes (N)">Notes (N)</button>
     <button id="overview-btn" class="hover:text-blue-400 transition-colors" title="Overview (O)">Overview</button>
     <button id="fs-btn" class="hover:text-blue-400 transition-colors" title="Toggle Fullscreen (F)">Fullscreen</button>
@@ -975,14 +1232,33 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     const indicator = document.getElementById('slide-indicator');
     const progress = document.getElementById('progress-bar');
     const drawer = document.getElementById('cognitive-drawer');
+    const hud = document.getElementById('presenter-hud');
+    const archModal = document.getElementById('arch-drilldown-modal');
     const noteArc = document.getElementById('note-arc');
     const noteMission = document.getElementById('note-mission');
     const noteTransition = document.getElementById('note-transition');
     const noteEvidence = document.getElementById('note-evidence');
     const stepBtn = document.getElementById('step-btn');
 
+    let metaData = {{ contract: {{}}, slides: [] }};
+    try {{
+      const metaEl = document.getElementById('presentation-metadata');
+      if (metaEl) {{
+        metaData = JSON.parse(metaEl.textContent);
+      }}
+    }} catch (e) {{
+      console.warn('Could not parse presentation metadata', e);
+    }}
+
     function toggleNotes() {{
       drawer.classList.toggle('hidden');
+    }}
+
+    function toggleHUD() {{
+      hud.classList.toggle('hidden');
+      if (!hud.classList.contains('hidden')) {{
+        updatePresenterHUD(currentSlide);
+      }}
     }}
 
     function toggleStepMode() {{
@@ -992,6 +1268,94 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         stepBtn.classList.toggle('text-blue-400', stepMode);
       }}
       resetStagedElements();
+    }}
+
+    function updateCognitiveNotes(slideEl) {{
+      if (!slideEl) return;
+      if (noteArc) noteArc.textContent = slideEl.dataset.arc || 'PROGRESSION';
+      if (noteMission) noteMission.textContent = slideEl.dataset.mission || '未定义单页认知使命';
+      if (noteTransition) noteTransition.textContent = slideEl.dataset.transition || '承接前文，自然演进';
+      if (noteEvidence) noteEvidence.textContent = slideEl.dataset.evidence || '结构性量化支撑';
+    }}
+
+    function updatePresenterHUD(idx) {{
+      const slideMeta = (metaData.slides && metaData.slides[idx]) ? metaData.slides[idx] : {{}};
+      const contract = metaData.contract || {{}};
+
+      const arcEl = document.getElementById('hud-arc-badge');
+      if (arcEl) arcEl.textContent = (slideMeta.narrative_arc || 'PROGRESSION').toUpperCase();
+
+      const thesisEl = document.getElementById('hud-core-thesis');
+      if (thesisEl) thesisEl.textContent = contract.core_thesis || '未定义核心论点';
+
+      const audEl = document.getElementById('hud-audience');
+      if (audEl) {{
+        const role = contract.audience?.role || '汇报受众';
+        const stance = contract.audience?.stance ? ` (${{contract.audience.stance}})` : '';
+        audEl.textContent = `${{role}}${{stance}}`;
+      }}
+
+      const missionEl = document.getElementById('hud-mission');
+      if (missionEl) missionEl.textContent = slideMeta.mission || '推动认知转化';
+
+      const teleEl = document.getElementById('hud-teleprompter');
+      if (teleEl) {{
+        const trans = slideMeta.transition || '承接前文，自然进入本页核心论证。';
+        teleEl.textContent = `“${{trans}}”`;
+      }}
+
+      const objContainer = document.getElementById('hud-objections-container');
+      if (objContainer) {{
+        objContainer.innerHTML = '';
+        const objections = slideMeta.objections || [];
+        objections.forEach((obj, i) => {{
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 space-y-1';
+          itemDiv.innerHTML = `
+            <div class="text-amber-400 font-bold text-[11px] flex items-start gap-1">
+              <span>⚠️</span>
+              <span>发难 #${{i+1}}: ${{obj.skepticism}}</span>
+            </div>
+            <div class="text-slate-300 text-[11px] leading-relaxed pl-4 border-l border-emerald-500/40">
+              <span class="text-emerald-400 font-semibold">权威对策:</span> ${{obj.counter}}
+            </div>
+          `;
+          objContainer.appendChild(itemDiv);
+        }});
+      }}
+    }}
+
+    // Count-up Physics for Metrics
+    function animateValue(el, start, end, duration, prefix = '', suffix = '') {{
+      let startTimestamp = null;
+      const step = (timestamp) => {{
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const current = start + (end - start) * easeProgress;
+        el.textContent = `${{prefix}}${{current.toFixed(end % 1 === 0 ? 0 : 1)}}${{suffix}}`;
+        if (progress < 1) {{
+          window.requestAnimationFrame(step);
+        }} else {{
+          el.textContent = `${{prefix}}${{end}}${{suffix}}`;
+        }}
+      }};
+      window.requestAnimationFrame(step);
+    }}
+
+    function triggerCountUpAnimations(slideEl) {{
+      if (!slideEl) return;
+      const metricEls = slideEl.querySelectorAll('.metric-val');
+      metricEls.forEach(el => {{
+        const targetStr = el.textContent.trim();
+        const match = targetStr.match(/^([^0-9.]*)([0-9]+(?:\\.[0-9]+)?)(.*)$/);
+        if (match) {{
+          const prefix = match[1];
+          const targetNum = parseFloat(match[2]);
+          const suffix = match[3];
+          animateValue(el, 0, targetNum, 600, prefix, suffix);
+        }}
+      }});
     }}
 
     function getStagedElements(slideEl) {{
@@ -1038,6 +1402,10 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       indicator.textContent = `${{currentSlide + 1}} / ${{total}}`;
       progress.style.width = `${{((currentSlide + 1) / total) * 100}}%`;
       updateCognitiveNotes(slides[currentSlide]);
+      if (!hud.classList.contains('hidden')) {{
+        updatePresenterHUD(currentSlide);
+      }}
+      triggerCountUpAnimations(slides[currentSlide]);
       resetStagedElements();
     }}
 
@@ -1059,8 +1427,81 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     document.getElementById('next-btn').addEventListener('click', () => showSlide(currentSlide + 1));
     if (stepBtn) stepBtn.addEventListener('click', toggleStepMode);
     document.getElementById('notes-btn').addEventListener('click', toggleNotes);
+    document.getElementById('hud-btn').addEventListener('click', toggleHUD);
     document.getElementById('close-drawer-btn').addEventListener('click', () => drawer.classList.add('hidden'));
+    document.getElementById('close-hud-btn').addEventListener('click', () => hud.classList.add('hidden'));
 
+    // Architecture Drilldown Modal Events
+    document.querySelectorAll('.architecture-item').forEach(item => {{
+      item.addEventListener('click', () => {{
+        const comp = item.dataset.component || '核心组件';
+        const layer = item.dataset.layer || '架构层级';
+        document.getElementById('drill-component').textContent = comp;
+        document.getElementById('drill-layer').textContent = layer;
+        document.getElementById('drill-chain-comp').textContent = comp;
+        archModal.classList.remove('hidden');
+      }});
+    }});
+
+    const closeDrillBtn = document.getElementById('close-drill-btn');
+    const dismissDrillBtn = document.getElementById('dismiss-drill-btn');
+    if (closeDrillBtn) closeDrillBtn.addEventListener('click', () => archModal.classList.add('hidden'));
+    if (dismissDrillBtn) dismissDrillBtn.addEventListener('click', () => archModal.classList.add('hidden'));
+
+    // Scenario Sandbox Switcher Events
+    document.querySelectorAll('.scenario-sandbox').forEach(box => {{
+      const btns = box.querySelectorAll('.scenario-btn');
+      btns.forEach(btn => {{
+        btn.addEventListener('click', (e) => {{
+          e.stopPropagation();
+          btns.forEach(b => {{
+            b.classList.remove('active', 'text-blue-700', 'bg-white', 'shadow-sm', 'font-bold');
+            b.classList.add('text-slate-600');
+          }});
+          btn.classList.add('active', 'text-blue-700', 'bg-white', 'shadow-sm', 'font-bold');
+          btn.classList.remove('text-slate-600');
+
+          const scenario = btn.dataset.scenario;
+          const slideEl = btn.closest('.slide');
+          if (!slideEl) return;
+
+          // Update metric-val elements
+          slideEl.querySelectorAll('.metric-val').forEach(mEl => {{
+            let targetVal = mEl.dataset.baseVal;
+            if (scenario === 'conservative' && mEl.dataset.conservativeVal) {{
+              targetVal = mEl.dataset.conservativeVal;
+            }} else if (scenario === 'aggressive' && mEl.dataset.aggressiveVal) {{
+              targetVal = mEl.dataset.aggressiveVal;
+            }}
+
+            const match = targetVal.match(/^([^0-9.]*)([0-9]+(?:\\.[0-9]+)?)(.*)$/);
+            if (match) {{
+              const prefix = match[1];
+              const targetNum = parseFloat(match[2]);
+              const suffix = match[3];
+              const curMatch = mEl.textContent.match(/([0-9]+(?:\\.[0-9]+)?)/);
+              const startNum = curMatch ? parseFloat(curMatch[1]) : 0;
+              animateValue(mEl, startNum, targetNum, 400, prefix, suffix);
+            }} else {{
+              mEl.textContent = targetVal;
+            }}
+          }});
+
+          // Update metric delta badges
+          slideEl.querySelectorAll('.metric-delta').forEach(dEl => {{
+            if (scenario === 'conservative') {{
+              dEl.textContent = `▲ ${{dEl.dataset.consDelta || '稳健保底'}}`;
+            }} else if (scenario === 'aggressive') {{
+              dEl.textContent = `▲ ${{dEl.dataset.aggrDelta || '激进突破'}}`;
+            }} else {{
+              dEl.textContent = `▲ ${{dEl.dataset.baseDelta || '基准目标'}}`;
+            }}
+          }});
+        }});
+      }});
+    }});
+
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {{
       if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {{
         e.preventDefault();
@@ -1072,8 +1513,14 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         toggleFullscreen();
       }} else if (e.key === 'n' || e.key === 'N') {{
         toggleNotes();
+      }} else if (e.key === 'p' || e.key === 'P') {{
+        toggleHUD();
       }} else if (e.key === 's' || e.key === 'S') {{
         toggleStepMode();
+      }} else if (e.key === 'Escape') {{
+        if (!archModal.classList.contains('hidden')) archModal.classList.add('hidden');
+        if (!hud.classList.contains('hidden')) hud.classList.add('hidden');
+        if (!drawer.classList.contains('hidden')) drawer.classList.add('hidden');
       }}
     }});
 
