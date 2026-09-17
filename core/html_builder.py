@@ -12,6 +12,7 @@ Features:
 import html
 import json
 import os
+import re
 from typing import Any, Dict, List
 
 
@@ -284,8 +285,105 @@ def _render_summary_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
     title = slide.get("action_title") or slide.get("title", "核心总结与实施建议")
     subtitle = slide.get("subtitle", "")
     points = slide.get("points", [])
+    options = slide.get("options", [])
+    sign_off_items = slide.get("sign_off_items", [])
+    recommendation = slide.get("recommendation", "")
     p = tokens.get("palette", {})
     tag = slide.get("tag") or (slide.get("narrative_arc", "").upper() if slide.get("narrative_arc") else "SUMMARY")
+
+    # Decision-Ready Ask Mode (Options / Sign-off Items)
+    if options or sign_off_items:
+        opts_html = []
+        if options:
+            col_class = "grid-cols-3" if len(options) >= 3 else "grid-cols-2"
+            for opt_idx, opt in enumerate(options[:3]):
+                is_rec = bool(opt.get("recommended", False))
+                border_cls = "border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20" if is_rec else "border-slate-200 bg-white"
+                badge_html = """<div class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white mb-2 shadow-sm">★ 推荐决策 RECOMMENDED</div>""" if is_rec else ""
+                pros = opt.get("pros", "")
+                cons = opt.get("cons", "")
+                cost = opt.get("cost", "N/A")
+                risk = opt.get("risk", "N/A")
+
+                opts_html.append(f"""
+                <div class="rounded-xl border p-3.5 shadow-sm flex flex-col justify-between {border_cls}">
+                  <div>
+                    {badge_html}
+                    <h4 class="text-sm font-bold text-slate-900">{opt.get('name', f'方案 {chr(65+opt_idx)}')}</h4>
+                    {f'<div class="text-[11px] text-emerald-800 bg-emerald-50 rounded px-2 py-1 mt-2">✔ 优势: {pros}</div>' if pros else ''}
+                    {f'<div class="text-[11px] text-rose-700 bg-rose-50 rounded px-2 py-1 mt-1">✖ 短板: {cons}</div>' if cons else ''}
+                  </div>
+                  <div class="mt-3 pt-2 border-t border-slate-200/70 flex justify-between text-[10px] text-slate-500 font-semibold">
+                    <span>投入: {cost}</span>
+                    <span>风险: {risk}</span>
+                  </div>
+                </div>
+                """)
+
+        rec_banner_html = ""
+        if recommendation:
+            rec_banner_html = f"""
+            <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 text-xs text-amber-900 font-medium flex items-center gap-2">
+              <span class="font-bold text-amber-700 flex-shrink-0">💡 决策建议:</span>
+              <span>{recommendation}</span>
+            </div>
+            """
+
+        signoff_html = ""
+        if sign_off_items:
+            items_checkbox_html = []
+            for item in sign_off_items:
+                clean_item = re.sub(r'^[\[\(\d+\]\)\.\s✓]+', '', item).strip()
+                items_checkbox_html.append(f"""
+                <label class="flex items-center gap-3 bg-slate-800/90 hover:bg-slate-800 px-3.5 py-1.5 rounded-lg cursor-pointer transition-colors">
+                  <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500 focus:ring-0 bg-slate-700 border-slate-600 cursor-pointer" />
+                  <span class="text-xs font-medium text-slate-200 leading-snug">{clean_item}</span>
+                </label>
+                """)
+
+            signoff_html = f"""
+            <div class="bg-slate-900 text-white rounded-xl p-3.5 shadow-lg border border-slate-800">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-400">请领导决策与审批清单 (Sign-off Items)</span>
+                <span class="text-[10px] text-slate-400">现场演示可直接勾选核准</span>
+              </div>
+              <div class="space-y-1.5">
+                {"".join(items_checkbox_html)}
+              </div>
+            </div>
+            """
+
+        # If we have points but no options, show points on left / top
+        fallback_points_html = ""
+        if not options and points:
+            pts = []
+            for idx, pt in enumerate(points[:3]):
+                pts.append(f"""
+                <div class="flex items-center gap-3 bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm">
+                  <div class="w-6 h-6 rounded bg-blue-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">{idx+1}</div>
+                  <div class="flex-1">
+                    <h5 class="text-xs font-bold text-slate-900">{pt.get('title', f'要点 {idx+1}')}</h5>
+                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">{pt.get('desc', '')}</p>
+                  </div>
+                </div>
+                """)
+            fallback_points_html = f"""<div class="space-y-1.5 mb-2">{"".join(pts)}</div>"""
+
+        return f"""
+        <div class="h-full flex flex-col px-12 py-8">
+          <div class="mb-4">
+            <span class="text-xs font-bold tracking-wider uppercase px-2.5 py-1 rounded bg-blue-50 text-blue-700">{tag}</span>
+            <h2 class="text-3xl font-bold text-slate-900 mt-2">{title}</h2>
+            <p class="text-sm text-slate-500 mt-1">{subtitle}</p>
+          </div>
+          <div class="flex-1 flex flex-col justify-between gap-2.5 pb-2">
+            {fallback_points_html}
+            {f'<div class="grid {col_class} gap-3">{"".join(opts_html)}</div>' if opts_html else ''}
+            {rec_banner_html}
+            {signoff_html}
+          </div>
+        </div>
+        """
 
     points_html = []
     for idx, pt in enumerate(points[:4]):

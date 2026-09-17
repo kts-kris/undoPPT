@@ -5,6 +5,52 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.4.0] - 2026-09-17
+
+### Added
+- **Enterprise 12 Scenarios & Executive Decision Rigor PRD (`docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md`)**:
+  - Published comprehensive v3.4 PRD standardizing enterprise presentation cognitive architecture across 12 core workplace scenarios.
+  - Formulated Jobs-to-be-Done (JTBD), executive psychological defenses, bespoke Q1~Q4 cognitive contracts, and recommended 6-slide deduction storylines for all 12 scenarios.
+- **Enterprise 12 Scenarios Dedicated Cognitive Synthesizers (`core/cognitive_planner.py`)**:
+  - `project_charter` (S01: 项目立项答辩与投资评审) - Focuses on commercial viability, ROI, and resource exchange.
+  - `annual_strategy_okr` (S02: 年度战略规划与 OKR 制定) - Focuses on vision cascade, resource allocation, and organizational alignment.
+  - `qbr_business_review` (S03: 季度/月度业务复盘 QBR) - Focuses on honest metrics variance, root cause attribution, and corrective actions.
+  - `cross_team_alignment` (S04: 跨部门业务协同与共识拉通) - Focuses on shared OKRs, dependency handshakes, and SLA contracts.
+  - `team_headcount_review` (S05: 团队述职与 HC 编制申请) - Focuses on productivity leverage, bandwidth bottleneck, and ROI per headcount.
+  - `tech_rfc_review` (S06: 技术方案选型与架构 RFC 评审) - Focuses on 3-way benchmarking, failure domains, and rollback mechanisms.
+  - `post_mortem_review` (S07: 生产重大故障复盘与根因分析) - Focuses on timeline reconstruction, 5-Whys root cause, and systemic defense mechanisms.
+  - `product_launch_gtm` (S08: 新产品发布会与 GTM 上市方案) - Focuses on product positioning, unit economics, and launch milestones.
+  - `enterprise_rfp_pitch` (S09: 大客户商务提案与竞标 RFP) - Focuses on enterprise compliance, case studies, and SLA guarantees.
+  - `promotion_assessment` (S10: 晋升答辩与职级评审) - Focuses on STAR battle evidence, stripping platform tailwinds for net personal contribution, and next-level commitments.
+  - `internal_tech_talk` (S11: 内部技术分享与赋能培训) - Focuses on anti-pattern contrast, step-by-step hands-on mental models, and knowledge transfer.
+  - `all_hands_rally` (S12: 全员大会与战略誓师动员) - Focuses on battle milestones, cultural hero stories, and collective call-to-arms.
+- **Executive Decision-Ready Closing Extension (`summary` primitive)**:
+  - Extended `summary` layout in `core/pptx_builder.py` and `core/html_builder.py` with structured decision deliverables:
+    - **Options Comparison Matrix**: Options A/B/C with pros, cons, and cost trade-offs.
+    - **Recommendation Callout**: Distinct visual badge and clear rationale for the recommended choice.
+    - **Sign-off Checklist (`sign_off_items`)**: Explicit headcount, budget, timeline, and decision approvals.
+  - Interactive HTML presentation allows executives to click checkboxes live on the projector during meetings.
+  - Native PPTX delivers high-contrast decision cards with highlighted recommendation badges.
+- **Multi-Dimensional External Benchmarking Rigor & Audit Rule (`BENCHMARK_UNBALANCED`)**:
+  - Enforced 3-way reference framework (Industry Tier 1, Open Source/New Entrant, Status Quo/Self-developed).
+  - Code-level auditor (`core/content_auditor.py`) verifies presenter's proposal acknowledges trade-offs (costs, migration friction, boundary limitations) to eliminate hollow "all-win" claims.
+  - Automatic self-healing blueprint patching in `core/cognitive_planner.py`.
+- **Authentic Career Attribution Protocol & Audit Rule (`PROMOTION_LAUNDRY_LIST`)**:
+  - Enforces STAR methodology and isolates personal net increment from overall company/macro growth tailwinds.
+  - Disallows routine duty listings ("参与了/负责了...") without hard quantifiable metrics.
+- **Leadership Decision Ask Enforcement (`DECISION_ASK_MISSING`)**:
+  - Audits executive decks to ensure slides never end on open-ended discussion questions, demanding concrete sign-off items.
+- **Design Philosophy Principles 8 & 9 (`DESIGN_PHILOSOPHY.md` & `DESIGN_PHILOSOPHY_zh.md`)**:
+  - Principle 8: *Decision-Ready Closing & Rigorous Multi-Dimensional Benchmarking*.
+  - Principle 9: *Authentic Career Attribution & Multi-Scenario Depth*.
+- **Comprehensive Scenario Anti-Patterns Section 3 (`docs/en/scenario_anti_patterns.md`)**:
+  - Detailed anti-patterns, correct patterns, and required primitive sequences for all 12 enterprise scenarios.
+
+### Changed
+- Bumped engine version to `3.4.0` across `core/__init__.py`, `SKILL.md`, `.agents/skills/undo-ppt/SKILL.md`, and test suites.
+
+---
+
 ## [3.3.0] - 2026-09-17
 
 ### Added

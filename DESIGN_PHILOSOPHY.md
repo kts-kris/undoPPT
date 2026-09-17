@@ -6,8 +6,8 @@
 
 </div>
 
-> **Version**: v3.1.0  
-> **Positioning**: Core design specifications and quality engineering manifesto for the next-generation presentation deconstruction & re-engineering super agent (undoPPT Super Skill).  
+> **Version**: v3.4.0  
+> **Positioning**: Next-generation Presentation Deconstruction & Re-engineering Super Agent (undoPPT Super Skill) Core Architectural Standard.  
 > **Core Manifesto**: *“A presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.”*
 
 ---
@@ -144,6 +144,18 @@ The fatal vulnerability of traditional presentations is instant collapse when an
 - Interactive scenario tabs (Conservative / Baseline / Aggressive) and sensitivity sliders recompute chart trajectories and KPIs dynamically in real-time;
 - Clickable architecture drilldowns pop up SLA boundaries and failure domains;
 - Equips speakers with a **Live Presenter HUD** (`P` key) featuring a Cognitive Radar, Transition Teleprompter, and an Objection & Defense Playbook.
+
+### Principle 8: Decision-Ready Closing & Rigorous Multi-Dimensional Benchmarking
+Presentations delivered to leadership or review committees must never exist to showcase author effort; their sole legitimate purpose is to **catalyze high-quality, low-friction management decisions**:
+- **Decision-Ready Ask (`DECISION_ASK_MISSING`)**: Decks must culminate in a structured decision closing (comparative trade-off matrix, clear recommendation, and explicit sign-off items). In HTML decks, interactive checkboxes allow executives to register approvals during live reviews;
+- **3-Way Reference Frame Benchmarking (`BENCHMARK_UNBALANCED`)**: Prohibits superficial "all-win vs all-lose" competitor comparisons. Benchmarks must establish a credible 3-way coordinate system (Industry Leader Benchmark vs Direct Competitor vs Cost of In-House Status Quo), honestly detailing migration friction, cognitive costs, and scenario boundaries.
+
+### Principle 9: Authentic Career Attribution & Multi-Scenario Depth
+In talent reviews, project debriefs, and specialized corporate decks, presenters must break through reviewer skepticism with undeniable rigor:
+- **Net Incremental Yield over Market Tailwinds (`PROMOTION_LAUNDRY_LIST`)**: Prohibits packaging organizational baseline growth as individual sole credit. Enforces deep STAR causality to isolate and verify the individual's net incremental contribution;
+- **Methodological Elevation over Task Dumps**: Demands extracting reusable system architectures, SOPs, and governance standards from single-event problem solving;
+- **12 Enterprise JTBD Mastery**: Tailors cognitive probes to the exact Job-to-be-Done across 12 distinct enterprise operational scenarios (Project Charters, Annual Strategy/OKRs, QBRs, Cross-Team Alignment, Headcount/Budget Reviews, RFCs, Post-Mortems, GTM Releases, RFP Bidding, Promotion Reviews, Tech Talks, and All-Hands Rallies).
+
 
 ---
 

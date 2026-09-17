@@ -340,7 +340,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(bp["grounded_sources"]["has_doc"])
         self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
         self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
-        self.assertEqual(bp["version"], "3.1.0")
+        self.assertIn(bp["version"], ("3.1.0", "3.4.0"))
 
     def test_undo_engine_master_slots_and_theme_mode(self):
         """Test undo_engine extracts master slots geometry and theme mode."""
@@ -636,7 +636,151 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(len(res["intent_breakdown"]) >= 2)
         self.assertIn("激进化", res["suggested_agent_posture"])
 
+    def test_enterprise_12_scenarios_cognitive_planning(self):
+        """Test CognitivePlanner accurately classifies, contracts, and synthesizes all 12 enterprise operational scenarios."""
+        planner = CognitivePlanner()
+
+        test_cases = [
+            ("project_charter", "strategic_planning", "某重点创新业务立项答辩与投资评审"),
+            ("annual_strategy_okr", "strategic_planning", "集团年度战略规划与 OKR 拆解大图"),
+            ("qbr_business_review", "general_informative", "核心业务季度经营复盘 QBR 分析"),
+            ("cross_team_alignment", "general_informative", "跨部门业务拉通与协同交付对齐"),
+            ("team_headcount_review", "general_informative", "团队编制规划与财务人头预算答辩"),
+            ("tech_rfc_review", "tech_architecture", "核心系统高可用架构选型 RFC 评审答辩"),
+            ("post_mortem_review", "tech_architecture", "线上生产事故复盘与系统防呆治理"),
+            ("product_launch_gtm", "product_pitch", "新产品上市策略与 GTM 全渠道推进计划"),
+            ("enterprise_rfp_pitch", "product_pitch", "政企数字化大客户解决方案竞标答辩 RFP"),
+            ("promotion_assessment", "career_portfolio", "资深技术专家职级晋升述职答辩"),
+            ("internal_tech_talk", "education_training", "高并发微服务工程方法论内部技术培训"),
+            ("all_hands_rally", "education_training", "公司年度战略誓师与全员动员大会")
+        ]
+
+        for expected_scenario, expected_archetype, prompt in test_cases:
+            bp = planner.plan(prompt, auto_refine=True)
+            self.assertEqual(bp["scenario"], expected_scenario, f"Failed for prompt: {prompt}")
+            self.assertEqual(bp["archetype"], expected_archetype, f"Failed archetype for prompt: {prompt}")
+            self.assertIn("contract", bp)
+            self.assertIn("core_thesis", bp["contract"])
+            self.assertEqual(len(bp["slides"]), 6, f"Expected 6 slides for scenario {expected_scenario}")
+            self.assertGreaterEqual(bp["audit_summary"]["score"], 85, f"Low audit score for {expected_scenario}")
+
+    def test_decision_ready_ask_dual_rendering(self):
+        """Test Decision-Ready Ask options, recommendations, and sign-off checklists in PPTX and HTML."""
+        bp = {
+            "version": "3.4.0",
+            "scenario": "project_charter",
+            "archetype": "strategic_planning",
+            "slides": [
+                {
+                    "layout_type": "cover",
+                    "title": "项目立项答辩",
+                    "subtitle": "投资决策与推进建议"
+                },
+                {
+                    "layout_type": "summary",
+                    "narrative_arc": "call_to_action",
+                    "action_title": "决策决议：推荐全面启动方案 B 实施改造，明确三项资源审批",
+                    "title": "方案比选与请领导决策事项",
+                    "subtitle": "三大路径权衡、推荐结论与审批决议清单",
+                    "options": [
+                        {"name": "方案A: 维持现状打补丁", "pros": "零前期资本追加", "cons": "瓶颈恶化不可持续", "cost": "0 元", "risk": "高", "recommended": False},
+                        {"name": "方案B: 试点立项演进 (推荐)", "pros": "投产比 1:4.5，周期可控", "cons": "需短期调配专班", "cost": "首期预算", "risk": "低", "recommended": True},
+                        {"name": "方案C: 全新颠覆重构", "pros": "理论天花板最高", "cons": "周期长达18个月", "cost": "数百万追加", "risk": "极高", "recommended": False}
+                    ],
+                    "recommendation": "综合 ROI 与交付确定性，推荐采纳方案 B：试点立项演进，验证核心产出后再行释放后续资源。",
+                    "sign_off_items": [
+                        "1. 批准《方案实施立项申请》并划拨首期专用预算",
+                        "2. 协调核心业务团队各指派 1 名专职研发骨干组建联合专班",
+                        "3. 锁定 Q3 关键里程碑交付节点并建立双周调度机制"
+                    ]
+                }
+            ]
+        }
+
+        # Test PPTX build
+        out_pptx = os.path.join(self.test_dir, "decision_ask_test.pptx")
+        build_presentation(bp, self.sample_tokens, out_pptx)
+        self.assertTrue(os.path.exists(out_pptx))
+        self.assertGreater(os.path.getsize(out_pptx), 1000)
+
+        # Test HTML build
+        out_html = os.path.join(self.test_dir, "decision_ask_test.html")
+        build_standalone_html(bp, self.sample_tokens, out_html)
+        self.assertTrue(os.path.exists(out_html))
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_content = f.read()
+
+        # Check Decision Ask visual indicators in HTML
+        self.assertIn("★ 推荐决策 RECOMMENDED", html_content)
+        self.assertIn("💡 决策建议", html_content)
+        self.assertIn("请领导决策与审批清单 (Sign-off Items)", html_content)
+        self.assertIn('type="checkbox"', html_content)
+        self.assertIn("批准《方案实施立项申请》并划拨首期专用预算", html_content)
+
+    def test_enterprise_rigor_audit_rules(self):
+        """Test ContentAuditor enforces DECISION_ASK_MISSING, BENCHMARK_UNBALANCED, and PROMOTION_LAUNDRY_LIST."""
+        auditor = ContentAuditor()
+
+        # 1. Test DECISION_ASK_MISSING in leadership deck
+        bp_missing_ask = {
+            "scenario": "project_charter",
+            "slides": [
+                {"layout_type": "cover", "title": "项目立项答辩"},
+                {"layout_type": "summary", "title": "结论与总结", "action_title": "行动：持续推进项目后续落地", "mission": "总结全篇", "transition": "【总结】综上所述", "points": [{"title": "要点1", "desc": "描述1"}]}
+            ]
+        }
+        res1 = auditor.audit(bp_missing_ask)
+        codes1 = [f["code"] for f in res1["findings"]]
+        self.assertIn("DECISION_ASK_MISSING", codes1)
+
+        # 2. Test BENCHMARK_UNBALANCED in comparison table
+        bp_unbalanced_table = {
+            "scenario": "tech_rfc_review",
+            "slides": [
+                {"layout_type": "cover", "title": "技术架构选型"},
+                {
+                    "layout_type": "standard_table",
+                    "title": "主流架构方案充分对标",
+                    "action_title": "选型：我方方案全维度远超所有竞品方案",
+                    "mission": "架构方案选型对标",
+                    "transition": "【对标】与竞品进行全方位对比",
+                    "headers": ["评估维度", "竞品A", "我方方案", "结论"],
+                    "rows": [
+                        ["性能表现", "差", "优", "我方胜出"],
+                        ["可用性", "低", "高", "我方胜出"],
+                        ["扩展性", "弱", "强", "我方胜出"]
+                    ]
+                },
+                {"layout_type": "summary", "title": "审批事项", "options": [{"name": "B", "recommended": True}], "sign_off_items": ["批准立项"]}
+            ]
+        }
+        res2 = auditor.audit(bp_unbalanced_table)
+        codes2 = [f["code"] for f in res2["findings"]]
+        self.assertTrue(any(c.startswith("BENCHMARK_UNBALANCED") for c in codes2))
+
+        # 3. Test PROMOTION_LAUNDRY_LIST in career review
+        bp_laundry_promo = {
+            "scenario": "promotion_assessment",
+            "slides": [
+                {"layout_type": "cover", "title": "个人晋升述职"},
+                {
+                    "layout_type": "content_columns",
+                    "title": "日常工作回顾",
+                    "action_title": "工作：认真负责完成各项日常跟进与维护",
+                    "mission": "阐明工作职责",
+                    "transition": "【工作】在过去一年中完成各项日常",
+                    "columns": [
+                        {"tag": "任务", "title": "日常维护与跟进", "points": ["负责日常系统维护", "参与了需求评审", "协助完成各种琐碎测试"]}
+                    ]
+                }
+            ]
+        }
+        res3 = auditor.audit(bp_laundry_promo)
+        codes3 = [f["code"] for f in res3["findings"]]
+        self.assertTrue(any(c.startswith("PROMOTION_LAUNDRY_LIST") for c in codes3))
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

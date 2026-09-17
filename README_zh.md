@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -15,43 +15,51 @@
 
 > **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**  
 > 📖 **深度阅读**：[《undoPPT 设计哲学与架构协同白皮书》](DESIGN_PHILOSOPHY_zh.md)（[English](DESIGN_PHILOSOPHY.md)）—— 彻底厘清 Agent 认知大脑与 Skill 执行底座的协同分工与五重质量保障闭环。  
-> 📋 **PRD 需求文档**：[《undoPPT v3.3.0 动效全能进化与活动决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《6大场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
+> 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
-`undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂”** 的核心痛点。
+`undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
 
 ---
 
-## 🧠 核心升级：15 大图元、动效全能进化与活动决策推演沙盒 (v3.3.0)
+## 🧠 核心升级：企业 12 大实战场景深度穷尽与高管决策闭环 (v3.4.0)
 
-在专业商业、战略咨询、技术架构、学术教学与个人述职场景下，**PPT 的本质不是美术画册，而是“以受众为中心的认知重塑与决策干预工程”**。`undoPPT v3.3.0` 全面汲取前沿 Skill 实践并实现六大突破性超越：
+在企业日常经营、向上管理、横向拉通与职级晋升中，**PPT 从来不是无病呻吟的汇报走过场，而是“以受众为中心的高效决策推动工程”**。`undoPPT v3.4.0` 针对企业 12 大典型实战场景展开系统化专项提升，带来四大决定性能力跨越：
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. 认知基座 (Cognitive Contract)                                             │
+│ 1. 认知契约探针 (Cognitive Contract Probes)                                  │
 │    • Q1: 我想表达什么？(主旨唯一性 / Core Message)                           │
-│    • Q2: 我的对象是谁？(受众画像与立场偏好 / Audience Profile)               │
+│    • Q2: 我的对象是谁？(受众画像与防线 / Audience Profile & Defense)          │
 │    • Q3: 对方知道什么、不知道什么？(认知差与盲区痛点 / Knowledge Delta)       │
-│    • Q4: 希望对方看完后理解什么、相信什么、做什么？(行动转化闭环 / Outcomes) │
+│    • Q4: 希望对方看完后理解什么、相信什么、做什么？(决策与行动闭环 / Outcomes) │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 2. 全局叙事 (Narrative Dynamics)                                            │
-│    • Q5: 演示按什么节奏展开？(叙事弧线: Hook → Conflict → Breakthrough...)  │
-│    • Q10: 页面之间如何形成因果、冲突、递进、转折与结论？(页间推演语法)       │
+│ 2. 企业 12 大典型场景认知推演骨架 (12 Enterprise Operational Scenarios)       │
+│    • S01~S05 向上战略与管理: 立项答辩/年度战略OKR/经营复盘QBR/跨部门拉通/HC编制│
+│    • S06~S07 研发与工程治理: 技术方案RFC评审 / 生产重大故障复盘与根因分析     │
+│    • S08~S09 商业与客户开拓: 新产品发布GTM / 大客户商务提案与竞标RFP         │
+│    • S10~S12 个人战功与组织宣导: 晋升述职答辩 / 内部技术分享培训 / 全员誓师大会│
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 3. 单页切片 (Slide Slicing & Budget)                                        │
-│    • Q6: 每一页到底承担什么任务？(单页使命纯粹度 / Single Responsibility)    │
-│    • Q7: 一页应该放多少信息？(信息容量预算红线 / Content Budget)            │
-│    • Q8: 哪些信息先出现、哪些延后？(行动结论标题先行 / Action Titles)         │
-│    • Q9: 哪些是核心证据、哪些只是补充？(铁证突出与次级降噪 / Proof vs Note)  │
+│ 3. 终局高管决策闭环 (Executive Decision-Ready Ask)                           │
+│    • 多方案互斥决策矩阵 (Option A vs B vs C，明确利弊代价与预算)            │
+│    • 权威推荐建议突出 (Highlighted Recommendation Callout)                   │
+│    • 待批决议清单 (Sign-off Checklist): 现场可交互勾选 HC/预算/里程碑/仲裁点 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 4. 严谨性红线审查机制 (Rigor Enforcement Protocols)                          │
+│    • 外部对标充分性审查: 严禁自嗨式全赢，强制三维参照系并自曝摩擦与适用边界 │
+│    • 述职战功纯度审查: 强制 STAR 归因，剥离大盘红利突出个人净增量贡献         │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🎬 **PPTX 原生 OOXML `<p:timing>` 动效时序生成**：自动构建 ECMA-376 时间节点树，在 Office / Keynote / WPS 中获得原生单击步进进入效果（Click-to-advance sequence），全面看齐并超越外部引擎。
+- 🎯 **企业 12 大典型实战场景推演引擎**：精准分类并深度定制 12 大企业场景的推演逻辑，从《立项答辩》、《年度战略 OKR》、《经营复盘 QBR》、《跨部门拉通》、《HC编制》、《技术方案RFC》、《故障复盘》、《新产品GTM》、《大客户竞标RFP》、《晋升答辩》、《内部技术培训》到《全员誓师大会》，彻底终结模板千篇一律的机械套用。
+- ⚖️ **终局“请领导决策与审批清单”高阶图元**：收尾页告别空洞问答，结构化输出方案对比矩阵、推荐主选方案与审批清单（Sign-off Items）。在 PPTX 端渲染原生高对比度决策卡片，在 HTML 端支持现场点击勾选批准决议（现场演示即决议）。
+- 🔬 **外部对标充分性审查协议（三维参照系）**：代码级拦截单维度浅层拉踩，要求覆盖「行业 Tier-1 标杆」、「开源/新锐方案」与「现状/自研方案」三维参照系；强制自述本方案的代价（成本、迁移摩擦、适用边界、复杂度），杜绝盲目宣称“全面领先”。
+- 🎖️ **晋升述职战功真实归因协议**：严格执行 STAR 结构化归因，以代码规则严格拦截流水账（“参与了/负责了...”）；核验个人在团队成果中的“净增量贡献（Net Increment）”，严禁将公司业务自然增长的大盘红利包装为个人战功。
+- 🎬 **PPTX 原生 OOXML `<p:timing>` 动效时序生成**：自动构建 ECMA-376 时间节点树，在 Office / Keynote / WPS 中获得原生单击步进进入效果（Click-to-advance sequence）。
 - ⚡ **15 大图元内生语义动力学与节拍时钟**：架构栈自底向上沉稳装配、时间轴流光粒子点亮、KPI 跑数物理锁定（0% -> 94.8%），叙事弧线自适应节奏控制（冲突 250ms 紧迫切入、突破光晕扩散、实证平缓跑数）。
 - 🎙️ **现场演播双重视野中枢 (Live Presenter HUD，按 `P` 键)**：单文件 HTML 按 `P` 键激活现场中枢，内嵌认知罗盘（主旨与受众立场向心力）、因果提词器（切页口播连词）与评委质疑应对弹药库（典型发难与权威解题对策）。
 - 🎛️ **活动决策推演沙盒 (Active Sandbox & 架构下钻)**：支持现场切换“保守 / 基准 / 突破”情景并动态重绘 KPI 跑表与图表；架构栈支持点击微服务组件即刻弹出技术规格（SLA 目标、P99、容灾回滚机制与故障隔离）。
 - 🧠 **跨工具链毫秒级意图反思飞轮 (`cli.py sync`)**：`SyncWatcher` 升级语义反思引擎，捕获人类专家在 Office/Keynote 中修改数值与结构的深层战略动机，指导 AI 智能体保持意图并肩同频。
-- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀 6 大场景避坑红线手册（[scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准。
-- 🤖 **自主认知规划器 (`cli.py plan` / `cli.py generate`)**：从一句话提示词自主推演《认知契约》、叙事弧线、15 大信息图元与完备演讲脚本，支持 6 大场景自适应。
+- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀场景避坑红线手册（[scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准。
 - 📊 **15 大信息图元与原生矢量图表**：原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。详见 [图元蓝图规约手册](docs/en/blueprint_specification.md)。
 - 💡 **自动化内容与因果审计 (`cli.py audit`)**：内置场景感知审计器，兼顾商业量化数据与教学定性范例，实时评分并给出整改建议。
 - 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。

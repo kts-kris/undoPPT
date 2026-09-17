@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -15,45 +15,54 @@
 
 > **“Cognitive Contract • Master Decompilation • Graphic Reconstruction • Zero-Friction Delivery • Always-in-Sync”**  
 > 📖 **Deep Dive**: [undoPPT Design Philosophy & Architecture Synergy Whitepaper](DESIGN_PHILOSOPHY.md) ([简体中文](DESIGN_PHILOSOPHY_zh.md)) — Formalizing the collaboration boundaries between the AI Agent brain and the Skill execution engine through a 5-layer quality assurance closed-loop.  
-> 📋 **PRD Specification**: [undoPPT v3.3.0 Kinetic Dynamics & Interactive Decision Sandbox PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [6-Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
+> 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
-`undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, and one-way generation without feedback loops.**
+`undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
 
 ---
 
-## 🧠 Core Highlights: 15 Primitives, Kinetic Dynamics & Active Decision Sandbox (v3.3.0)
+## 🧠 Core Highlights: Enterprise 12 Scenarios & Executive Decision Rigor (v3.4.0)
 
-In corporate strategy, technical architecture, commercial pitch decks, educational lectures, and executive debriefs, **a presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.**
+In corporate leadership, upward management, cross-functional alignment, and career promotion, **a presentation is never a decorative monologue, but an audience-centric decision intervention project.**
 
-`undoPPT v3.3.0` incorporates cutting-edge agent skill practices and delivers 6 breakthrough advancements across motion dynamics and live executive interaction:
+`undoPPT v3.4.0` introduces a dedicated cognitive and engineering architecture tailored to 12 core enterprise operational scenarios:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. Cognitive Foundation (Cognitive Contract)                                │
+│ 1. Cognitive Contract Probes                                                │
 │    • Q1: What is the core message? (Core Thesis & Premise)                  │
-│    • Q2: Who is the audience? (Audience Profile, Risks & Stance)            │
+│    • Q2: Who is the audience? (Audience Profile, Risks & Psychological Gate)│
 │    • Q3: What do they know vs. what are their blindspots? (Knowledge Delta) │
-│    • Q4: What should they understand, believe, and do? (Target Action/Act)  │
+│    • Q4: What should they understand, believe, and decide? (Action/Sign-off)│
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 2. Global Narrative (Narrative Dynamics)                                    │
-│    • Q5: What is the narrative pacing? (Hook → Conflict → Breakthrough...)   │
-│    • Q10: How do slides causally connect? (Rhetorical Transitions)          │
+│ 2. 12 Enterprise Operational Scenarios Dedicated Deduction Archetypes       │
+│    • S01~S05 Upward Strategy & Management: Charter/Annual OKR/QBR/Cross/HC   │
+│    • S06~S07 Engineering Governance: Tech RFC Review / Post-Mortem 5-Whys   │
+│    • S08~S09 Commercial Growth: Product Launch GTM / Enterprise Pitch RFP   │
+│    • S10~S12 Career & Alignment: Promotion Review / Tech Talk / All-Hands   │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 3. Slide Slicing & Content Budget                                           │
-│    • Q6: What single duty does each slide carry? (Single Responsibility)    │
-│    • Q7: How much information fits on one slide? (Content Budget Redline)   │
-│    • Q8: What appears first vs. later? (Action-First Conclusion Titles)     │
-│    • Q9: What is empirical evidence vs. secondary context? (Hard Proof)     │
+│ 3. Executive Decision-Ready Closing (Decision-Ready Ask)                    │
+│    • Mutually Exclusive Options Matrix (Option A vs B vs C with trade-offs) │
+│    • Highlighted Recommendation Callout (Rationale & Strategic Alignment)   │
+│    • Sign-off Checklist: Interactive live checkboxes for HC/Budget/Dates    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 4. Rigor Enforcement Protocols                                              │
+│    • Multi-Dimensional External Benchmarking (Tier 1 vs New vs Status Quo)  │
+│    • Trade-off & Friction Disclosure (Cost, Migration Friction, Limits)     │
+│    • Authentic Promotion STAR Attribution (Stripping platform tailwinds)    │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- 🎬 **PPTX Native OOXML `<p:timing>` Animation Sequences**: Generates standard ECMA-376 time node trees, enabling genuine step-by-step click-to-advance animations in PowerPoint, Keynote, and WPS without any plugins or headless browser dependencies.
-- ⚡ **15 Primitives Semantic Kinetic Physics**: Inner-topological dynamics (bottom-up architecture assembly, flowing light beam timelines, and smooth count-up physics 0% -> 94.8%) dynamically calibrated to narrative arcs (`conflict` 250ms snappy, `breakthrough` 400ms radial glow, `evidence` 600ms firm count-up).
-- 🎙️ **Live Presenter HUD (`P` Key / Cognitive Copilot in HTML)**: Press `P` in standalone HTML to open the dual-view HUD featuring the Cognitive Compass (contract & audience stance), Transition Teleprompter (rhetorical bridging prompts), and Objection Playbook (defenses against hard skepticisms).
+- 🎯 **12 Enterprise Operational Scenarios Dedicated Engine**: Native cognitive deduction pipelines for all 12 scenarios (`project_charter`, `annual_strategy_okr`, `qbr_business_review`, `cross_team_alignment`, `team_headcount_review`, `tech_rfc_review`, `post_mortem_review`, `product_launch_gtm`, `enterprise_rfp_pitch`, `promotion_assessment`, `internal_tech_talk`, `all_hands_rally`), with custom Jobs-to-be-Done (JTBD) and deduction structures.
+- ⚖️ **Executive Decision-Ready Closing Primitive**: Structured closing slides featuring an options matrix, highlighted recommendations, and an explicit sign-off checklist (`sign_off_items`). Interactive HTML checkboxes allow live toggling during leadership meetings; native PPTX renders crisp, high-contrast decision cards.
+- 🔬 **Multi-Dimensional External Benchmarking Rigor (`BENCHMARK_UNBALANCED`)**: Code-level enforcement of 3-way benchmarking (Industry Tier 1, Open Source/New Entrant, Status Quo/Self-developed) and mandatory disclosure of proposal trade-offs and frictions, barring superficial "all-win" hype.
+- 🎖️ **Authentic Career Attribution Protocol (`PROMOTION_LAUNDRY_LIST`)**: Enforces STAR structure and isolates personal net increments from company/market tailwinds, blocking routine duty dumps lacking hard metrics.
+- 🎬 **PPTX Native OOXML `<p:timing>` Animation Sequences**: Generates standard ECMA-376 time node trees, enabling genuine step-by-step click-to-advance animations in PowerPoint, Keynote, and WPS.
+- ⚡ **15 Primitives Semantic Kinetic Physics**: Inner-topological dynamics (bottom-up architecture assembly, flowing light beam timelines, and smooth count-up physics 0% -> 94.8%) dynamically calibrated to narrative arcs.
+- 🎙️ **Live Presenter HUD (`P` Key / Cognitive Copilot in HTML)**: Press `P` in standalone HTML to open the dual-view HUD featuring the Cognitive Compass, Transition Teleprompter, and Objection Playbook.
 - 🎛️ **Active Decision Sandbox & Architecture Drilldown**: Real-time scenario switcher tab (*Conservative*, *Baseline*, *Aggressive*) with instant metric/chart recalculation; click any microservice in architecture stacks to drill down into SLA specs, P99 latency, calling chains, and disaster recovery fallbacks.
-- 🧠 **Cross-Toolchain Strategic Intent Reflection (`cli.py sync`)**: `SyncWatcher` infers human experts' strategic motivations (metric elevation, scope focusing, posture change) from local manual edits to keep the AI Agent in sync across turns.
-- 🚫 **Scenario Anti-Pattern Red Lines & Buzzword Interception**: Official anti-pattern specification ([scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)) and deterministic regex filtering blocking hollow clichés (*"不仅是X更是Y"*, *"闭环/抓手/赋能/打法"*), disallowing fabricated benchmarks or fake precision.
-- 🤖 **Autonomous Cognitive Planner (`cli.py plan` / `cli.py generate`)**: Synthesizes a structured Cognitive Contract, narrative arcs, 15 layout primitives, and complete spoken scripts from a single prompt or reference document across 6 scenarios.
+- 🧠 **Cross-Toolchain Strategic Intent Reflection (`cli.py sync`)**: `SyncWatcher` infers human experts' strategic motivations (metric elevation, scope focusing, posture change) from local manual edits.
+- 🚫 **Scenario Anti-Pattern Red Lines & Buzzword Interception**: Official anti-pattern specification ([scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)) and deterministic regex filtering blocking hollow clichés (*"不仅是X更是Y"*, *"闭环/抓手/赋能/打法"*).
 - 📊 **15 Layout Primitives & Native Vector Charts**: Generates native PowerPoint vector charts (clustered column, line, pie), formatted tables, bento card grids, quote cards, and horizontal process workflows. See [Blueprint Specification](docs/en/blueprint_specification.md).
 - 💡 **Automated Content & Semantic Auditing (`cli.py audit`)**: Audits slides across 10 structural and semantic dimensions, balancing quantitative enterprise metrics with qualitative educational case studies.
 - 🔍 **HTML Cognitive Inspector Drawer (`N` key)**: Press `N` in the standalone HTML presentation to inspect underlying slide objectives, causal transitions, and argument hierarchies.

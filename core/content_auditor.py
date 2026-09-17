@@ -80,6 +80,14 @@ class ContentAuditor:
         findings.extend(slide_findings)
         struct_score -= slide_deduction
 
+        # --- 3.5 Audit Enterprise Rules (v3.4: Decision Ask, Benchmark Rigor, Promotion STAR) ---
+        scenario_type = None
+        if isinstance(blueprint_data, dict):
+            scenario_type = blueprint_data.get("scenario") or blueprint_data.get("scenario_type")
+        ent_findings, ent_deduction = self._audit_enterprise_rules(slides, scenario_type, contract)
+        findings.extend(ent_findings)
+        struct_score -= ent_deduction
+
         struct_score = max(0, min(100, struct_score))
 
         # --- 4. Deep Semantic & Rhetorical Audit (v2.5.0) ---
@@ -359,3 +367,83 @@ class ContentAuditor:
                     deduction += 2
 
         return findings, deduction
+
+    def _audit_enterprise_rules(
+        self,
+        slides: List[Dict[str, Any]],
+        scenario_type: Optional[str],
+        contract: Optional[Dict[str, Any]]
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Audit enterprise management rigor: Decision-Ready Ask, Objective Benchmarking, Promotion STAR."""
+        findings = []
+        deduction = 0
+
+        if not slides:
+            return findings, deduction
+
+        stype = (scenario_type or "").lower()
+
+        # Rule 1: DECISION_ASK_MISSING
+        # Management-facing briefings require explicit decision ask (sign_off_items or options)
+        leadership_scenarios = {
+            "project_charter", "annual_strategy_okr", "team_headcount_review",
+            "tech_rfc_review", "cross_team_alignment", "strategic_planning"
+        }
+        if stype in leadership_scenarios:
+            has_decision_ask = False
+            for slide in slides:
+                if slide.get("options") or slide.get("sign_off_items"):
+                    has_decision_ask = True
+                    break
+            if not has_decision_ask:
+                findings.append({
+                    "level": "warning",
+                    "code": "DECISION_ASK_MISSING",
+                    "message": "管理汇报收尾页未提供明确的【请领导决策事项】(sign_off_items 或 options 选项比选)。向上汇报绝不能以泛泛空话结尾，必须推动高管审批与资源决议。"
+                })
+                deduction += 4
+
+        # Rule 2: BENCHMARK_UNBALANCED
+        # Comparison tables must establish balanced trade-offs (costs, migration friction, or boundaries)
+        for idx, slide in enumerate(slides):
+            page_num = idx + 1
+            layout = slide.get("layout_type", "")
+            if layout in ("standard_table", "table"):
+                title_corpus = f"{slide.get('title', '')} {slide.get('action_title', '')} {slide.get('mission', '')}".lower()
+                is_comparison = any(kw in title_corpus for kw in ["对比", "选型", "竞品", "对标", "benchmark", "rfc"])
+                if is_comparison:
+                    headers = [str(h).lower() for h in slide.get("headers", [])]
+                    rows = slide.get("rows", [])
+                    all_text = " ".join([str(c) for r in rows for c in r]).lower() + " " + " ".join(headers)
+                    has_tradeoffs = any(kw in all_text for kw in [
+                        "成本", "摩擦", "门槛", "劣势", "缺点", "局限", "trade-off", "tradeoff",
+                        "代价", "短板", "学习成本", "风险", "适用边界", "复杂度", "兼容性"
+                    ])
+                    if len(rows) >= 2 and not has_tradeoffs:
+                        findings.append({
+                            "level": "warning",
+                            "code": f"BENCHMARK_UNBALANCED_P{page_num}",
+                            "message": f"第 {page_num} 页外部对标/选型表格缺乏客观权衡维度(成本/迁移摩擦/适用边界/门槛)。严禁虚假全优对比，必须客观呈现妥协与代价。"
+                        })
+                        deduction += 3
+
+        # Rule 3: PROMOTION_LAUNDRY_LIST
+        # Promotion reviews must avoid laundry list duty dumps without metrics or STAR causality
+        if stype in ("promotion_assessment", "career_portfolio"):
+            for idx, slide in enumerate(slides):
+                page_num = idx + 1
+                layout = slide.get("layout_type", "")
+                if layout in ("content_columns", "bento_cards"):
+                    corpus = json.dumps(slide, ensure_ascii=False)
+                    has_laundry = any(kw in corpus for kw in ["日常维护", "日常跟进", "参与了", "协助完成", "各种琐碎", "常规工作", "负责日常"])
+                    has_quantified = bool(re.search(r'\d+(\.\d+)?(%|万|亿|倍|qps|ms|人|次|个|级)', corpus, re.IGNORECASE))
+                    if has_laundry and not has_quantified:
+                        findings.append({
+                            "level": "warning",
+                            "code": f"PROMOTION_LAUNDRY_LIST_P{page_num}",
+                            "message": f"第 {page_num} 页述职内容呈现碎片化任务流水账，缺乏 STAR 框架因果归因与量化净增量成果。建议剥离大盘红利，突出个人核心贡献。"
+                        })
+                        deduction += 4
+
+        return findings, deduction
+

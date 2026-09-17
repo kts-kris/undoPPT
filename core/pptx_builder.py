@@ -579,6 +579,245 @@ def render_summary_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]
     _add_header(slide, title, slide_data.get("subtitle", ""), tokens, tag=tag)
 
     points = slide_data.get("points", [])
+    options = slide_data.get("options", [])
+    sign_off_items = slide_data.get("sign_off_items", [])
+    recommendation = slide_data.get("recommendation", "")
+
+    # Decision-Ready Ask Mode with Options
+    if options:
+        num_opts = min(len(options), 3)
+        start_x = 0.8
+        total_w = 11.73
+        gap = 0.25
+        card_w = (total_w - (num_opts - 1) * gap) / num_opts
+        card_y = 2.05
+        card_h = 2.55 if (sign_off_items or recommendation) else 4.7
+
+        for opt_idx, opt in enumerate(options[:num_opts]):
+            opt_x = start_x + opt_idx * (card_w + gap)
+            is_rec = bool(opt.get("recommended", False))
+
+            # Option Card
+            card = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(opt_x),
+                Inches(card_y),
+                Inches(card_w),
+                Inches(card_h)
+            )
+            card.fill.solid()
+            if is_rec:
+                card.fill.fore_color.rgb = RGBColor(240, 246, 255)
+                card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+                card.line.width = Pt(2.5)
+            else:
+                card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+                card.line.color.rgb = _hex_to_rgb(palette.get("border", "#CBD5E1"))
+                card.line.width = Pt(1)
+
+            # Recommended badge
+            if is_rec:
+                badge = slide.shapes.add_shape(
+                    MSO_SHAPE.ROUNDED_RECTANGLE,
+                    Inches(opt_x + 0.15),
+                    Inches(card_y + 0.12),
+                    Inches(card_w - 0.3),
+                    Inches(0.32)
+                )
+                badge.fill.solid()
+                badge.fill.fore_color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
+                badge.line.fill.background()
+                tf_b = badge.text_frame
+                p_b = tf_b.paragraphs[0]
+                p_b.alignment = PP_ALIGN.CENTER
+                run_b = p_b.add_run()
+                run_b.text = "★ 推荐决策 / RECOMMENDED"
+                run_b.font.bold = True
+                run_b.font.size = Pt(10)
+                run_b.font.color.rgb = RGBColor(255, 255, 255)
+
+            # Option details
+            text_y = card_y + (0.48 if is_rec else 0.15)
+            text_h = card_h - (0.55 if is_rec else 0.25)
+            tb = slide.shapes.add_textbox(Inches(opt_x + 0.15), Inches(text_y), Inches(card_w - 0.3), Inches(text_h))
+            tf = tb.text_frame
+            tf.word_wrap = True
+
+            p_name = tf.paragraphs[0]
+            p_name.space_after = Pt(4)
+            run_n = p_name.add_run()
+            run_n.text = opt.get("name", f"方案 {chr(65 + opt_idx)}")
+            run_n.font.size = Pt(13)
+            run_n.font.bold = True
+            run_n.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB")) if is_rec else _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+            if opt.get("pros"):
+                p_pros = tf.add_paragraph()
+                p_pros.space_after = Pt(2)
+                run_p = p_pros.add_run()
+                run_p.text = f"✔ 优势: {opt['pros']}"
+                run_p.font.size = Pt(9.5)
+                run_p.font.color.rgb = RGBColor(22, 101, 52)
+
+            if opt.get("cons"):
+                p_cons = tf.add_paragraph()
+                p_cons.space_after = Pt(3)
+                run_c = p_cons.add_run()
+                run_c.text = f"✖ 短板: {opt['cons']}"
+                run_c.font.size = Pt(9.5)
+                run_c.font.color.rgb = RGBColor(185, 28, 28)
+
+            p_cost = tf.add_paragraph()
+            p_cost.space_before = Pt(2)
+            run_cr = p_cost.add_run()
+            run_cr.text = f"投入: {opt.get('cost', 'N/A')}  |  风险: {opt.get('risk', 'N/A')}"
+            run_cr.font.size = Pt(9)
+            run_cr.font.bold = True
+            run_cr.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+
+        # Bottom Decision Area
+        curr_y = card_y + card_h + 0.18
+
+        if recommendation:
+            rec_box = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(start_x),
+                Inches(curr_y),
+                Inches(total_w),
+                Inches(0.55)
+            )
+            rec_box.fill.solid()
+            rec_box.fill.fore_color.rgb = RGBColor(254, 243, 199)
+            rec_box.line.color.rgb = RGBColor(245, 158, 11)
+            rec_box.line.width = Pt(1)
+            tf_r = rec_box.text_frame
+            tf_r.word_wrap = True
+            p_r = tf_r.paragraphs[0]
+            run_r = p_r.add_run()
+            run_r.text = f"💡 决策建议 (Recommendation): {recommendation}"
+            run_r.font.size = Pt(11)
+            run_r.font.bold = True
+            run_r.font.color.rgb = RGBColor(120, 53, 15)
+            curr_y += 0.65
+
+        if sign_off_items:
+            remain_h = max(1.2, 7.1 - curr_y)
+            chk_box = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(start_x),
+                Inches(curr_y),
+                Inches(total_w),
+                Inches(remain_h)
+            )
+            chk_box.fill.solid()
+            chk_box.fill.fore_color.rgb = RGBColor(15, 23, 42)
+            chk_box.line.fill.background()
+            tf_c = chk_box.text_frame
+            tf_c.word_wrap = True
+
+            p_ch = tf_c.paragraphs[0]
+            p_ch.space_after = Pt(3)
+            run_ch = p_ch.add_run()
+            run_ch.text = "【请领导决策与审批清单 (Sign-off Items)】"
+            run_ch.font.size = Pt(11)
+            run_ch.font.bold = True
+            run_ch.font.color.rgb = RGBColor(96, 165, 250)
+
+            for item in sign_off_items[:3]:
+                p_it = tf_c.add_paragraph()
+                p_it.space_after = Pt(2)
+                run_it = p_it.add_run()
+                clean_item = item.strip()
+                if not clean_item.startswith("["):
+                    clean_item = f"[✓]  {clean_item}"
+                run_it.text = clean_item
+                run_it.font.size = Pt(10.5)
+                run_it.font.color.rgb = RGBColor(241, 245, 249)
+        return
+
+    # Decision-Ready Ask Mode with Split Points and Sign-off Items
+    elif sign_off_items:
+        start_x = 0.8
+        start_y = 2.1
+        left_w = 5.6
+        right_x = 6.7
+        right_w = 5.8
+        avail_h = 4.8
+
+        num_points = min(len(points), 3) if points else 0
+        if num_points > 0:
+            gap = 0.16
+            row_h = (avail_h - (num_points - 1) * gap) / num_points
+            for idx, p_data in enumerate(points[:num_points]):
+                curr_y = start_y + idx * (row_h + gap)
+                card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(start_x), Inches(curr_y), Inches(left_w), Inches(row_h))
+                card.fill.solid()
+                card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
+                card.line.color.rgb = _hex_to_rgb(palette.get("border", "#E2E8F0"))
+                card.line.width = Pt(1)
+
+                tb = slide.shapes.add_textbox(Inches(start_x + 0.15), Inches(curr_y + 0.08), Inches(left_w - 0.3), Inches(row_h - 0.16))
+                tf = tb.text_frame
+                tf.word_wrap = True
+                p_title = tf.paragraphs[0]
+                run_t = p_title.add_run()
+                run_t.text = f"{idx+1}. {p_data.get('title', '要点')}"
+                run_t.font.size = Pt(13)
+                run_t.font.bold = True
+                run_t.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+                if p_data.get("desc"):
+                    p_desc = tf.add_paragraph()
+                    run_d = p_desc.add_run()
+                    run_d.text = p_data["desc"]
+                    run_d.font.size = Pt(10)
+                    run_d.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+
+        # Right side: Recommendation banner (if any) + sign_off_items dark card
+        right_y = start_y
+        if recommendation:
+            rec_card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(right_x), Inches(right_y), Inches(right_w), Inches(0.85))
+            rec_card.fill.solid()
+            rec_card.fill.fore_color.rgb = RGBColor(254, 243, 199)
+            rec_card.line.color.rgb = RGBColor(245, 158, 11)
+            tf_rec = rec_card.text_frame
+            tf_rec.word_wrap = True
+            p_rec = tf_rec.paragraphs[0]
+            run_rec = p_rec.add_run()
+            run_rec.text = f"💡 推荐决策：{recommendation}"
+            run_rec.font.size = Pt(10.5)
+            run_rec.font.bold = True
+            run_rec.font.color.rgb = RGBColor(120, 53, 15)
+            right_y += 0.98
+
+        sign_h = max(1.5, start_y + avail_h - right_y)
+        sign_card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(right_x), Inches(right_y), Inches(right_w), Inches(sign_h))
+        sign_card.fill.solid()
+        sign_card.fill.fore_color.rgb = RGBColor(15, 23, 42)
+        sign_card.line.fill.background()
+        tf_sign = sign_card.text_frame
+        tf_sign.word_wrap = True
+        p_sh = tf_sign.paragraphs[0]
+        p_sh.space_after = Pt(4)
+        run_sh = p_sh.add_run()
+        run_sh.text = "【请领导决策与审批清单】"
+        run_sh.font.size = Pt(11.5)
+        run_sh.font.bold = True
+        run_sh.font.color.rgb = RGBColor(96, 165, 250)
+
+        for item in sign_off_items[:4]:
+            p_it = tf_sign.add_paragraph()
+            p_it.space_after = Pt(3)
+            run_it = p_it.add_run()
+            clean_item = item.strip()
+            if not clean_item.startswith("["):
+                clean_item = f"[✓]  {clean_item}"
+            run_it.text = clean_item
+            run_it.font.size = Pt(10)
+            run_it.font.color.rgb = RGBColor(241, 245, 249)
+        return
+
+    # Fallback to standard 1~4 row points cards
     if not points:
         return
 

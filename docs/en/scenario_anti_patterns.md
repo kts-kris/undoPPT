@@ -76,7 +76,56 @@ The following phrases and jargon patterns are strictly prohibited. The automated
 
 ---
 
-## 3. Automated Enforcement Mechanism (`cli.py audit`)
+## 3. The 12 Enterprise Scenarios & Executive Decision Rigor
+
+In enterprise settings, presentation decks serve high-stakes decision makers. The following specialized rules apply across the 12 enterprise operational scenarios:
+
+### 3.1 Executive Decision-Ready Closing (`DECISION_ASK_MISSING`)
+* **Mandate**: Every presentation directed to leadership (`project_charter`, `annual_strategy_okr`, `team_headcount_review`, `tech_rfc_review`, `cross_team_alignment`) **must conclude with a structured decision request**.
+* **Forbidden**: Ending with generic summaries like "Thank you", "Continuous optimization in Q4", or purely informational wrap-ups.
+* **Required Structure**:
+  - Comparative option trade-offs (Option A / B / C with pros, cons, costs, risks).
+  - Clear author recommendation ("We recommend Option B...").
+  - Explicit sign-off checklist (`sign_off_items`) defining what leadership is asked to approve (headcount, budget allocation, cross-team staffing, milestone schedule).
+
+### 3.2 Rigorous Multi-Dimensional Benchmarking (`BENCHMARK_UNBALANCED`)
+* **Mandate**: Any external competitor or architecture comparison must establish a credible 3-way coordinate system:
+  1. **Leader Benchmark**: What the industry standard or top player achieves.
+  2. **Direct Competitor**: How equivalent alternatives perform.
+  3. **Status Quo / In-House Baseline**: The true cost of doing nothing.
+* **Forbidden**: "All-Green vs All-Red" checklists where the presenter's proposal miraculously wins every dimension without trade-offs.
+* **Required**: Explicitly document migration friction, cognitive training curves, operational complexity, and scenario boundary limitations.
+
+### 3.3 Promotion Attribution & STAR Net Contribution (`PROMOTION_LAUNDRY_LIST`)
+* **Mandate**: In career advancement reviews (`promotion_assessment`), candidates must prove net incremental business contribution.
+* **Forbidden**:
+  - Laundry lists of day-to-day duties ("Participated in meeting X, supported project Y").
+  - Claiming macroeconomic or team baseline growth as individual sole credit.
+* **Required**:
+  - Rigorous **STAR** causality: Problem Crisis (Situation) → Mandate Boundary (Task) → Unique Lever Invented (Action) → Decoupled Net Yield (Result).
+  - Methodological depth: Generalizing one-off fixes into organizational blueprints, reusable SDKs, or standard operating procedures (SOPs).
+  - Next-level vision: Forward commitments for the next career grade.
+
+### 3.4 12 Enterprise Operational Scenarios Summary Matrix
+
+| Code | Scenario Name | Archetype | Primary Decision Barrier | Mandatory Primitive Sequence |
+| :--- | :--- | :--- | :--- | :--- |
+| `S01` | `project_charter` | `strategic_planning` | "Why not existing systems? What is the cost of delay?" | `cover` → `bento_cards` → `matrix_2x2` → `architecture_stack` → `timeline` → `summary` (Decision Ask) |
+| `S02` | `annual_strategy_okr` | `strategic_planning` | "Are targets realistic? Are resources aligned?" | `cover` → `horizons_curve` → `cross_mapping` → `bento_cards` → `kpi_dashboard` → `summary` |
+| `S03` | `qbr_business_review` | `general_informative` | "Is the gap caused by market or execution?" | `cover` → `kpi_dashboard` → `data_chart` → `bento_cards` → `timeline` → `summary` |
+| `S04` | `cross_team_alignment` | `general_informative` | "Why our team? Will API changes break our sprint?" | `cover` → `bento_cards` → `process_flow` → `standard_table` → `timeline` → `summary` |
+| `S05` | `team_headcount_review`| `general_informative` | "What is the marginal ROI per new hire?" | `cover` → `kpi_dashboard` → `cross_mapping` → `standard_table` → `summary` (Headcount Sign-off) |
+| `S06` | `tech_rfc_review` | `tech_architecture` | "Is this over-engineered? What is the rollback plan?" | `cover` → `bento_cards` → `architecture_stack` → `standard_table` → `process_flow` → `summary` |
+| `S07` | `post_mortem_review` | `tech_architecture` | "Why was alert late? How to guarantee zero recurrence?" | `cover` → `timeline` → `bento_cards` → `matrix_2x2` → `content_columns` → `summary` |
+| `S08` | `product_launch_gtm` | `product_pitch` | "Do customers actually pay? How do we seed adoption?" | `cover` → `matrix_2x2` → `bento_cards` → `standard_table` → `timeline` → `summary` |
+| `S09` | `enterprise_rfp_pitch` | `product_pitch` | "Does it fit enterprise compliance? Case study validity?" | `cover` → `bento_cards` → `architecture_stack` → `standard_table` → `content_columns` → `summary` |
+| `S10` | `promotion_assessment` | `career_portfolio` | "Net contribution vs market tide? Methodological depth?" | `cover` → `bento_cards` → `content_columns` → `maturity_ladder` → `timeline` → `summary` |
+| `S11` | `internal_tech_talk` | `education_training` | "How does this apply to our codebase tomorrow?" | `cover` → `bento_cards` → `architecture_stack` → `standard_table` → `process_flow` → `summary` |
+| `S12` | `all_hands_rally` | `education_training` | "How does strategy impact my day-to-day role?" | `cover` → `bento_cards` → `horizons_curve` → `kpi_dashboard` → `content_columns` → `summary` |
+
+---
+
+## 4. Automated Enforcement Mechanism (`cli.py audit`)
 
 The `ContentAuditor` and `SemanticAuditor` verify these red lines deterministically:
 
@@ -84,3 +133,7 @@ The `ContentAuditor` and `SemanticAuditor` verify these red lines deterministica
 2. **Action Title Check**: Verifies that titles start with conclusion keywords or active verbs, flagging passive titles like "Overview" or "Status".
 3. **Core Evidence Density**: Scans for verifiable numbers (`%`, `ms`, `x`, currency, counts) or explicit assumption markers (`[Pending Verification]`).
 4. **Inter-Slide Transitions**: Ensures transitions belong to recognized rhetorical families (`contrast`, `causality`, `breakthrough`, `progression`, `evidence`, `action`).
+5. **Decision-Ready Ask Audit (`DECISION_ASK_MISSING`)**: Verifies that leadership-facing decks feature explicit options or sign-off requests in closing slides.
+6. **Objective Benchmark Audit (`BENCHMARK_UNBALANCED`)**: Flags comparative tables that lack trade-offs or multidimensional balance.
+7. **Promotion Attribution Audit (`PROMOTION_LAUNDRY_LIST`)**: Flags fragmented task laundry lists in promotion and career reviews lacking quantified business outcomes.
+
