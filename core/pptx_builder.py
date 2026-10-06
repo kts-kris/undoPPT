@@ -25,8 +25,23 @@ from pptx.oxml import parse_xml
 from pptx.util import Inches, Pt
 
 from core import provenance
+from core.motion import apply_motion
 from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
-from core.layout_fit import fit_title_size, normalize_slide, pick_font
+from core.layout_fit import fit_title_size, normalize_slide, pick_font, repair_contrast
+
+
+SLIDE_WIDTH_IN = 13.333
+HEADER_TITLE_MAX_PT = 34
+HEADER_SUBTITLE_MAX_PT = 18
+
+
+_HEAVY_FONT_HINTS = ("black", "heavy", "impact", "haettenschweiler", "ultra", "extrabold", "extra bold")
+
+
+def _bold_for(font_name: str) -> bool:
+    """Faux-bold smears fonts that are already heavy (Impact, Haettenschweiler, *Black): leave those alone."""
+    name = (font_name or "").lower()
+    return not any(h in name for h in _HEAVY_FONT_HINTS)
 
 
 def _hex_to_rgb(hex_str: str) -> RGBColor:
@@ -59,9 +74,11 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
     palette = tokens.get("palette", {})
     canvas = tokens.get("canvas", {})
 
-    left = Inches(canvas.get("margin_left_inches", 0.8))
-    top = Inches(canvas.get("margin_top_inches", 0.7))
-    width = Inches(11.7)
+    # Defensive: tokens may come from a hand-edited file or an old `undo` run with large margins.
+    left_in = min(float(canvas.get("margin_left_inches", 0.8)), 1.0)
+    left = Inches(left_in)
+    top = Inches(min(float(canvas.get("margin_top_inches", 0.7)), 0.9))
+    width = Inches(min(11.7, SLIDE_WIDTH_IN - 2 * left_in))  # the builder always draws a 13.333in 16:9 slide
     height = Inches(1.3)
 
     # Optional Tag Badge
@@ -98,9 +115,11 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
     run_title = p_title.add_run()
     run_title.text = title
     run_title.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
-    title_pt, one_line = fit_title_size(title, 11.7, typo.get("title", {}).get("size", 30))
+    # The layout grid reserves a fixed header height (title <= 34pt, subtitle <= 18pt); larger template sizes
+    # would run into the content that starts at a fixed y.
+    title_pt, one_line = fit_title_size(title, width.inches, min(typo.get("title", {}).get("size", 30), HEADER_TITLE_MAX_PT))
     run_title.font.size = Pt(title_pt)
-    run_title.font.bold = True
+    run_title.font.bold = _bold_for(run_title.font.name)
     run_title.font.color.rgb = _hex_to_rgb(typo.get("title", {}).get("color", palette.get("text_primary", "#0F172A")))
 
     # A title that cannot fit one line even at the minimum size wraps; the subtitle is dropped
@@ -110,7 +129,7 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
         run_sub = p_sub.add_run()
         run_sub.text = subtitle
         run_sub.font.name = pick_font(typo.get("subtitle", {}).get("font", "PingFang SC"))
-        run_sub.font.size = Pt(typo.get("subtitle", {}).get("size", 16))
+        run_sub.font.size = Pt(min(typo.get("subtitle", {}).get("size", 16), HEADER_SUBTITLE_MAX_PT))
         run_sub.font.color.rgb = _hex_to_rgb(typo.get("subtitle", {}).get("color", palette.get("text_secondary", "#475569")))
 
 
@@ -162,7 +181,7 @@ def render_cover_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
     run_title.text = slide_data.get("title", "Presentation Title")
     run_title.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
     run_title.font.size = Pt(40)
-    run_title.font.bold = True
+    run_title.font.bold = _bold_for(run_title.font.name)
     run_title.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
 
     # Subtitle
@@ -614,7 +633,7 @@ def render_summary_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]
             )
             card.fill.solid()
             if is_rec:
-                card.fill.fore_color.rgb = RGBColor(240, 246, 255)
+                card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#F0F6FF"))
                 card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
                 card.line.width = Pt(2.5)
             else:
@@ -975,7 +994,7 @@ def render_matrix_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any])
             Inches(qx), Inches(qy), Inches(card_w), Inches(card_h)
         )
         q_card.fill.solid()
-        q_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_hl else "#FFFFFF")
+        q_card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_hl else palette.get("surface", "#FFFFFF"))
         q_card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_hl else palette.get("border", "#CBD5E1"))
         q_card.line.width = Pt(2 if is_hl else 1)
 
@@ -1078,7 +1097,7 @@ def render_ladder_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any])
             Inches(curr_x), Inches(start_y), Inches(col_w), Inches(card_h)
         )
         card.fill.solid()
-        card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_high else "#FFFFFF")
+        card.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface_subtle", "#EFF6FF") if is_high else palette.get("surface", "#FFFFFF"))
         card.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB") if is_high else palette.get("border", "#CBD5E1"))
         card.line.width = Pt(2 if is_high else 1)
 
@@ -1423,7 +1442,7 @@ def render_cross_mapping_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str
             Inches(tx), Inches(curr_y), Inches(tgt_w), Inches(row_h)
         )
         t_card_tgt.fill.solid()
-        t_card_tgt.fill.fore_color.rgb = _hex_to_rgb("#FFFFFF")
+        t_card_tgt.fill.fore_color.rgb = _hex_to_rgb(palette.get("surface", "#FFFFFF"))
         t_card_tgt.line.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
         t_card_tgt.line.width = Pt(1.5)
 
@@ -2132,174 +2151,8 @@ def _apply_slide_transition(slide, effect: str = "fade"):
         pass
 
 
-def _inject_slide_element_timings(slide, slide_data: Dict[str, Any], tokens: Dict[str, Any], shape_groups: Optional[List[List[int]]] = None):
-    """Inject standard ECMA-376 OOXML <p:timing> sequence for native click-to-advance animations in Office/Keynote."""
-    layout_type = slide_data.get("layout_type", "")
-    if layout_type == "cover":
-        return
-
-    # Clean existing timing if any
-    for child in list(slide._element):
-        if child.tag.endswith("timing"):
-            slide._element.remove(child)
-
-    groups = shape_groups
-    if not groups:
-        # Auto-cluster content shapes (EPIC-02 Semantic Dynamics)
-        content_shapes = []
-        for s in slide.shapes:
-            # Ignore full bleed background
-            if s.left == 0 and s.top == 0 and s.width >= Inches(13):
-                continue
-            # Ignore header (title / subtitle / tag)
-            if s.top < Inches(1.8):
-                continue
-            content_shapes.append(s)
-
-        if not content_shapes:
-            return
-
-        # Semantic ordering and clustering based on layout type
-        if layout_type in ("architecture_stack", "cross_mapping"):
-            # Vertical clustering (by top)
-            raw_groups: List[List[Any]] = []
-            # For architecture_stack, bottom-up assembly (largest top first)
-            reverse_order = (layout_type == "architecture_stack")
-            sorted_shapes = sorted(content_shapes, key=lambda s: s.top, reverse=reverse_order)
-            for s in sorted_shapes:
-                matched = False
-                for g in raw_groups:
-                    if abs(g[0].top - s.top) < Inches(0.8):
-                        g.append(s)
-                        matched = True
-                        break
-                if not matched:
-                    raw_groups.append([s])
-            groups = [[s.shape_id for s in g] for g in raw_groups]
-        elif layout_type == "matrix_2x2":
-            # 4 quadrants: Top-Left, Top-Right, Bottom-Left, Bottom-Right
-            raw_groups = []
-            for s in sorted(content_shapes, key=lambda s: (s.top, s.left)):
-                matched = False
-                for g in raw_groups:
-                    if abs(g[0].left - s.left) < Inches(1.0) and abs(g[0].top - s.top) < Inches(1.0):
-                        g.append(s)
-                        matched = True
-                        break
-                if not matched:
-                    raw_groups.append([s])
-            groups = [[s.shape_id for s in g] for g in raw_groups]
-        elif layout_type in ("standard_table", "data_chart"):
-            # Single main unit
-            groups = [[s.shape_id for s in content_shapes]]
-        else:
-            # Horizontal clustering (by left) for bento_cards, metric_spotlight, timeline, process_flow, content_columns, maturity_ladder, horizons_curve, summary
-            raw_groups = []
-            for s in sorted(content_shapes, key=lambda s: s.left):
-                matched = False
-                for g in raw_groups:
-                    if abs(g[0].left - s.left) < Inches(0.6):
-                        g.append(s)
-                        matched = True
-                        break
-                if not matched:
-                    raw_groups.append([s])
-            groups = [[s.shape_id for s in g] for g in raw_groups]
-
-    if not groups or len(groups) <= 1:
-        return
-
-    # Narrative arc duration adaptation (EPIC-03)
-    arc = slide_data.get("narrative_arc", "progression")
-    dur_map = {
-        "conflict": 250,
-        "breakthrough": 400,
-        "evidence": 600,
-        "progression": 400,
-        "hook": 300,
-        "call_to_action": 350
-    }
-    dur_ms = dur_map.get(arc, 400)
-
-    # Build XML
-    step_pars = []
-    curr_id = 3
-    for shape_ids in groups:
-        step_id = curr_id
-        curr_id += 1
-        shape_pars = []
-        for spid in shape_ids:
-            p_id = curr_id; s_id = curr_id + 1; a_id = curr_id + 2
-            curr_id += 3
-            sp_xml = f"""<p:par xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-              <p:cTn id="{p_id}" fill="hold">
-                <p:stCondLst><p:cond delay="0"/></p:stCondLst>
-                <p:childTnLst>
-                  <p:set>
-                    <p:cBhvr>
-                      <p:cTn id="{s_id}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>
-                      <p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl>
-                      <p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst>
-                    </p:cBhvr>
-                    <p:to><p:strVal val="visible"/></p:to>
-                  </p:set>
-                  <p:animEffect transition="in" filter="fade">
-                    <p:cBhvr>
-                      <p:cTn id="{a_id}" dur="{dur_ms}"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>
-                      <p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl>
-                    </p:cBhvr>
-                  </p:animEffect>
-                </p:childTnLst>
-              </p:cTn>
-            </p:par>"""
-            shape_pars.append(sp_xml)
-
-        shapes_joined = "\n".join(shape_pars)
-        step_xml = f"""<p:par xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-          <p:cTn id="{step_id}" fill="hold">
-            <p:stCondLst><p:cond delay="0"/></p:stCondLst>
-            <p:childTnLst>
-              {shapes_joined}
-            </p:childTnLst>
-          </p:cTn>
-        </p:par>"""
-        step_pars.append(step_xml)
-
-    all_steps_xml = "\n".join(step_pars)
-    timing_xml = f"""<p:timing xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
-      <p:tnLst>
-        <p:par>
-          <p:cTn id="1" dur="indefinite" restart="always" nodeType="tmRoot">
-            <p:childTnLst>
-              <p:seq concurrent="1" nextAc="seek">
-                <p:cTn id="2" dur="indefinite" nodeType="mainSeq">
-                  <p:childTnLst>
-                    {all_steps_xml}
-                  </p:childTnLst>
-                </p:cTn>
-                <p:prevCondLst><p:cond evt="onPrev" delay="0"/></p:prevCondLst>
-                <p:nextCondLst><p:cond evt="onNext" delay="0"/></p:nextCondLst>
-              </p:seq>
-            </p:childTnLst>
-          </p:cTn>
-        </p:par>
-      </p:tnLst>
-    </p:timing>"""
-
-    try:
-        timing_elm = parse_xml(timing_xml)
-        insert_idx = len(slide._element)
-        for i, child in enumerate(slide._element):
-            if child.tag.endswith("extLst"):
-                insert_idx = i
-                break
-        slide._element.insert(insert_idx, timing_elm)
-    except Exception:
-        pass
-
-
 def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str, default_transition: Optional[str] = None,
-                       show_provenance_badges: bool = True) -> str:
+                       show_provenance_badges: bool = True, motion: Optional[str] = None) -> str:
     """Compile blueprint into a clean vector PowerPoint presentation."""
     prs = Presentation()
     # 16:9 standard dimensions
@@ -2309,17 +2162,20 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
     contract = None
     slides = []
     global_transition = "fade"
-    motion_pace = "staged"
+    cfg_motion = None
     if isinstance(blueprint, dict):
         contract = blueprint.get("contract")
         slides = blueprint.get("slides", [])
         cfg = blueprint.get("presentation_config", {})
         global_transition = cfg.get("transition_effect", "fade")
-        motion_pace = cfg.get("motion_pace", "staged")
+        # v3.8: narrative animations are off by default. `motion: "narrative"` turns them on; the v3.3 value
+        # `motion_pace: "staged"` is kept as an alias.
+        cfg_motion = cfg.get("motion") or ("narrative" if cfg.get("motion_pace") == "staged" else None)
     elif isinstance(blueprint, list):
         slides = blueprint
 
     active_default_transition = default_transition or global_transition
+    deck_motion = motion or cfg_motion
 
     for idx, slide_data in enumerate(slides):
         slide_data = normalize_blueprint_slide(slide_data)
@@ -2333,6 +2189,7 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
         current_slide = prs.slides[-1]
         normalize_slide(current_slide, tokens, layout_type)
         _add_provenance(current_slide, slide_data, tokens, show_badge=show_provenance_badges)
+        repair_contrast(current_slide)
         slide_contract = contract if idx == 0 else None
         _inject_cognitive_notes(current_slide, slide_data, contract=slide_contract)
 
@@ -2340,10 +2197,8 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
         slide_trans = slide_data.get("transition_effect", active_default_transition)
         _apply_slide_transition(current_slide, slide_trans)
 
-        # Apply slide element timings (v3.3)
-        slide_pace = slide_data.get("motion_pace", motion_pace)
-        if slide_pace != "instant":
-            _inject_slide_element_timings(current_slide, slide_data, tokens)
+        # Narrative animation (v3.8): reveal / contrast / build, off unless the deck or the slide asks
+        apply_motion(current_slide, slide_data, deck_motion)
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     prs.save(output_path)

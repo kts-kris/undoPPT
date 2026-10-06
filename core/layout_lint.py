@@ -9,6 +9,7 @@ and reports layout defects that a viewer would see:
   TEXT_CROSSES_SHAPE a text block straddles the edge of another shape (e.g. a wrapped
                      title running into the cards below)
   TEXT_OVERLAP       two text blocks overlap
+  LOW_CONTRAST       text whose colour is too close to the fill behind it (WCAG: 4.5:1, 3:1 for large text)
 """
 
 from typing import Any, Dict, List
@@ -17,6 +18,7 @@ from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.util import Emu
 
+from core.contrast import EPS, contrast_ratio, required_ratio, text_runs_with_backdrop
 from core.layout_fit import _in, estimate_text_height_in
 
 TOL_IN = 0.06
@@ -108,6 +110,26 @@ def lint_slide(slide, index: int, sw_in: float, sh_in: float) -> List[Dict[str, 
     return findings
 
 
+# ------------------------------------------------------------------------------------------------
+# Contrast (v3.8)
+# ------------------------------------------------------------------------------------------------
+
+def lint_contrast(slide, index: int) -> List[Dict[str, Any]]:
+    findings: List[Dict[str, Any]] = []
+    seen = set()
+    for run, fg, bg, size, bold in text_runs_with_backdrop(slide):
+        need = required_ratio(size, bold)
+        ratio = contrast_ratio(fg, bg)
+        key = (fg, bg, need)
+        if ratio < need - EPS and key not in seen:
+            seen.add(key)
+            findings.append({
+                "slide": index, "code": "LOW_CONTRAST",
+                "message": f"'{run.text.strip()[:18]}' is #{fg} on #{bg}: contrast {ratio:.2f}:1, needs {need:g}:1 ({size:g}pt)",
+            })
+    return findings
+
+
 class _OneParagraph:
     """Adapter exposing a single paragraph through the text-frame interface used by the estimator."""
 
@@ -129,4 +151,5 @@ def lint_pptx(path: str) -> Dict[str, Any]:
     findings: List[Dict[str, Any]] = []
     for i, slide in enumerate(prs.slides, 1):
         findings.extend(lint_slide(slide, i, sw, sh))
+        findings.extend(lint_contrast(slide, i))
     return {"slides": len(prs.slides), "findings": findings, "ok": not findings}

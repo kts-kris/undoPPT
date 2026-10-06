@@ -1,6 +1,6 @@
 # undoPPT Architecture & Engineering Deep-Dive
 
-This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.7.0).
+This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.8.0).
 
 ---
 
@@ -138,6 +138,15 @@ The Blueprint Specification and the planner use one set of field names for sever
 `provenance.scan_slide` finds the figures on a slide (percentages, multiples, money, durations, counted units; not years, quarters or structural counts), works out which are covered by a `source` (slide-level or nested), and classifies them by `status`. Renderers use `provenance_labels` for the footer and 待核 badge and `notes_block` for the speaker notes; the auditor uses the scan for `UNSOURCED_FIGURES` / `EVIDENCE_TODO` (deduction capped at 10). `ingest.extract_facts` reads Markdown, text and CSV and returns figures with `file:line` or `file:row·column` origins; `provenance.attach_sources` links them to a blueprint conservatively (see CLI reference).
 
 The footer and badge are added after the layout pass (`layout_fit`), so they never shift the content block.
+
+### 2.6.9 `core/motion.py` (v3.8)
+Three narrative animations (`reveal`, `contrast`, `build`), off by default. `plan_groups` clusters a slide's content shapes into click steps (by horizontal centre line, so a roadmap node and its card move together; arrows and badges join the step they belong to; the header, footer, badge and connector lines never animate). `build_timing_xml` writes the tree in the shape PowerPoint writes. `validate_timing` and `timing_summary` read a tree back; `render_check.check_motion` compares the file with what PowerPoint itself recognises.
+
+### 2.6.10 `core/contrast.py` and `core/design_check.py` (v3.8)
+WCAG contrast maths and per-run backdrop detection. The layout lint reports `LOW_CONTRAST`; the layout pass repairs it (`repair_contrast`: a run's colour is nudged toward black or white, keeping its hue, until it reaches 4.5:1, or 3:1 for large text; fills are never touched, so a brand colour used as a badge fill stays as it is). `design_check` checks and repairs *tokens*: text colours on their surfaces, minimum sizes (title 28, subtitle 16, body 12, KPI 40) and the title-to-body hierarchy (1.5x).
+
+### 2.6.11 `core/theme_reader.py` (v3.8)
+Reads a real template's theme: the colour scheme, the master's colour map and background (including `lumMod` / `lumOff`), and the major / minor / East Asian fonts. `undo` derives the palette from it. See [Design system](design_system.md).
 
 ### 2.7 `core/sync_watcher.py`
 Maintains human-AI pair authoring synchronization.

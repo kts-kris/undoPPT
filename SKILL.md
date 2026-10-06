@@ -1,7 +1,7 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.7.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.8.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 12 enterprise operational scenarios (project charter, annual strategy/OKR, QBR, cross-team alignment, headcount/budget review, RFC, post-mortem, GTM launch, RFP pitch, promotion assessment, internal tech talk, all-hands rally) anchored in 6 base archetypes with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows, Decision-Ready Ask Summary);
@@ -11,7 +11,7 @@ description: >-
   (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.7.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.8.0)
 
 `undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
@@ -173,6 +173,9 @@ python3 "<SKILL_ROOT>/cli.py" probe --prompt "<用户原话>" [--input-doc <file
 ```bash
 python3 "<SKILL_ROOT>/cli.py" undo --template /path/to/template.pptx --out .undoppt/design_tokens.json
 ```
+v3.8 起 `undo` 读取模板的**真实主题**（`theme1.xml` 配色方案、母版背景与颜色映射、主题字体含中文字体），因此深色模板会被识别为深色、品牌色会被保留。抽取后会自动做对比度与字号校验，修正记录在 `design_notes`。
+
+**诚实边界**：模板的配色、明暗、字体会带过来；模板的母版版式、背景图与 logo **不会**放到生成的页面上（引擎自己绘制 16:9 版式），4:3 模板也按 16:9 输出。向用户交代这一点，不要承诺"完全套用母版"。
 
 ### 阶段 3 · 蓝图编排与质量审计 (Plan & Audit)
 **先对照 [scenario_outlines.md](docs/scenario_outlines.md) 确定每页的"必备血肉"：用户给了才写这一页，没给就回去问，或合并/删除这一页。页数服从证据，不是证据服从页数。**
@@ -222,6 +225,17 @@ python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --final 
 交付产物：
 - `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注、ECMA-376 `<p:timing>` 原生时序步进）
 - `output/presentation.html`（单文件自包含、Tailwind 排版、`P` 键演播中枢 HUD、`N` 键认知抽屉、情景切换决策沙盒）
+
+### 动画（身姿，v3.8）
+**默认不加动画。** 动画只在服务叙事时才有价值，只保留三种：
+- `reveal` 逐条出现：一次点击一个观点，按阅读顺序（清单、路线图、架构栈自下而上、决策页）；
+- `contrast` 对比先后：先出现"现状/备选"，点击后才出现"推荐/目标"（带 `highlight` 的卡片、2x2 矩阵、现状→目标映射）；
+- `build` 数据递进：指标卡逐个划入，图表先出现、再出结论。
+
+```bash
+python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --motion narrative
+```
+单页可用 `"motion": {"type": "reveal|contrast|build|none"}` 指定。**只在用户要现场演讲、需要控制节奏时开启**；发给别人阅读的版本不要开。`render-check --render` 会让 PowerPoint 自己报告识别了多少动画对象；Keynote 无法脚本验证，不要承诺 Keynote 效果。
 
 ### 阶段 4.5 · 版面验证 (Render Check, v3.5)
 构建后必须验证成品，不要只看审计分数——审计只看蓝图结构，看不到渲染结果：

@@ -5,6 +5,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.8.0] - 2026-10-06
+
+Theme: **the skin and the poise**. Contrast and typography become guarantees, `undo` finally reads real templates, and animation is cut down to three that serve the telling.
+
+### Fixed
+- **`undo` did not read templates.** It scanned only explicit RGB fills on slides; a real template keeps its colours in `theme1.xml` and its slides are empty placeholders, so every template came back as the same light-blue default, **including a dark one**. Tested on three Office themes (Dark Gradient, Parcel, Editorial): v3.7 returned identical tokens for all three; v3.8 returns three different designs, with the right light/dark mode, brand colour and fonts.
+- **Animations were not animations.** The `<p:timing>` tree written since v3.3 used `delay="0"` for click steps and omitted preset ids, `clickEffect` nodes and `bldLst`. Asked directly, PowerPoint recognised **0** animated shapes in a v3.4 deck. The new tree follows what PowerPoint writes; PowerPoint recognises every animated shape on every slide of the demo and of all 12 scenario decks.
+- **Hard-coded colours.** The success green `#10B981` was 2.54:1 on white; on the dark preset the decision page used light cards and light text (unreadable); white text sat on light brand colours at 2.14:1. A contrast pass now repairs any text run below WCAG 4.5:1 (3:1 for large text) without touching fills; all four presets pass.
+- `enterprise_architecture` preset: secondary text on the quiet surface was 4.4995:1, now 4.5:1.
+- Real-template tokens broke the layout: sample-slide offsets became 1.5in+ margins (header pushed off the slide) and 36/20pt title/subtitle overran the reserved header. Margins are clamped, header sizes are capped, and the header width no longer follows the template's slide width.
+- Faux-bold smeared already-heavy title fonts (Haettenschweiler): digits became unreadable.
+
+### Added
+- **Narrative animations** (`core/motion.py`): `reveal`, `contrast`, `build`. **Off by default** (v3.3-v3.7 turned a broken animation on for every slide). `build --motion narrative`, `presentation_config.motion`, or per slide `motion: {"type": ...}`. `motion_pace: "staged"` stays as an alias.
+- `render-check` asks PowerPoint how many shapes it recognises as animated (`MOTION_NOT_RECOGNIZED`, `MOTION_INVALID`) and reports `LOW_CONTRAST`.
+- `core/theme_reader.py`, `core/contrast.py`, `core/design_check.py` (token contrast, minimum sizes, hierarchy; `check_tokens` / `repair_tokens`), `docs/en/design_system.md`, `docs/PRD_v3.8_SKIN_AND_POISE.md`.
+- 39 new tests (suite is now 144, plus 1 PowerPoint-gated test: `UNDOPPT_TEST_POWERPOINT=1`).
+
+### Changed
+- HTML decorative effects (count-up on slide entry, flowing pulse) now run only in narrative mode.
+- Font floor raises only runs under 12pt and leaves headings alone.
+
+### Known limits
+- **Template fidelity.** Palette, light/dark mode and fonts carry over from a template; its slide masters, background artwork and logos are not placed on generated slides, and a 4:3 template is rendered 16:9. "Real template" trials used Microsoft's built-in themes, not corporate templates.
+- **Keynote is unverified.** It would not open the file from a script, and Keynote does not expose builds to automation.
+- **HTML does not follow dark presets.** The HTML takes brand colours and fonts from the tokens but its light frame and card colours are fixed.
+
+---
+
 ## [3.7.0] - 2026-10-06
 
 Theme: **the flesh**. A number with no origin reads like evidence and cannot be checked. v3.7 makes provenance part of the blueprint and fixes the demo, which contradicted the tool's own rules.
@@ -28,7 +57,7 @@ Theme: **the flesh**. A number with no origin reads like evidence and cannot be 
 - Excel is not read directly; export to CSV.
 
 ### Roadmap
-- **v3.8.0** Skin polish and motion: typography and contrast rules, real-template trials, three narrative animations verified in PowerPoint and Keynote.
+- v3.8.0 Skin polish and motion: done in 3.8.0 (Keynote verification was not possible; see its known limits).
 
 ---
 
@@ -59,7 +88,7 @@ Theme: **the skeleton**. The audit cannot tell a deck built from real material f
 
 ### Roadmap
 - v3.7.0 Flesh: done (see above).
-- **v3.8.0** Skin polish and motion.
+- v3.8.0 Skin polish and motion: done (see above).
 
 ---
 
@@ -95,7 +124,7 @@ Theme: **the skin floor**. A deck that audits at 94/100 can still render broken.
 ### Roadmap
 - v3.6.0 Skeleton: done (see above).
 - **v3.7.0** Flesh: `source`/`status` fields, "to verify" marking, `cli.py ingest`, decision-ready demo.
-- **v3.8.0** Skin polish and motion: typography/contrast rules, real-template trials, three narrative animations verified in PowerPoint and Keynote.
+- v3.8.0 Skin polish and motion: done in 3.8.0.
 
 ---
 

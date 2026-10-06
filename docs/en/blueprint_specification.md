@@ -1,4 +1,4 @@
-# undoPPT Blueprint Specification (v3.5.0)
+# undoPPT Blueprint Specification (v3.8.0)
 
 > **Layout aliases**: `kpi_dashboard` is accepted as an alias of `metric_spotlight` (the cognitive planner emits it for QBR, annual-OKR and headcount scenarios). An unknown `layout_type` still falls back to `bento_cards`, but v3.5 now emits a warning instead of falling back silently.
 
@@ -54,7 +54,7 @@ Every slide object **must** include the following standard metadata attributes, 
 | `title` | `string` | Visual primary slide headline. |
 | `subtitle` | `string` | Contextual subtitle or framing statement. |
 | `transition_effect` | `string` (optional) | Slide transition animation: `"fade"` (default), `"push"`, `"wipe"`, or `"none"`. |
-| `motion` | `object` (optional) | Primitive-level staged reveal config: `{"staged_reveal": true, "stagger_delay_ms": 150}`. |
+| `motion` | `object` (optional, v3.8) | Narrative animation for this slide: `{"type": "reveal" \| "contrast" \| "build" \| "none"}`. Off unless the deck sets `presentation_config.motion: "narrative"` or the slide opts in. `{"staged_reveal": true}` (v3.3) still means `reveal`. |
 | `sandbox` | `object` (optional) | Active Decision Sandbox config: `{"enabled": true, "scenarios": { "conservative": {...}, "aggressive": {...} }}`. |
 | `hud_notes` | `object` (optional) | Presenter HUD coaching notes: `{"objection_defense": [{"skepticism": "...", "counter": "..."}]}`. |
 | `source` | `string \| string[]` (optional, v3.7) | Where the slide's figures come from: `"notes.md:L7"`, a CSV cell, a URL, `"用户口述 2026-10-06"`. On a slide it covers every figure on it; on a nested item (one metric, one card) it covers that item only. |

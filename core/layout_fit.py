@@ -15,6 +15,7 @@ render check (core/render_check.py) is the ground-truth verification.
 import math
 from typing import Any, Dict, List, Optional, Tuple
 
+from core.contrast import EPS, contrast_ratio, fix_color, required_ratio, text_runs_with_backdrop
 from pptx.enum.shapes import MSO_SHAPE, MSO_SHAPE_TYPE
 from pptx.enum.text import MSO_ANCHOR
 from pptx.oxml.ns import qn
@@ -359,6 +360,24 @@ def balance_vertically(slide, max_shift_in: float = 1.3):
     for s in content:
         s.top = s.top + Inches(shift)
     return shift
+
+
+def repair_contrast(slide) -> int:
+    """Nudge any text colour that is too close to the fill behind it until it meets WCAG (v3.8).
+
+    The hue is kept (a green stays green); only lightness moves. Returns the number of runs changed.
+    """
+    from pptx.dml.color import RGBColor
+
+    changed = 0
+    for run, fg, bg, size, bold in list(text_runs_with_backdrop(slide)):
+        need = required_ratio(size, bold)
+        if contrast_ratio(fg, bg) >= need - EPS:
+            continue
+        fixed = fix_color(fg, bg, need)
+        run.font.color.rgb = RGBColor.from_string(fixed)
+        changed += 1
+    return changed
 
 
 def normalize_slide(slide, tokens: Dict[str, Any], layout_type: str):

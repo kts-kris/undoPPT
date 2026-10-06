@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.8.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,18 @@
 > 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
+
+---
+
+## ✨ v3.8.0 新增：读懂真实模板、对比度有保证、动画名副其实
+
+用真实的 PowerPoint 输出检验后，README 里原本承诺的三件事其实都不成立。v3.8 逐一修复。
+
+- 🎨 **`undo` 现在能读真实模板。** 它只扫描幻灯片上显式写死的 RGB 填充，而真实模板根本没有，于是三份不同的 Office 主题（其中一份是深色）抽出来都是同一个浅蓝默认值。现在它读取主题的配色方案、母版背景和字体：同一份蓝图，三份模板，三种不同的设计。
+- 🌗 **对比度是保证，不是愿望。** 低于 WCAG 4.5:1（大字 3:1）的文字，会按它背后的实际填充色被修复，保持色相；品牌色填充从不被改动。深色预设的决策页（此前几乎不可读）现在可用。`design_check` 校验令牌（对比度、最小字号、层级）。
+- 🎬 **PowerPoint 真能播放的动画。** v3.3 起写入的动画 XML，PowerPoint 识别出的动画数是 **0**。新的时序树在每一页都被识别，且 `render-check` 会让 PowerPoint 来确认。动画现在**默认关闭**，只保留三种叙事动画：`reveal`、`contrast`、`build`。
+
+详见 [v3.8 PRD](docs/PRD_v3.8_SKIN_AND_POISE.md) 与 [设计系统](docs/en/design_system.md)。边界：模板的母版版式、背景图与 logo 不会放到生成的页面上；Keynote 未能验证。
 
 ---
 
@@ -194,6 +206,10 @@ undoPPT/
 │   ├── vision_extractor.py         # 视觉启发式解析器
 │   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
 │   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉，可离线)
+│   ├── motion.py                   # 叙事动画：reveal / contrast / build（默认关闭）
+│   ├── theme_reader.py             # 读取真实模板主题：配色方案、母版背景、字体
+│   ├── contrast.py                 # WCAG 对比度计算与逐字背景检测
+│   ├── design_check.py             # 令牌的对比度、最小字号、层级（检查/修复）
 │   ├── provenance.py               # 数字识别、出处覆盖、待核标记
 │   ├── ingest.py                   # 抽取带 文件:行号 出处的数据点 (md/txt/csv)
 │   ├── contract_probe.py           # 认知契约探针（动笔前还缺哪些信息）
@@ -214,11 +230,12 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归、版面与契约测试套件 (105 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (144 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
-│   └── test_flesh.py
+│   ├── test_flesh.py
+│   └── test_motion_design.py
 ├── output/                         # 生成的交付物（已加入 .gitignore，可用 `cli.py demo` 重建）
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
@@ -286,7 +303,13 @@ python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.j
 python3 cli.py build --blueprint .undoppt/blueprint.json --final   # 仍有待核数字时拒绝构建
 ```
 
-### 9. 版面验证 (Render Check)
+### 9. 套用企业模板并加动画
+```bash
+python3 cli.py undo --template company.pptx --out .undoppt/design_tokens.json
+python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json --motion narrative
+```
+
+### 10. 版面验证 (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # 静态 lint，无需渲染器
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render

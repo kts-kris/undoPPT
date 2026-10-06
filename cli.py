@@ -357,14 +357,15 @@ def cmd_build(args):
     if args.format in ("pptx", "all"):
         pptx_out = os.path.join(out_dir, "presentation.pptx")
         build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None),
-                           show_provenance_badges=not final)
+                           show_provenance_badges=not final, motion=getattr(args, "motion", None))
         watcher.record_baseline(pptx_out)
         print(f"[✓] PPTX generated successfully: {pptx_out}")
         _print_lint_warnings(pptx_out)
 
     if args.format in ("html", "all"):
         html_out = os.path.join(out_dir, "presentation.html")
-        build_standalone_html(blueprint, tokens, html_out, show_provenance_badges=not final)
+        build_standalone_html(blueprint, tokens, html_out, show_provenance_badges=not final,
+                              motion=getattr(args, "motion", None))
         watcher.record_baseline(html_out)
         print(f"[✓] Standalone HTML generated successfully: {html_out}")
 
@@ -508,13 +509,14 @@ def cmd_generate(args):
     if args.format in ("pptx", "all"):
         pptx_out = os.path.join(out_dir, "presentation.pptx")
         print("[3/4] Rendering Native Vector PPTX (with Speaker Notes injected)...")
-        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None))
+        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None),
+                           motion=getattr(args, "motion", None))
         watcher.record_baseline(pptx_out)
 
     if args.format in ("html", "all"):
         html_out = os.path.join(out_dir, "presentation.html")
         print("[4/4] Compiling Standalone HTML (with Cognitive Inspector Drawer)...")
-        build_standalone_html(blueprint, tokens, html_out)
+        build_standalone_html(blueprint, tokens, html_out, motion=getattr(args, "motion", None))
         watcher.record_baseline(html_out)
 
     print("\n[SUCCESS] Autonomous Delivery Complete!")
@@ -620,6 +622,9 @@ def cmd_render_check(args):
                 px = rc.check_pngs(res["pngs"])
                 findings += [dict(f, source=f"render:{res['engine']}") for f in px]
                 report["pptx"].update(engine=res["engine"], images=res["pngs"])
+                if res["engine"] == "powerpoint":
+                    # v3.8: animations written into the file must be ones PowerPoint actually recognises.
+                    findings += [dict(f, source="powerpoint-motion") for f in rc.check_motion(args.pptx)]
             except rc.RenderUnavailable as exc:
                 print(f"[i] PPTX render skipped: {exc}")
     if args.html:
@@ -641,7 +646,7 @@ def cmd_render_check(args):
 
     avail = rc.available_renderers()
     print("================================================================")
-    print("  undoPPT Render Check (v3.5)")
+    print("  undoPPT Render Check (v3.8)")
     print("================================================================")
     print(f"  Renderers: " + ", ".join(f"{k}={'yes' if v else 'no'}" for k, v in avail.items()))
     if report["pptx"]:
@@ -704,7 +709,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.7.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.8.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan
@@ -723,6 +728,7 @@ def main():
     p_gen.add_argument("--tokens", default="presets/modern_bento.json", help="Design tokens JSON path")
     p_gen.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
     p_gen.add_argument("--transition", choices=["fade", "push", "wipe", "none"], default=None, help="Slide transition effect (default: fade)")
+    p_gen.add_argument("--motion", choices=["off", "narrative"], default=None, help="Narrative animations (default: off)")
     p_gen.add_argument("--out", default="output", help="Output directory")
 
     # undo
@@ -737,6 +743,7 @@ def main():
     p_build.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
     p_build.add_argument("--transition", choices=["fade", "push", "wipe", "none"], default=None, help="Slide transition effect (default: fade)")
     p_build.add_argument("--out", default="output", help="Output directory")
+    p_build.add_argument("--motion", choices=["off", "narrative"], default=None, help="Narrative animations: reveal / contrast / build (default: off, or the blueprint's presentation_config.motion)")
     p_build.add_argument("--final", action="store_true", help="Delivery mode: refuse to build while figures lack a source or are todo; hide 待核 badges")
 
     # audit

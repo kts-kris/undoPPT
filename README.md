@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.8.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,18 @@
 > 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
+
+---
+
+## ✨ What's New in v3.8.0: Real Templates, Guaranteed Contrast, Honest Motion
+
+Tested against real PowerPoint output, three things the README used to promise turned out to be wrong. v3.8 fixes them.
+
+- 🎨 **`undo` now reads real templates.** It scanned only RGB fills on slides, which real templates do not have, so three different Office themes (one dark) all came back as the same light blue. It now reads the theme's colour scheme, master background and fonts: one blueprint, three templates, three different designs.
+- 🌗 **Contrast is a guarantee.** Text below WCAG 4.5:1 (3:1 for large text) is repaired against the fill behind it, keeping its hue; brand-colour fills are never touched. The dark preset's decision page, previously unreadable, now works. `design_check` validates tokens (contrast, minimum sizes, hierarchy).
+- 🎬 **Motion that PowerPoint actually plays.** The animation XML written since v3.3 was recognised by PowerPoint as **0** animations. The new tree is recognised on every slide, and `render-check` asks PowerPoint to confirm. Animation is now **off by default**, with three narrative types: `reveal`, `contrast`, `build`.
+
+See the [v3.8 PRD](docs/PRD_v3.8_SKIN_AND_POISE.md) and the [design system](docs/en/design_system.md). Limits: a template's masters, artwork and logos are not placed on generated slides; Keynote could not be verified.
 
 ---
 
@@ -197,6 +209,10 @@ undoPPT/
 │   ├── vision_extractor.py         # Visual heuristic analyzer
 │   ├── pptx_builder.py             # 15-primitive native vector PPTX builder (charts, tables, notes)
 │   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer, offline)
+│   ├── motion.py                   # Narrative animations: reveal / contrast / build (off by default)
+│   ├── theme_reader.py             # Real template theme: colour scheme, master background, fonts
+│   ├── contrast.py                 # WCAG contrast maths and per-run backdrop detection
+│   ├── design_check.py             # Token contrast, minimum sizes, hierarchy (check / repair)
 │   ├── provenance.py               # Figure detection, source coverage, 待核 marking
 │   ├── ingest.py                   # Extract data points with file:line origins (md/txt/csv)
 │   ├── contract_probe.py           # Contract readiness probe (what is still unknown before authoring)
@@ -217,11 +233,12 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression, layout and contract tests (105 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (144 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
-│   └── test_flesh.py
+│   ├── test_flesh.py
+│   └── test_motion_design.py
 ├── output/                         # Generated deliverables (git-ignored; rebuild with `cli.py demo`)
 ├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
 ├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
@@ -290,14 +307,20 @@ python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.j
 python3 cli.py build --blueprint .undoppt/blueprint.json --final   # refuses while any figure is 待核
 ```
 
-### 9. Verify the Layout (Render Check)
+### 9. Bring a Corporate Template and Add Motion
+```bash
+python3 cli.py undo --template company.pptx --out .undoppt/design_tokens.json
+python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json --motion narrative
+```
+
+### 10. Verify the Layout (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # static lint, no renderer needed
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
 ```
 `--render` needs `pip install -r requirements-dev.txt` plus PowerPoint (macOS) or LibreOffice for PPTX, and Chrome for HTML.
 
-### 10. Run Demo Showcase
+### 11. Run Demo Showcase
 ```bash
 python3 cli.py demo
 ```

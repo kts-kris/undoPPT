@@ -14,6 +14,10 @@ from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE, PP_PLACEHOLDER
 from pptx.util import Inches, Pt
 
+from core.contrast import contrast_ratio, fix_color, rel_luminance
+from core.design_check import repair_tokens
+from core.theme_reader import read_theme
+
 
 def _rgb_to_hex(rgb) -> Optional[str]:
     """Convert RGBColor to hex string #RRGGBB."""
@@ -34,6 +38,44 @@ def _calc_luminance(hex_code: str) -> float:
         return (r * 299 + g * 587 + b * 114) / 1000.0
     except Exception:
         return 255.0
+
+
+def _blend_hex(a: str, b: str, amount: float) -> str:
+    """Mix colour a toward colour b by `amount` (0..1)."""
+    a, b = a.lstrip("#"), b.lstrip("#")
+    return "#" + "".join(f"{round(int(a[i:i + 2], 16) + (int(b[i:i + 2], 16) - int(a[i:i + 2], 16)) * amount):02X}" for i in (0, 2, 4))
+
+
+def _palette_from_theme(theme: Dict[str, Any]) -> Dict[str, str]:
+    """Design-token palette derived from the template's own theme (colour scheme + master background)."""
+    colors = theme["colors"]
+    bg = theme["background"] or colors["lt1"]
+    is_dark = rel_luminance(bg) < 0.18
+    text = theme.get("text") or ("#FFFFFF" if is_dark else "#000000")
+    text = "#" + fix_color(text, bg, 7.0)
+    secondary_text = theme.get("text_secondary") or text
+    secondary_text = "#" + fix_color(secondary_text, bg, 4.5)
+    if contrast_ratio(secondary_text, text) < 1.15:  # tx2 is just tx1 again: step it back toward the background
+        secondary_text = "#" + fix_color(_blend_hex(text, bg, 0.3), bg, 4.5)
+    if is_dark:
+        surface = _blend_hex(bg, "#FFFFFF", 0.07)
+        subtle = _blend_hex(bg, "#FFFFFF", 0.12)
+        border = _blend_hex(bg, "#FFFFFF", 0.22)
+    else:
+        surface = "#FFFFFF" if rel_luminance(bg) < 0.97 else _blend_hex(bg, "#000000", 0.0)
+        subtle = _blend_hex(bg, "#000000", 0.04)
+        border = _blend_hex(bg, "#000000", 0.12)
+    return {
+        "primary": colors.get("accent1", "#1A56DB"),
+        "secondary": colors.get("accent2", "#3B82F6"),
+        "accent": colors.get("accent3", "#F59E0B"),
+        "background": bg,
+        "surface": surface,
+        "surface_subtle": subtle,
+        "text_primary": text,
+        "text_secondary": secondary_text,
+        "border": border,
+    }, is_dark
 
 
 def extract_template_assets(pptx_path: str, assets_dir: str = ".undoppt/assets") -> List[Dict[str, Any]]:
@@ -236,6 +278,19 @@ def extract_template_tokens(pptx_path: str, extract_assets: bool = False, assets
             if dark_colors:
                 palette["background"] = dark_colors[0]
 
+    # v3.8: the template's own theme is the source of truth when it has one. The scan above only finds colours
+    # written explicitly on slides, which real templates do not have.
+    theme = read_theme(pptx_path)
+    theme_info = None
+    if theme:
+        palette, is_dark = _palette_from_theme(theme)
+        theme_mode = "dark" if is_dark else "light"
+        fonts = theme["fonts"]
+        title_font = fonts["major"] or title_font
+        body_font = fonts["minor"] or body_font
+        theme_info = {"scheme": theme["scheme_name"], "background": theme["background"],
+                      "fonts": fonts, "method": "theme1.xml + slideMaster1.xml"}
+
     # Calculate safe margin
     default_left_margin = min(left_margins) if left_margins else 0.8
     default_top_margin = min(top_margins) if top_margins else 0.8
@@ -299,8 +354,10 @@ def extract_template_tokens(pptx_path: str, extract_assets: bool = False, assets
             "width_inches": round(width_inches, 2),
             "height_inches": round(height_inches, 2),
             "aspect_ratio": aspect_ratio,
-            "margin_left_inches": round(max(0.5, default_left_margin), 2),
-            "margin_top_inches": round(max(0.6, default_top_margin), 2)
+            # The builders draw their own grid; a template's sample-slide offsets (often 1.5in+) would push the
+            # header off the slide, so margins are clamped to what that grid can use.
+            "margin_left_inches": round(min(0.8, max(0.5, default_left_margin)), 2),
+            "margin_top_inches": round(min(0.8, max(0.6, default_top_margin)), 2)
         },
         "palette": palette,
         "typography": {
@@ -335,13 +392,19 @@ def extract_template_tokens(pptx_path: str, extract_assets: bool = False, assets
             "background": palette["surface"],
             "shadow": "0 4px 6px -1px rgba(0,0,0,0.2)" if is_dark else "0 4px 6px -1px rgba(0,0,0,0.05)"
         },
+        "theme_source": theme_info,
         "master_slots": master_slots_summary,
         "master_layouts_count": len(layouts_info),
         "layouts": layouts_info[:8],
         "extracted_assets": extracted_assets
     }
 
-    return tokens
+    if theme_info:
+        tokens["typography"]["font_ea"] = (theme_info["fonts"].get("east_asian") or "PingFang SC")
+    tokens["card_style"]["border_color"] = palette.get("border", tokens["card_style"]["border_color"])
+    repaired, notes = repair_tokens(tokens)
+    repaired["design_notes"] = notes
+    return repaired
 
 
 def save_tokens(tokens: Dict[str, Any], output_path: str) -> str:

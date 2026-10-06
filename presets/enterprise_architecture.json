@@ -16,13 +16,13 @@
     "surface": "#FFFFFF",
     "surface_subtle": "#EBECF0",
     "text_primary": "#172B4D",
-    "text_secondary": "#5E6C84",
+    "text_secondary": "#59677D",
     "border": "#DFE1E6"
   },
   "typography": {
     "title": { "font": "PingFang SC, Segoe UI, sans-serif", "size": 32, "weight": "bold", "color": "#172B4D" },
-    "subtitle": { "font": "PingFang SC, Segoe UI, sans-serif", "size": 17, "weight": "medium", "color": "#5E6C84" },
-    "body": { "font": "PingFang SC, Segoe UI, sans-serif", "size": 13, "weight": "normal", "color": "#5E6C84" },
+    "subtitle": { "font": "PingFang SC, Segoe UI, sans-serif", "size": 17, "weight": "medium", "color": "#59677D" },
+    "body": { "font": "PingFang SC, Segoe UI, sans-serif", "size": 13, "weight": "normal", "color": "#59677D" },
     "kpi_number": { "font": "Arial, sans-serif", "size": 48, "weight": "bold", "color": "#0052CC" }
   },
   "card_style": {

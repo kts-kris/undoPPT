@@ -1,6 +1,6 @@
 # undoPPT CLI Reference Manual
 
-This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.7.0).
+This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.8.0).
 
 ---
 
@@ -146,7 +146,11 @@ python3 cli.py audit --blueprint .undoppt/blueprint.json
 
 ## 4. `undo` (Template Master Decompiler)
 
-Deeply deconstructs an enterprise PowerPoint template. Extracts geometry bounds for title and body slots, detects background canvas luminance to infer light/dark mode, and dumps embedded raster and vector media into `.undoppt/assets/`.
+Deconstructs a PowerPoint template into design tokens. As of v3.8 it reads the template's **real theme**: the colour scheme (`ppt/theme/theme1.xml`), the master's colour map and background (resolving scheme colours with `lumMod` / `lumOff`), and the theme fonts (major, minor and the East Asian font). The palette, light/dark mode and fonts come from there; `theme_source` in the output records what was read.
+
+Before v3.8 `undo` only scanned explicit RGB fills on slides, which real templates do not have, so every template came back as the same light blue theme (even a dark one). The extracted tokens now go through the design check (contrast, minimum sizes) and any fixes are listed in `design_notes`. The brand colour (`palette.primary`) is never rewritten; the margins are clamped to what the builders' grid can use. Slide geometry and embedded media are also extracted.
+
+The builders always draw a 16:9 slide: a 4:3 template contributes its colours and fonts, not its aspect ratio.
 
 ```bash
 python3 cli.py undo --template <template.pptx> [options]
@@ -185,6 +189,20 @@ python3 cli.py --blueprint <blueprint.json> [options]
 | `--tokens` | No | `presets/modern_bento.json` | Design tokens or master template tokens JSON. |
 | `--format` | No | `all` | Output format: `pptx`, `html`, or `all`. |
 | `--out` | No | `output` | Output directory. |
+| `--motion` | No | `off` | `narrative` turns on the three narrative animations (see below). |
+| `--final` | No | off | Delivery mode (v3.7): refuse to build while figures lack a source. |
+
+### Narrative animations (v3.8)
+
+Motion is **off by default**. `--motion narrative` (or `presentation_config.motion: "narrative"`) gives each slide the animation that suits its layout; a slide can choose with `motion: {"type": "reveal" | "contrast" | "build" | "none"}`.
+
+| Type | One click is... | Used for |
+| :--- | :--- | :--- |
+| `reveal` | the next idea, in reading order | lists, roadmaps (node and card together), stacks (bottom-up), decision pages |
+| `contrast` | first the alternatives, then the recommended one | cards with a `highlight`, 2x2 matrices, current-vs-target mappings |
+| `build` | the next piece of data | KPI cards (wipe in), a chart and then its takeaway |
+
+The timing tree follows what PowerPoint itself writes (each click is an outer step with `delay="indefinite"`; the first effect is a `clickEffect`, the rest `withEffect`). `render-check --render` asks PowerPoint how many shapes it recognises as animated and reports `MOTION_NOT_RECOGNIZED` / `MOTION_INVALID` on a mismatch. v3.3-v3.7 wrote a tree PowerPoint did not recognise at all (0 animated shapes); `motion_pace: "staged"` is kept as an alias for `narrative`. In the HTML, count-up and flowing-pulse effects are decorative and run only in narrative mode; the `S` step mode is always available. Keynote could not be verified from a script: it does not expose builds to automation.
 
 ### Example
 

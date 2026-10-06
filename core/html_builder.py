@@ -14,7 +14,7 @@ import json
 import os
 import re
 import warnings
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from core import provenance
 from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
@@ -1049,7 +1049,8 @@ def _generate_default_objections(slide: Dict[str, Any]) -> List[Dict[str, str]]:
         ]
 
 
-def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str, show_provenance_badges: bool = True) -> str:
+def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str, show_provenance_badges: bool = True,
+                          motion: Optional[str] = None) -> str:
     """Generate a single-file standalone HTML presentation with zero external dependencies."""
     p = tokens.get("palette", {})
     slides_content_list = []
@@ -1122,6 +1123,10 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         </section>
         """)
 
+    cfg = blueprint.get("presentation_config", {}) if isinstance(blueprint, dict) else {}
+    deck_motion = motion or cfg.get("motion") or ("narrative" if cfg.get("motion_pace") == "staged" else None)
+    motion_attr = "narrative" if deck_motion in ("narrative", "staged") else "off"
+
     slides_blob = "\n".join(slides_content_list)
     total_slides = len(slides)
     meta_json = json.dumps(presentation_meta, ensure_ascii=False)
@@ -1188,12 +1193,13 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       0%, 100% {{ opacity: 0.5; transform: scale(0.99); }}
       50% {{ opacity: 1; transform: scale(1.01); filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4)); }}
     }}
-    .flowing-beam {{
+    /* v3.8: decorative motion is off unless the deck asks for narrative motion */
+    body[data-motion="narrative"] .flowing-beam {{
       animation: flowing-pulse 2.5s infinite ease-in-out;
     }}
   </style>
 </head>
-<body class="h-full flex flex-col items-center justify-center overflow-hidden bg-slate-900 text-slate-800">
+<body data-motion="{motion_attr}" class="h-full flex flex-col items-center justify-center overflow-hidden bg-slate-900 text-slate-800">
 
   <!-- Embedded Structured Presentation Metadata -->
   <script id="presentation-metadata" type="application/json">
@@ -1513,7 +1519,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     }}
 
     function triggerCountUpAnimations(slideEl) {{
-      if (!slideEl || STATIC_MODE) return;
+      if (!slideEl || STATIC_MODE || document.body.dataset.motion !== 'narrative') return;
       const metricEls = slideEl.querySelectorAll('.metric-val');
       metricEls.forEach(el => {{
         const targetStr = el.textContent.trim();

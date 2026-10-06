@@ -215,3 +215,74 @@ def check_html_layout(html_path: str, slides: int, width: int = 1600, height: in
             findings.append({"slide": n, "code": "HTML_OVERFLOW_RIGHT",
                              "message": f"content extends {info['right'] - 1340}px past the 1340px canvas at {width}x{height}"})
     return findings
+
+
+def powerpoint_animated_shapes(pptx_path: str, timeout: int = 150) -> Dict[int, int]:
+    """Ask PowerPoint how many shapes on each slide it recognises as animated ({slide_number: count}).
+
+    This is the ground truth for motion: an animation tree PowerPoint does not understand reads as 0.
+    """
+    if not available_renderers()["powerpoint"]:
+        raise RenderUnavailable("PowerPoint is not available")
+    os.makedirs(STAGING_DIR, exist_ok=True)
+    staged = os.path.join(STAGING_DIR, "motion.pptx")
+    shutil.copyfile(pptx_path, staged)
+    script = f'''
+tell application "Microsoft PowerPoint"
+  open POSIX file "{staged}"
+  delay 2
+  set pres to active presentation
+  set report to ""
+  repeat with n from 1 to (count of slides of pres)
+    set sld to slide n of pres
+    set animated to 0
+    repeat with idx from 1 to (count of shapes of sld)
+      try
+        if (animate of animation settings of shape idx of sld) is true then set animated to animated + 1
+      end try
+    end repeat
+    set report to report & n & ":" & animated & ";"
+  end repeat
+  close pres saving no
+  return report
+end tell
+'''
+    try:
+        out = subprocess.run(["osascript", "-e", script], check=True, capture_output=True, timeout=timeout).stdout.decode()
+    except subprocess.SubprocessError as exc:
+        raise RenderUnavailable(f"PowerPoint animation probe failed: {exc}") from exc
+    finally:
+        if os.path.exists(staged):
+            os.remove(staged)
+    result: Dict[int, int] = {}
+    for part in out.strip().split(";"):
+        if ":" in part:
+            n, c = part.split(":")
+            result[int(n)] = int(c)
+    return result
+
+
+def check_motion(pptx_path: str) -> List[Dict[str, Any]]:
+    """Compare the animations written into the PPTX with what PowerPoint recognises."""
+    from pptx import Presentation
+
+    from core.motion import timing_summary, validate_timing
+
+    prs = Presentation(pptx_path)
+    findings: List[Dict[str, Any]] = []
+    expected: Dict[int, int] = {}
+    for i, slide in enumerate(prs.slides, 1):
+        for problem in validate_timing(slide):
+            findings.append({"slide": i, "code": "MOTION_INVALID", "message": problem})
+        summary = timing_summary(slide)
+        if summary["present"]:
+            expected[i] = len(summary["spids"])
+    if not expected:
+        return findings
+    recognised = powerpoint_animated_shapes(pptx_path)
+    for i, want in expected.items():
+        got = recognised.get(i, 0)
+        if got < want:
+            findings.append({"slide": i, "code": "MOTION_NOT_RECOGNIZED",
+                             "message": f"the file animates {want} shape(s) but PowerPoint recognises {got}"})
+    return findings
