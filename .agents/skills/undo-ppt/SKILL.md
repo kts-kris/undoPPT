@@ -1,7 +1,7 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.4.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.5.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 12 enterprise operational scenarios (project charter, annual strategy/OKR, QBR, cross-team alignment, headcount/budget review, RFC, post-mortem, GTM launch, RFP pitch, promotion assessment, internal tech talk, all-hands rally) anchored in 6 base archetypes with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows, Decision-Ready Ask Summary);
@@ -11,7 +11,7 @@ description: >-
   (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.4.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.5.0)
 
 `undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
@@ -128,11 +128,12 @@ graph TD
     A[用户提出需求 / 输入文档] --> B[阶段 1: 认知契约探针 Q1~Q4 识别 6 大场景之一]
     B --> C{是否提供模板?}
     C -- 是 --> D[阶段 2: 模板深度逆向解构 AST/Slots/Assets]
-    C -- 否 --> E[阶段 2: 匹配内置设计规范 modern_bento / cyber_dark]
+    C -- 否 --> E[阶段 2: 匹配内置设计规范 modern_bento / consulting_minimalist / tech_keynote / enterprise_architecture]
     D --> F[阶段 3: 编排 15 大图元 blueprint.json & 审计自愈]
     E --> F
     F --> G[阶段 4: 双端原生高精构建 注入Notes与认知抽屉]
-    G --> H[交付 PPTX 与单文件 HTML]
+    G --> V[阶段 4.5: render-check 版面验证 lint + 真实渲染]
+    V --> H[交付 PPTX 与单文件 HTML]
     H --> I[用户本地手动微调]
     I --> J[阶段 5: Turn-by-Turn 意图感知与对齐]
     J --> B
@@ -172,6 +173,17 @@ python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --tokens
 - `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注、ECMA-376 `<p:timing>` 原生时序步进）
 - `output/presentation.html`（单文件自包含、Tailwind 排版、`P` 键演播中枢 HUD、`N` 键认知抽屉、情景切换决策沙盒）
 
+### 阶段 4.5 · 版面验证 (Render Check, v3.5)
+构建后必须验证成品，不要只看审计分数——审计只看蓝图结构，看不到渲染结果：
+```bash
+# 静态版面 lint（无需任何渲染器；`build` 已自动执行并打印警告）
+python3 "<SKILL_ROOT>/cli.py" render-check --pptx output/presentation.pptx
+
+# 真实渲染验证：PowerPoint(macOS)/LibreOffice 渲染 PPTX，无头 Chrome 在桌面与手机宽度检查 HTML
+python3 "<SKILL_ROOT>/cli.py" render-check --pptx output/presentation.pptx --html output/presentation.html --render
+```
+检出 `TITLE_WRAPS` / `TEXT_OVERFLOW` / `TEXT_OVERLAP` / `BLANK_BAND` / `HTML_OVERFLOW_*` 时，回到蓝图精简该页文字或拆页后重建，直至通过。真实渲染依赖 `pip install -r requirements-dev.txt`。
+
 ### 阶段 5 · 协同感知与意图对齐 (Sync Watcher)
 在后续每轮用户发言开始时：
 ```bash
@@ -201,7 +213,10 @@ python3 "<SKILL_ROOT>/cli.py" build --blueprint <blueprint.json> --tokens <token
 # 6. 检查用户本地外部修改
 python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 
-# 7. 一键运行端到端示范流水线
+# 7. 版面验证：静态 lint；加 --render 做 PowerPoint/Chrome 真实渲染检查
+python3 "<SKILL_ROOT>/cli.py" render-check --pptx output/presentation.pptx [--html output/presentation.html] [--render]
+
+# 8. 一键运行端到端示范流水线
 python3 "<SKILL_ROOT>/cli.py" demo
 ```
 

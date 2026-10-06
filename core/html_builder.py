@@ -13,7 +13,10 @@ import html
 import json
 import os
 import re
+import warnings
 from typing import Any, Dict, List
+
+_TAILWIND_RUNTIME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "tailwindcss-play-3.4.17.js")
 
 
 def _render_cover_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
@@ -793,7 +796,7 @@ def _render_chart_html(slide: Dict[str, Any], tokens: Dict[str, Any]) -> str:
       </div>
       <div class="flex-1 flex gap-5 items-stretch pb-2">
         <div class="flex-1 bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
-          <div class="flex justify-between items-center mb-2">
+          <div class="flex justify-between items-center mb-7">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">趋势对比指标</span>
             <div class="flex gap-4">{"".join(legend_items)}</div>
           </div>
@@ -947,6 +950,7 @@ HTML_RENDERERS = {
     "architecture_stack": _render_architecture_stack_html,
     "bento_cards": _render_bento_cards_html,
     "metric_spotlight": _render_metric_spotlight_html,
+    "kpi_dashboard": _render_metric_spotlight_html,
     "timeline": _render_timeline_html,
     "summary": _render_summary_html,
     "matrix_2x2": _render_matrix_html,
@@ -996,7 +1000,7 @@ def _generate_default_objections(slide: Dict[str, Any]) -> List[Dict[str, str]]:
                 "counter": "基础设施层全部采用跨可用区多活部署与热备秒级倒换，故障域严格隔离至局部租户，绝不产生全局级联击穿。"
             }
         ]
-    elif l_type in ("metric_spotlight", "data_chart"):
+    elif l_type in ("metric_spotlight", "kpi_dashboard", "data_chart"):
         return [
             {
                 "skepticism": "核心 KPI 数据在生产全量压力下能否持续保持？有无实测样本偏差？",
@@ -1062,7 +1066,10 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
 
     for idx, slide_data in enumerate(slides):
         l_type = slide_data.get("layout_type", "bento_cards")
-        renderer = HTML_RENDERERS.get(l_type, _render_bento_cards_html)
+        renderer = HTML_RENDERERS.get(l_type)
+        if renderer is None:
+            warnings.warn(f"slide {idx + 1}: unknown layout_type '{l_type}', falling back to bento_cards")
+            renderer = _render_bento_cards_html
         inner_html = renderer(slide_data, tokens)
 
         arc_attr = html.escape(str(slide_data.get("narrative_arc", "")), quote=True)
@@ -1100,6 +1107,10 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     total_slides = len(slides)
     meta_json = json.dumps(presentation_meta, ensure_ascii=False)
 
+    # Inline the Tailwind runtime so the deliverable works offline (no CDN dependency).
+    with open(_TAILWIND_RUNTIME, "r", encoding="utf-8") as fh:
+        tailwind_runtime = fh.read().replace("</script", "<\\/script")
+
     # Compile entire HTML bundle
     html_content = f"""<!DOCTYPE html>
 <html lang="zh-CN" class="h-full bg-slate-950">
@@ -1107,7 +1118,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>undoPPT - Editable Presentation</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script>{tailwind_runtime}</script>
   <script>
     tailwind.config = {{
       theme: {{
@@ -1124,7 +1135,6 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     }}
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body {{
       font-family: 'PingFang SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       user-select: none;
@@ -1133,6 +1143,13 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       opacity: 1;
       pointer-events: auto;
       z-index: 10;
+    }}
+    /* v3.5: content-adaptive body. The slide body shrinks to its natural height and is centered
+       in the space under the header instead of stretching every card to fill the canvas. */
+    .slide > div.h-full.flex-col > .flex-1 {{
+      flex: 0 1 auto;
+      margin-block: auto;
+      width: 100%;
     }}
     .staged-hidden {{
       opacity: 0 !important;
@@ -1165,9 +1182,11 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
   </script>
 
   <!-- Main Presentation Canvas Frame -->
-  <main id="presentation-frame" class="relative w-full max-w-[1340px] aspect-16-9 max-h-[92vh] bg-[#F8FAFC] shadow-2xl rounded-2xl overflow-hidden border border-slate-800/60">
-    {slides_blob}
-  </main>
+  <div id="stage" class="relative shrink-0" style="width:1340px;height:754px;">
+    <main id="presentation-frame" class="absolute left-0 top-0 bg-[#F8FAFC] shadow-2xl rounded-2xl overflow-hidden border border-slate-800/60" style="width:1340px;height:754px;transform-origin:0 0;">
+      {slides_blob}
+    </main>
+  </div>
 
   <!-- Live Presenter HUD (P) -->
   <aside id="presenter-hud" class="fixed top-4 right-4 w-[430px] max-w-[92vw] max-h-[92vh] bg-slate-950/95 backdrop-blur-xl border border-blue-500/40 text-slate-200 rounded-2xl p-5 shadow-2xl z-50 text-xs hidden overflow-y-auto transition-all duration-300">
@@ -1441,8 +1460,30 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       window.requestAnimationFrame(step);
     }}
 
+    // ?static=1 freezes animations (used by the render check to capture the settled state).
+    const STATIC_MODE = new URLSearchParams(window.location.search).get('static') === '1';
+    if (STATIC_MODE) {{
+      const st = document.createElement('style');
+      st.textContent = '*, *::before, *::after {{ transition: none !important; animation: none !important; }}';
+      document.head.appendChild(st);
+    }}
+
+    // Static mode only: record how far the active slide's content extends past the 1340x754 canvas.
+    function reportLayout() {{
+      const fr = frame.getBoundingClientRect();
+      const sc = fr.height / 754;
+      let maxB = 0, maxR = 0;
+      slides[currentSlide].querySelectorAll('*').forEach(el => {{
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return;
+        maxB = Math.max(maxB, (r.bottom - fr.top) / sc);
+        maxR = Math.max(maxR, (r.right - fr.left) / sc);
+      }});
+      document.body.dataset.layout = JSON.stringify({{ slide: currentSlide + 1, bottom: Math.round(maxB), right: Math.round(maxR) }});
+    }}
+
     function triggerCountUpAnimations(slideEl) {{
-      if (!slideEl) return;
+      if (!slideEl || STATIC_MODE) return;
       const metricEls = slideEl.querySelectorAll('.metric-val');
       metricEls.forEach(el => {{
         const targetStr = el.textContent.trim();
@@ -1484,6 +1525,27 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       }}
     }}
 
+    // v3.5 density fit: scale the slide body up (max 1.4x) to use the free height under the header,
+    // and back down if it would overflow. The frame is a fixed 1340x754 canvas, so this is deterministic.
+    function fitBody(slideEl) {{
+      const root = slideEl.querySelector(':scope > div.h-full.flex-col');
+      const body = root && root.querySelector(':scope > .flex-1');
+      if (!body) return;
+      body.style.zoom = 1;
+      body.style.width = '100%';
+      const cs = getComputedStyle(root);
+      let others = 0;
+      Array.from(root.children).forEach(c => {{ if (c !== body) others += c.offsetHeight + parseFloat(getComputedStyle(c).marginBottom || 0); }});
+      const avail = root.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - others - 12;
+      const natural = body.offsetHeight;
+      if (!natural || avail <= 0) return;
+      let z = Math.max(1, Math.min(1.4, (avail / natural) * 0.94));
+      const apply = (v) => {{ body.style.zoom = v; body.style.width = '100%'; }};
+      apply(z);
+      const visual = body.getBoundingClientRect().height / (frame.getBoundingClientRect().height / 754);
+      if (visual > avail && z > 1) {{ z = Math.max(1, z * (avail / visual) * 0.97); apply(z); }}
+    }}
+
     function showSlide(index) {{
       if (index < 0) index = 0;
       if (index >= total) index = total - 1;
@@ -1503,6 +1565,8 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       if (!hud.classList.contains('hidden')) {{
         updatePresenterHUD(currentSlide);
       }}
+      fitBody(slides[currentSlide]);
+      if (STATIC_MODE) reportLayout();
       triggerCountUpAnimations(slides[currentSlide]);
       resetStagedElements();
     }}
@@ -1634,8 +1698,21 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
 
     document.getElementById('fs-btn').addEventListener('click', toggleFullscreen);
 
-    // Initial render
-    showSlide(0);
+    // Fixed 1340x754 canvas scaled to the viewport, so layout is identical on every screen.
+    const stage = document.getElementById('stage');
+    const frame = document.getElementById('presentation-frame');
+    function fitStage() {{
+      const s = Math.min(window.innerWidth / 1340, (window.innerHeight * 0.9) / 754);
+      frame.style.transform = `scale(${{s}})`;
+      stage.style.width = `${{1340 * s}}px`;
+      stage.style.height = `${{754 * s}}px`;
+    }}
+    window.addEventListener('resize', fitStage);
+    fitStage();
+
+    // Initial render (?slide=N deep-links to slide N, 1-based)
+    const deepLink = parseInt(new URLSearchParams(window.location.search).get('slide'), 10);
+    showSlide(Number.isFinite(deepLink) ? deepLink - 1 : 0);
 
   </script>
 </body>

@@ -1,6 +1,6 @@
 # undoPPT CLI Reference Manual
 
-This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.1.0).
+This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.5.0).
 
 ---
 
@@ -20,6 +20,7 @@ python3 cli.py <command> [arguments...]
 | `undo` | Master template deconstruction & token extraction | Enterprise `.pptx` | `.undoppt/design_tokens.json`, assets |
 | `build` | Dual-format vector presentation rendering | Blueprint, Design Tokens | `presentation.pptx`, `presentation.html` |
 | `sync` | Detect external manual edits by human presenter | Target `.pptx` file | Semantic AST diff summary |
+| `render-check` | Verify the layout of built deliverables | `.pptx`, `.html` | Findings report, rendered PNGs |
 | `demo` | Run full showcase demonstration pipeline | *None* | Complete audited demo presentations |
 
 ---
@@ -216,7 +217,57 @@ python3 cli.py sync --target output/presentation.pptx
 
 ---
 
-## 7. `demo` (Showcase Pipeline)
+## 7. `render-check` (Layout Verification, v3.5)
+
+The audit scores a blueprint; it cannot see the rendered result. `render-check` closes that gap in two layers:
+
+1. **Static lint** (always runs, no renderer needed): measures text against its container and reports defects a viewer would see.
+2. **Real renders** (`--render`): PPTX through PowerPoint (macOS, AppleScript) or LibreOffice, converted to PNG and checked for empty bands; HTML through headless Chrome at 1600x900 and 500x900, reading back how far content extends past the canvas.
+
+`build` already runs the static lint and prints non-fatal warnings.
+
+```bash
+python3 cli.py render-check --pptx output/presentation.pptx
+python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
+```
+
+### Arguments
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `--pptx` | — | PPTX to lint (and render with `--render`). |
+| `--html` | — | HTML to check. Needs `--render` and Chrome. |
+| `--render` | off | Also render with PowerPoint/LibreOffice and headless Chrome. |
+| `--engine` | auto | `powerpoint` or `libreoffice`. |
+| `--slides` | 0 | Slide count for the HTML check when `--pptx` is not given. |
+| `--out` | `.undoppt/render` | Directory for rendered PNGs. |
+| `--json` | — | Write the full report to this file. |
+
+Exit code is `1` when any finding is reported, `0` otherwise.
+
+### Finding codes
+
+| Code | Meaning |
+| :--- | :--- |
+| `OUT_OF_BOUNDS` | A shape extends past the slide edge. |
+| `TITLE_WRAPS` | The title needs more than one line even at the minimum size (22pt). Shorten it. |
+| `TEXT_OVERFLOW` | Text is estimated taller than the card that holds it. Cut text or split the slide. |
+| `TEXT_CROSSES_SHAPE` | A text block straddles the edge of another shape. |
+| `TEXT_OVERLAP` | Two text blocks overlap. |
+| `BLANK_BAND` | More than 35% of the slide height is one empty horizontal band (the slide has too little content). |
+| `HTML_OVERFLOW_BOTTOM` / `HTML_OVERFLOW_RIGHT` | HTML content extends past the 1340x754 canvas. |
+
+### Setup for `--render`
+
+```bash
+pip install -r requirements-dev.txt     # pypdfium2 + pillow (PDF to PNG), pytest
+```
+
+PowerPoint is sandboxed and can only write to folders the user has granted, so the checker stages files in `~/Documents/.undoppt_render` and removes them afterwards. The first run may ask for folder access. Without PowerPoint or LibreOffice the PPTX render is skipped and the static lint still runs.
+
+---
+
+## 8. `demo` (Showcase Pipeline)
 
 Runs a comprehensive demonstration that highlights the complete cognitive pipeline, compiles all 15 layout primitives, renders native vector charts and tables, injects speaker notes, and generates the standalone HTML drawer.
 

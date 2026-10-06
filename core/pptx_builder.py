@@ -12,6 +12,7 @@ Implements the 6 core Infographic Primitives:
 """
 
 import os
+import warnings
 from typing import Any, Dict, List, Optional
 
 from pptx import Presentation
@@ -22,6 +23,8 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml import parse_xml
 from pptx.util import Inches, Pt
+
+from core.layout_fit import fit_title_size, normalize_slide, pick_font
 
 
 def _hex_to_rgb(hex_str: str) -> RGBColor:
@@ -75,7 +78,7 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
         p_tag.alignment = PP_ALIGN.CENTER
         run_tag = p_tag.add_run()
         run_tag.text = tag.upper()
-        run_tag.font.name = typo.get("body", {}).get("font", "Arial")
+        run_tag.font.name = pick_font(typo.get("body", {}).get("font", "Arial"))
         run_tag.font.size = Pt(10)
         run_tag.font.bold = True
         run_tag.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
@@ -92,17 +95,19 @@ def _add_header(slide, title: str, subtitle: str, tokens: Dict[str, Any], tag: O
     p_title.space_after = Pt(4)
     run_title = p_title.add_run()
     run_title.text = title
-    run_title.font.name = typo.get("title", {}).get("font", "PingFang SC")
-    run_title.font.size = Pt(typo.get("title", {}).get("size", 30))
+    run_title.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
+    title_pt, one_line = fit_title_size(title, 11.7, typo.get("title", {}).get("size", 30))
+    run_title.font.size = Pt(title_pt)
     run_title.font.bold = True
     run_title.font.color.rgb = _hex_to_rgb(typo.get("title", {}).get("color", palette.get("text_primary", "#0F172A")))
 
-    # Subtitle
-    if subtitle:
+    # A title that cannot fit one line even at the minimum size wraps; the subtitle is dropped
+    # from the slide face (it stays in notes/HTML) so it never collides with the content below.
+    if subtitle and one_line:
         p_sub = tf.add_paragraph()
         run_sub = p_sub.add_run()
         run_sub.text = subtitle
-        run_sub.font.name = typo.get("subtitle", {}).get("font", "PingFang SC")
+        run_sub.font.name = pick_font(typo.get("subtitle", {}).get("font", "PingFang SC"))
         run_sub.font.size = Pt(typo.get("subtitle", {}).get("size", 16))
         run_sub.font.color.rgb = _hex_to_rgb(typo.get("subtitle", {}).get("color", palette.get("text_secondary", "#475569")))
 
@@ -143,7 +148,7 @@ def render_cover_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
     p_cat.space_after = Pt(14)
     run_cat = p_cat.add_run()
     run_cat.text = category
-    run_cat.font.name = typo.get("body", {}).get("font", "Arial")
+    run_cat.font.name = pick_font(typo.get("body", {}).get("font", "Arial"))
     run_cat.font.size = Pt(12)
     run_cat.font.bold = True
     run_cat.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
@@ -153,7 +158,7 @@ def render_cover_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
     p_title.space_after = Pt(12)
     run_title = p_title.add_run()
     run_title.text = slide_data.get("title", "Presentation Title")
-    run_title.font.name = typo.get("title", {}).get("font", "PingFang SC")
+    run_title.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
     run_title.font.size = Pt(40)
     run_title.font.bold = True
     run_title.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
@@ -165,7 +170,7 @@ def render_cover_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
         p_sub.space_after = Pt(28)
         run_sub = p_sub.add_run()
         run_sub.text = subtitle
-        run_sub.font.name = typo.get("subtitle", {}).get("font", "PingFang SC")
+        run_sub.font.name = pick_font(typo.get("subtitle", {}).get("font", "PingFang SC"))
         run_sub.font.size = Pt(20)
         run_sub.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
 
@@ -432,7 +437,7 @@ def render_metric_spotlight_slide(prs, slide_data: Dict[str, Any], tokens: Dict[
         p_num.space_after = Pt(6)
         run_n = p_num.add_run()
         run_n.text = str(m.get("value", "99.9%"))
-        run_n.font.name = typo.get("kpi_number", {}).get("font", "DIN Alternate, Arial")
+        run_n.font.name = pick_font(typo.get("kpi_number", {}).get("font", "DIN Alternate, Arial"))
         run_n.font.size = Pt(typo.get("kpi_number", {}).get("size", 48))
         run_n.font.bold = True
         run_n.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
@@ -1464,7 +1469,9 @@ def render_standard_table_slide(prs, slide_data: Dict[str, Any], tokens: Dict[st
     left = Inches(0.8)
     top = Inches(2.2)
     width = Inches(11.733)
-    row_height = min(0.6, max(0.38, 4.6 / max(1, num_rows)))
+    row_height = min(0.85, max(0.4, 4.6 / max(1, num_rows)))
+    body_pt = 14 if num_rows <= 7 else 12
+    head_pt = body_pt + 1
     height = Inches(row_height * num_rows)
 
     table_shape = slide.shapes.add_table(num_rows, num_cols, left, top, width, height)
@@ -1481,8 +1488,8 @@ def render_standard_table_slide(prs, slide_data: Dict[str, Any], tokens: Dict[st
         p.alignment = PP_ALIGN.CENTER
         run = p.add_run()
         run.text = str(header_text)
-        run.font.name = typo.get("title", {}).get("font", "PingFang SC")
-        run.font.size = Pt(13)
+        run.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
+        run.font.size = Pt(head_pt)
         run.font.bold = True
         run.font.color.rgb = _hex_to_rgb("#FFFFFF")
 
@@ -1513,13 +1520,89 @@ def render_standard_table_slide(prs, slide_data: Dict[str, Any], tokens: Dict[st
             p.alignment = PP_ALIGN.LEFT if c_idx == 0 else PP_ALIGN.CENTER
             run = p.add_run()
             run.text = str(val)
-            run.font.name = typo.get("body", {}).get("font", "Arial")
-            run.font.size = Pt(11)
+            run.font.name = pick_font(typo.get("body", {}).get("font", "Arial"))
+            run.font.size = Pt(body_pt)
             if is_highlighted:
                 run.font.bold = True
                 run.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
             else:
                 run.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+
+
+def _chart_series_colors(palette: Dict[str, Any], n: int) -> List[str]:
+    base = [
+        palette.get("primary", "#2563EB"),
+        palette.get("accent", "#F59E0B"),
+        palette.get("secondary", "#38BDF8"),
+        palette.get("text_secondary", "#475569"),
+        "#10B981",
+        "#8B5CF6",
+    ]
+    return [base[i % len(base)] for i in range(n)]
+
+
+def _style_chart(chart, chart_type_str: str, n_categories: int, n_series: int, palette: Dict[str, Any], typo: Dict[str, Any]):
+    """Theme the native chart: palette colors, readable fonts, light gridlines, data labels when sparse."""
+    body_font = pick_font(typo.get("body", {}).get("font"))
+    chart.font.size = Pt(12)
+    chart.font.name = body_font
+    chart.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
+    if chart.has_legend:
+        try:
+            chart.legend.position = XL_LEGEND_POSITION.TOP
+            chart.legend.include_in_layout = False
+            chart.legend.font.size = Pt(12)
+        except Exception:
+            pass
+    plot = chart.plots[0]
+    colors = _chart_series_colors(palette, max(n_series, 1))
+    if chart_type_str == "pie":
+        pie_colors = _chart_series_colors(palette, max(n_categories, 1))
+        for i, point_color in enumerate(pie_colors[:n_categories]):
+            pt = plot.series[0].points[i]
+            pt.format.fill.solid()
+            pt.format.fill.fore_color.rgb = _hex_to_rgb(point_color)
+    else:
+        for series, color in zip(plot.series, colors):
+            if chart_type_str == "line":
+                series.format.line.color.rgb = _hex_to_rgb(color)
+                series.format.line.width = Pt(2.5)
+                series.smooth = False
+            else:
+                series.format.fill.solid()
+                series.format.fill.fore_color.rgb = _hex_to_rgb(color)
+        try:
+            plot.gap_width = 70
+            if chart_type_str not in ("line",):
+                plot.overlap = -8
+        except Exception:
+            pass
+        try:
+            va = chart.value_axis
+            va.has_major_gridlines = True
+            va.major_gridlines.format.line.color.rgb = _hex_to_rgb(palette.get("border", "#E2E8F0"))
+            va.format.line.fill.background()
+            va.tick_labels.font.size = Pt(11)
+            chart.category_axis.tick_labels.font.size = Pt(12)
+            chart.category_axis.format.line.color.rgb = _hex_to_rgb(palette.get("border", "#CBD5E1"))
+        except Exception:
+            pass
+    if n_categories * n_series <= 16:
+        plot.has_data_labels = True
+        dl = plot.data_labels
+        dl.font.size = Pt(11)
+        dl.font.bold = True
+        dl.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
+        if chart_type_str == "pie":
+            dl.show_percentage = True
+            dl.show_value = False
+        else:
+            dl.show_value = True
+        try:
+            dl.number_format = '0.#'
+            dl.number_format_is_linked = False
+        except Exception:
+            pass
 
 
 def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]):
@@ -1562,12 +1645,7 @@ def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, A
     chart_shape = slide.shapes.add_chart(chart_type_enum, chart_l, chart_t, chart_w, chart_h, chart_data)
     chart = chart_shape.chart
     chart.has_legend = len(series_list) > 1 or chart_type_str == "pie"
-    if chart.has_legend:
-        try:
-            chart.legend.position = XL_LEGEND_POSITION.TOP
-            chart.legend.include_in_layout = False
-        except Exception:
-            pass
+    _style_chart(chart, chart_type_str, len(categories), len(series_list), palette, typo)
 
     # Takeaway Side Card
     if has_takeaway:
@@ -1590,7 +1668,7 @@ def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, A
         run_b = p_badge.add_run()
         run_b.text = "KEY TAKEAWAY"
         run_b.font.bold = True
-        run_b.font.size = Pt(10)
+        run_b.font.size = Pt(12)
         run_b.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
 
         p_tw_title = tf_s.add_paragraph()
@@ -1598,14 +1676,14 @@ def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, A
         run_twt = p_tw_title.add_run()
         run_twt.text = "核心数据洞察与结论"
         run_twt.font.bold = True
-        run_twt.font.size = Pt(14)
+        run_twt.font.size = Pt(20)
         run_twt.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
 
         p_tw_body = tf_s.add_paragraph()
         p_tw_body.space_before = Pt(10)
         run_twb = p_tw_body.add_run()
         run_twb.text = takeaway
-        run_twb.font.size = Pt(12)
+        run_twb.font.size = Pt(16)
         run_twb.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
 
         extra_bullets = slide_data.get("bullets", [])
@@ -1617,7 +1695,7 @@ def render_data_chart_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, A
             run_dot.font.color.rgb = _hex_to_rgb(palette.get("primary", "#1A56DB"))
             run_b = p_eb.add_run()
             run_b.text = b
-            run_b.font.size = Pt(11)
+            run_b.font.size = Pt(14)
             run_b.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#475569"))
 
 
@@ -1689,7 +1767,7 @@ def render_content_columns_slide(prs, slide_data: Dict[str, Any], tokens: Dict[s
         p_title.space_after = Pt(8)
         run_t = p_title.add_run()
         run_t.text = col.get("title", f"要素 {idx+1}")
-        run_t.font.name = typo.get("title", {}).get("font", "PingFang SC")
+        run_t.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
         run_t.font.size = Pt(15)
         run_t.font.bold = True
         run_t.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
@@ -1767,7 +1845,7 @@ def render_keynote_quote_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str
     p_q = tf.paragraphs[0]
     run_q = p_q.add_run()
     run_q.text = quote
-    run_q.font.name = typo.get("title", {}).get("font", "PingFang SC")
+    run_q.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
     run_q.font.size = Pt(21)
     run_q.font.bold = True
     run_q.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
@@ -1865,7 +1943,7 @@ def render_process_flow_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str,
         p_title = tf.paragraphs[0]
         run_t = p_title.add_run()
         run_t.text = stg.get("name") or stg.get("title", f"阶段 {idx+1}")
-        run_t.font.name = typo.get("title", {}).get("font", "PingFang SC")
+        run_t.font.name = pick_font(typo.get("title", {}).get("font", "PingFang SC"))
         run_t.font.size = Pt(14)
         run_t.font.bold = True
         run_t.font.color.rgb = _hex_to_rgb(palette.get("text_primary", "#0F172A"))
@@ -1909,6 +1987,7 @@ RENDERERS = {
     "architecture_stack": render_architecture_stack_slide,
     "bento_cards": render_bento_cards_slide,
     "metric_spotlight": render_metric_spotlight_slide,
+    "kpi_dashboard": render_metric_spotlight_slide,
     "timeline": render_timeline_slide,
     "summary": render_summary_slide,
     "matrix_2x2": render_matrix_slide,
@@ -2204,10 +2283,14 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
 
     for idx, slide_data in enumerate(slides):
         layout_type = slide_data.get("layout_type", "bento_cards")
-        renderer = RENDERERS.get(layout_type, render_bento_cards_slide)
+        renderer = RENDERERS.get(layout_type)
+        if renderer is None:
+            warnings.warn(f"slide {idx + 1}: unknown layout_type '{layout_type}', falling back to bento_cards")
+            renderer = render_bento_cards_slide
         renderer(prs, slide_data, tokens)
 
         current_slide = prs.slides[-1]
+        normalize_slide(current_slide, tokens, layout_type)
         slide_contract = contract if idx == 0 else None
         _inject_cognitive_notes(current_slide, slide_data, contract=slide_contract)
 

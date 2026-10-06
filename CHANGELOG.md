@@ -5,6 +5,42 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.5.0] - 2026-10-06
+
+Theme: **the skin floor**. A deck that audits at 94/100 can still render broken. v3.5 renders the deliverables in PowerPoint and Chrome and fixes what that shows.
+
+### Added
+- **`cli.py render-check`**: static layout lint (always) plus real renders (`--render`) through PowerPoint/LibreOffice and headless Chrome. Finding codes: `OUT_OF_BOUNDS`, `TITLE_WRAPS`, `TEXT_OVERFLOW`, `TEXT_CROSSES_SHAPE`, `TEXT_OVERLAP`, `BLANK_BAND`, `HTML_OVERFLOW_BOTTOM`, `HTML_OVERFLOW_RIGHT`. `build` now runs the static lint and prints warnings.
+- **`core/layout_fit.py`**: content-adaptive layout pass (title fit, token card radius, 12pt font floor with overflow guard, card fit, vertical balance).
+- **`core/layout_lint.py`**, **`core/render_check.py`**, `requirements-dev.txt`.
+- **HTML**: fixed 1340x754 canvas scaled to the viewport, `?slide=N` deep link, `?static=1` mode for deterministic capture, body density fit (up to 1.4x).
+- `docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md`, 21 new tests (`tests/test_layout.py`); suite is now 44 tests.
+
+### Fixed
+- **Wrapped titles collided with content** on 5 of 8 demo slides (a 34pt title wrapped to two lines and ran into the cards; the subtitle was hidden behind them).
+- **Empty slides**: the planner emitted `kpi_dashboard` for QBR/OKR/headcount decks, which neither builder knew; the slide fell back to an empty bento page. Both builders now alias it, and unknown layouts warn.
+- **Unreadable decision pages**: 64% of text on `summary` decision pages was under 11pt; maturity ladder 61%, 2x2 matrix 50%.
+- **Stretched cards and blank space**: PPTX cards were fixed-height regardless of content; HTML bodies stretched every card to fill the canvas.
+- **Pill-shaped cards**: python-pptx's default corner radius is 1/6 of the short side; tall cards rendered as pills. Now uses the token `card_style.border_radius`.
+- **Charts** used PowerPoint's default blue/red/green; now themed from the palette with light gridlines and data labels.
+- **Font names** were written as CSS stacks (`"PingFang SC, Inter, sans-serif"`), which PowerPoint cannot resolve; now the first family, applied to latin and east-asian.
+- **HTML was not offline**: it loaded Tailwind and web fonts from CDNs, contradicting the "zero dependencies" claim. The Tailwind runtime is inlined (`core/vendor/`, MIT).
+- **Narrow screens**: slide content overflowed and was clipped.
+- Stale `output/` artifacts removed from git (now ignored); version strings and docs aligned to the release; `cyber_dark` preset reference replaced with the four real presets.
+
+### Known limits
+- Text measurement is a heuristic (CJK = 1 em, Latin about 0.55 em); `render-check --render` is the ground truth.
+- PPTX real rendering needs PowerPoint (macOS) or LibreOffice; without them only the static lint runs.
+- `BLANK_BAND` flags slides that have too little content. Fixing thin content is the v3.6 `EVIDENCE_BUDGET` work, not a layout problem.
+- The planner classifies "内部技术分享" prompts as `general_informative` instead of `internal_tech_talk` (planned for v3.6).
+
+### Roadmap
+- **v3.6.0** Skeleton: per-scenario contract probes, 12 exemplar outlines, `EVIDENCE_BUDGET` pre-check.
+- **v3.7.0** Flesh: `source`/`status` fields, "to verify" marking, `cli.py ingest`, decision-ready demo.
+- **v3.8.0** Skin polish and motion: typography/contrast rules, real-template trials, three narrative animations verified in PowerPoint and Keynote.
+
+---
+
 ## [3.4.0] - 2026-09-17
 
 ### Added

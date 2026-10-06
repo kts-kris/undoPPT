@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,20 @@
 > 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
+
+---
+
+## 🪞 v3.5.0 新增：皮囊底线与渲染验证闭环
+
+一份审计 94 分的 PPT，打开仍可能是坏的。v3.5 在真实查看器（PowerPoint、Chrome）里渲染每一份交付物，并修复渲染中发现的问题：
+
+- 📐 **内容自适应版面**：标题缩到单行，不再折行压住下方卡片；卡片按文字收缩；稀疏文字自动放大（上限 1.3 倍）；内容块在剩余空间居中。
+- 🔤 **可读字号地板**：空间允许时正文不小于 12pt。v3.4 的决策页 64% 的字小于 11pt。
+- 🌐 **真正离线的 HTML**：内联 Tailwind 运行时（无 CDN、无网络字体），固定 1340x754 画布等比缩放到任意屏幕，支持 `?slide=N` 深链接。
+- 🔍 **`cli.py render-check`**：静态版面 lint（无需渲染器）+ PowerPoint/LibreOffice 与无头 Chrome 的真实渲染检查；`build` 会自动运行 lint。
+- 🐛 **修复**：规划器会输出构建器不认识的 `kpi_dashboard` 图元，导致 QBR/OKR/人头评审的 PPT 出现空白页。
+
+详见 [v3.5 PRD](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md) 与 [更新日志](CHANGELOG.md)。
 
 ---
 
@@ -143,16 +157,20 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Antigravity 工作区 Skill 注册目录
-│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.1.0)
+│   └── SKILL.md                    # 超级 Skill 主指令规范与 SOP (v3.5.0)
 ├── core/                           # 核心 Python 自动化引擎
-│   ├── __init__.py                 # 版本号导出 (3.1.0)
+│   ├── __init__.py                 # 版本号导出 (3.5.0)
 │   ├── cognitive_planner.py        # 6 大场景通用解耦认知规划器与自愈修正循环 (v3.1.0)
 │   ├── semantic_auditor.py         # 场景感知语义因果认知审计器 (修辞/离心/实证/疑虑)
 │   ├── content_auditor.py          # 15 大图元 10 维认知质量与容量预算综合审计器
 │   ├── undo_engine.py              # 母版 AST 槽位解析与明暗主题/资产逆向解构
 │   ├── vision_extractor.py         # 视觉启发式解析器
 │   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
-│   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉)
+│   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉，可离线)
+│   ├── layout_fit.py               # 内容自适应版面（标题适配、卡片收缩、字号地板、居中）
+│   ├── layout_lint.py              # PPTX 静态几何 lint（溢出、重叠、标题折行）
+│   ├── render_check.py             # 基于 PowerPoint/LibreOffice 与无头 Chrome 的真实渲染验证
+│   ├── vendor/                     # 内联的 Tailwind 运行时 (MIT)，保证 HTML 离线可用
 │   └── sync_watcher.py             # 毫秒级指纹追踪与语义 AST 差异对比器
 ├── docs/                           # 完整技术文档库
 │   └── en/                         # 英文技术规格与手册
@@ -165,11 +183,10 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元与回归测试套件 (15/15 passing)
-│   └── test_engine.py
-├── output/                         # 最终交付物目录
-│   ├── presentation.pptx           # 可二次编辑的 PPTX (含备注)
-│   └── presentation.html           # 单文件自包含 HTML (含认知抽屉)
+├── tests/                          # 自动化单元、回归与版面测试套件 (44 passing)
+│   ├── test_engine.py
+│   └── test_layout.py
+├── output/                         # 生成的交付物（已加入 .gitignore，可用 `cli.py demo` 重建）
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
 ├── DESIGN_PHILOSOPHY.md            # 核心设计哲学与 Agent-Skill 协同白皮书 (英文版)
@@ -222,6 +239,13 @@ python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/desig
 ```bash
 python3 cli.py sync --target output/presentation.pptx
 ```
+
+### 7. 版面验证 (Render Check)
+```bash
+python3 cli.py render-check --pptx output/presentation.pptx                       # 静态 lint，无需渲染器
+python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
+```
+`--render` 需要 `pip install -r requirements-dev.txt`，PPTX 渲染需要 PowerPoint (macOS) 或 LibreOffice，HTML 检查需要 Chrome。
 
 ---
 

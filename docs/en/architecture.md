@@ -1,6 +1,6 @@
 # undoPPT Architecture & Engineering Deep-Dive
 
-This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.1.0).
+This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.5.0).
 
 ---
 
@@ -106,6 +106,24 @@ Compiles presentations into a zero-dependency, single-file HTML deliverable.
 - **Slide-out Cognitive Inspector (`N` Key)**: A persistent drawer that reveals the underlying Cognitive Contract, slide mission, rhetorical transition, and proof hierarchy in real time.
 
 ---
+
+### 2.6.1 `core/layout_fit.py` (v3.5)
+A content-adaptive pass the PPTX builder applies to every slide after its renderer runs. The renderers still place shapes at fixed coordinates; this layer measures the text that actually sits in them and adapts:
+- **Title fit**: shrinks the header title (down to 22pt) until it fits one line, so it never wraps into the content below. A title that still does not fit drops its subtitle from the slide face.
+- **Card radius**: applies the token `card_style.border_radius` instead of python-pptx's default 1/6 of the short side.
+- **Font floor**: scales frames whose smallest run is under 12pt (max 1.4x), backing off if the estimated text height would overflow its card. Ovals are skipped because their text area is narrower than the frame.
+- **Card fit**: shrinks cards to their text (rows are equalised), scaling sparse text up to 1.3x first. Covers text boxes over cards (`bento_cards`, `metric_spotlight`, `timeline`) and cards that carry their own text (`content_columns`).
+- **Vertical balance**: centers the content block in the free space under the header (up to 1.3in).
+Text is measured with a heuristic (CJK = 1 em, Latin about 0.55 em); the real-render check is the ground truth.
+
+### 2.6.2 `core/layout_lint.py` (v3.5)
+Static geometry lint for built PPTX files: `OUT_OF_BOUNDS`, `TITLE_WRAPS`, `TEXT_OVERFLOW`, `TEXT_CROSSES_SHAPE`, `TEXT_OVERLAP`. It needs no renderer. Against the v3.4 demo it reports 19 findings, all of which were visible in PowerPoint; against v3.5 output it reports none.
+
+### 2.6.3 `core/render_check.py` (v3.5)
+Real-render verification. PPTX goes through PowerPoint (macOS) or LibreOffice to PDF, then PNG via `pypdfium2`, then a pixel check for large empty bands. HTML is opened in headless Chrome with `?slide=N&static=1`; in static mode the page freezes animations and writes how far its content extends past the canvas into `data-layout` on `<body>`, which the checker reads with `--dump-dom`.
+
+### 2.6.4 HTML canvas model (v3.5)
+The HTML deliverable is a fixed 1340x754 canvas scaled with a CSS transform to fit the viewport (`fitStage`), so layout is identical on every screen. `fitBody` then scales each slide body up to 1.4x to use the free height under the header, and back down if it would overflow. The Tailwind runtime is inlined from `core/vendor/`, so the file has no network dependency.
 
 ### 2.7 `core/sync_watcher.py`
 Maintains human-AI pair authoring synchronization.

@@ -9,6 +9,7 @@ import unittest
 
 from pptx import Presentation
 
+from core import __version__
 from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.html_builder import build_standalone_html
@@ -340,7 +341,7 @@ class TestUndoPPTEngine(unittest.TestCase):
         self.assertTrue(bp["grounded_sources"]["has_doc"])
         self.assertGreaterEqual(bp["grounded_sources"]["extracted_numbers_count"], 1)
         self.assertGreaterEqual(bp["audit_summary"]["score"], 85)
-        self.assertIn(bp["version"], ("3.1.0", "3.4.0"))
+        self.assertEqual(bp["version"], __version__)
 
     def test_undo_engine_master_slots_and_theme_mode(self):
         """Test undo_engine extracts master slots geometry and theme mode."""

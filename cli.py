@@ -1,4 +1,4 @@
-"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v3.1.0).
+"""cli.py - Unified Command Line Interface for undoPPT Super Skill Engine (v3.5.0).
 
 Usage:
   python3 cli.py plan --prompt "<prompt>" [--input-doc <file.md>] [--context "<notes>"] [--out <blueprint.json>]
@@ -18,6 +18,7 @@ import sys
 from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.html_builder import build_standalone_html
+from core.layout_lint import lint_pptx
 from core.pptx_builder import build_presentation
 from core.sync_watcher import SyncWatcher
 from core.undo_engine import extract_template_tokens, save_tokens
@@ -321,6 +322,7 @@ def cmd_build(args):
         build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None))
         watcher.record_baseline(pptx_out)
         print(f"[✓] PPTX generated successfully: {pptx_out}")
+        _print_lint_warnings(pptx_out)
 
     if args.format in ("html", "all"):
         html_out = os.path.join(out_dir, "presentation.html")
@@ -480,6 +482,68 @@ def cmd_sync(args):
         print(f"[✓] File is in SYNC with agent baseline: {target}")
 
 
+def _print_lint_warnings(pptx_path):
+    """Non-fatal layout lint after a PPTX build (full check: `cli.py render-check`)."""
+    findings = lint_pptx(pptx_path)["findings"]
+    if not findings:
+        return
+    print(f"[!] Layout lint: {len(findings)} issue(s) in {pptx_path} (run `cli.py render-check --pptx {pptx_path}` for details)")
+    for f in findings[:5]:
+        print(f"    - slide {f['slide']} {f['code']}: {f['message']}")
+
+
+def cmd_render_check(args):
+    """Verify built deliverables: static layout lint + (optionally) real renders."""
+    from core import render_check as rc
+
+    findings = []
+    report = {"pptx": None, "html": None}
+    if args.pptx:
+        lint = lint_pptx(args.pptx)
+        findings += [dict(f, source="pptx-lint") for f in lint["findings"]]
+        report["pptx"] = {"slides": lint["slides"], "lint_issues": len(lint["findings"])}
+        if args.render:
+            try:
+                res = rc.render_pptx(args.pptx, os.path.join(args.out, "pptx"), engine=args.engine)
+                px = rc.check_pngs(res["pngs"])
+                findings += [dict(f, source=f"render:{res['engine']}") for f in px]
+                report["pptx"].update(engine=res["engine"], images=res["pngs"])
+            except rc.RenderUnavailable as exc:
+                print(f"[i] PPTX render skipped: {exc}")
+    if args.html:
+        if args.render:
+            try:
+                from pptx import Presentation  # slide count comes from the sibling PPTX when present
+                n = args.slides or (len(Presentation(args.pptx).slides) if args.pptx else 0)
+                if not n:
+                    print("[i] HTML check needs --slides N (or --pptx)")
+                else:
+                    for w, h in ((1600, 900), (500, 900)):
+                        findings += [dict(f, source=f"html@{w}") for f in rc.check_html_layout(args.html, n, w, h)]
+                    rc.render_html(args.html, os.path.join(args.out, "html"), n, 1600, 900, "desktop")
+                    report["html"] = {"slides": n, "images": os.path.join(args.out, "html")}
+            except rc.RenderUnavailable as exc:
+                print(f"[i] HTML check skipped: {exc}")
+        else:
+            print("[i] HTML check needs --render (uses headless Chrome)")
+
+    avail = rc.available_renderers()
+    print("================================================================")
+    print("  undoPPT Render Check (v3.5)")
+    print("================================================================")
+    print(f"  Renderers: " + ", ".join(f"{k}={'yes' if v else 'no'}" for k, v in avail.items()))
+    if report["pptx"]:
+        print(f"  PPTX: {report['pptx']['slides']} slides, {report['pptx']['lint_issues']} lint issue(s)")
+    for f in findings:
+        print(f"  [!] slide {f['slide']} {f['code']} ({f['source']}): {f['message']}")
+    if not findings:
+        print("  [PASS] No layout defects found.")
+    if args.json:
+        with open(args.json, "w", encoding="utf-8") as fh:
+            json.dump({"report": report, "findings": findings}, fh, ensure_ascii=False, indent=2)
+    sys.exit(1 if findings else 0)
+
+
 def cmd_demo(args):
     """Run full demonstration pipeline."""
     print("================================================================")
@@ -528,7 +592,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.1.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.5.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan
@@ -571,6 +635,16 @@ def main():
     p_sync = subparsers.add_parser("sync", help="Check for external user edits")
     p_sync.add_argument("--target", default="output/presentation.pptx", help="Target file path to check")
 
+    # render-check
+    p_rc = subparsers.add_parser("render-check", help="Verify layout of built PPTX/HTML (static lint + real renders)")
+    p_rc.add_argument("--pptx", help="Path to presentation.pptx")
+    p_rc.add_argument("--html", help="Path to presentation.html")
+    p_rc.add_argument("--render", action="store_true", help="Also render with PowerPoint/LibreOffice and headless Chrome")
+    p_rc.add_argument("--engine", choices=["powerpoint", "libreoffice"], default=None, help="PPTX renderer (default: auto)")
+    p_rc.add_argument("--slides", type=int, default=0, help="Slide count for the HTML check when --pptx is not given")
+    p_rc.add_argument("--out", default=".undoppt/render", help="Directory for rendered PNGs")
+    p_rc.add_argument("--json", help="Write the full report to this JSON file")
+
     # demo
     subparsers.add_parser("demo", help="Generate full showcase presentation")
 
@@ -591,6 +665,8 @@ def main():
         cmd_audit(args)
     elif args.command == "sync":
         cmd_sync(args)
+    elif args.command == "render-check":
+        cmd_render_check(args)
     elif args.command == "demo":
         cmd_demo(args)
 

@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.4.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,20 @@
 > 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
+
+---
+
+## 🪞 What's New in v3.5.0: The Skin Floor & the Render Check Loop
+
+A deck that scores 94/100 can still look broken. v3.5 renders every deliverable in a real viewer (PowerPoint, Chrome) and fixes what it finds:
+
+- 📐 **Content-adaptive layout**: titles shrink to one line instead of wrapping into the cards below; cards shrink to their text; sparse text scales up (max 1.3x); the content block is centered in the free space.
+- 🔤 **Readable text floor**: body text is at least 12pt where space allows. v3.4 decision pages were 64% under 11pt.
+- 🌐 **Truly offline HTML**: the Tailwind runtime is inlined (no CDN, no web fonts), on a fixed 1340x754 canvas scaled to any screen, with `?slide=N` deep links.
+- 🔍 **`cli.py render-check`**: static layout lint (no renderer needed) plus real renders through PowerPoint/LibreOffice and headless Chrome. `build` runs the lint automatically.
+- 🐛 **Fixed**: the planner emitted a `kpi_dashboard` layout that no builder knew, so QBR/OKR/headcount decks got an empty slide.
+
+See the [v3.5 PRD](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md) and the [roadmap](CHANGELOG.md).
 
 ---
 
@@ -146,16 +160,20 @@ Say goodbye to boring text slides. Built-in layout primitives include (see [Blue
 ```text
 undoPPT/
 ├── .agents/skills/undo-ppt/         # Workspace Agent Skill registration
-│   └── SKILL.md                    # Super Skill specification and SOP (v3.1.0)
+│   └── SKILL.md                    # Super Skill specification and SOP (v3.5.0)
 ├── core/                           # Python automation core engine
-│   ├── __init__.py                 # Version export (3.1.0)
+│   ├── __init__.py                 # Version export (3.5.0)
 │   ├── cognitive_planner.py        # 6-scenario decoupled cognitive planner & self-healing loop
 │   ├── semantic_auditor.py         # Scenario-aware semantic & causal rhetoric auditor
 │   ├── content_auditor.py          # 15-primitive 10-dimension quality & budget auditor
 │   ├── undo_engine.py              # Master AST slot decompiler & theme/asset extractor
 │   ├── vision_extractor.py         # Visual heuristic analyzer
 │   ├── pptx_builder.py             # 15-primitive native vector PPTX builder (charts, tables, notes)
-│   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer)
+│   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer, offline)
+│   ├── layout_fit.py               # Content-adaptive layout pass (title fit, card fit, font floor, centering)
+│   ├── layout_lint.py              # Static geometry lint for built PPTX (overflow, overlap, wrapped titles)
+│   ├── render_check.py             # Real-render verification via PowerPoint/LibreOffice and headless Chrome
+│   ├── vendor/                     # Inlined Tailwind runtime (MIT) so the HTML works offline
 │   └── sync_watcher.py             # Sub-10ms fingerprint tracking & AST diff comparator
 ├── docs/                           # Complete technical documentation suite
 │   └── en/                         # English documentation
@@ -168,11 +186,10 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit and integration test suite (15/15 passing)
-│   └── test_engine.py
-├── output/                         # Output delivery directory
-│   ├── presentation.pptx           # Editable vector PPTX (with Speaker Notes)
-│   └── presentation.html           # Standalone single-file HTML (with Cognitive Inspector)
+├── tests/                          # Automated unit, regression and layout tests (44 passing)
+│   ├── test_engine.py
+│   └── test_layout.py
+├── output/                         # Generated deliverables (git-ignored; rebuild with `cli.py demo`)
 ├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
 ├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
 ├── DESIGN_PHILOSOPHY.md            # Whitepaper: Design philosophy & architecture synergy (English)
@@ -227,7 +244,14 @@ Detect changes after manually modifying slides in PowerPoint or Keynote:
 python3 cli.py sync --target output/presentation.pptx
 ```
 
-### 7. Run Demo Showcase
+### 7. Verify the Layout (Render Check)
+```bash
+python3 cli.py render-check --pptx output/presentation.pptx                       # static lint, no renderer needed
+python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
+```
+`--render` needs `pip install -r requirements-dev.txt` plus PowerPoint (macOS) or LibreOffice for PPTX, and Chrome for HTML.
+
+### 8. Run Demo Showcase
 ```bash
 python3 cli.py demo
 ```

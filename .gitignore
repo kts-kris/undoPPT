@@ -31,3 +31,6 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Generated deliverables (rebuild with `python3 cli.py demo`)
+output/

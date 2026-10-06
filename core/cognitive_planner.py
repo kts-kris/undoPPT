@@ -1,4 +1,4 @@
-"""cognitive_planner.py - Autonomous Grounded Cognitive Planner for undoPPT Engine (v3.1.0).
+"""cognitive_planner.py - Autonomous Grounded Cognitive Planner for undoPPT Engine (v3.5.0).
 
 Transforms user intent ("一句话提示词") and optional grounded context/documents
 into a complete, fully-formed, audited presentation blueprint (blueprint.json).
@@ -16,6 +16,7 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
+from core import __version__
 from core.content_auditor import ContentAuditor
 
 
@@ -123,7 +124,7 @@ class CognitivePlanner:
         slides = self._synthesize_slides(cleaned_prompt, scenario_meta, contract, grounded_data, num_slides=num_slides)
 
         blueprint = {
-            "version": "3.4.0",
+            "version": __version__,
             "scenario": scenario_meta["scenario_type"],
             "archetype": scenario_meta.get("archetype", scenario_meta["scenario_type"]),
             "contract": contract,

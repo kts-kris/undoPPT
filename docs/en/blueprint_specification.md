@@ -1,4 +1,6 @@
-# undoPPT Blueprint Specification (v3.1.0)
+# undoPPT Blueprint Specification (v3.5.0)
+
+> **Layout aliases**: `kpi_dashboard` is accepted as an alias of `metric_spotlight` (the cognitive planner emits it for QBR, annual-OKR and headcount scenarios). An unknown `layout_type` still falls back to `bento_cards`, but v3.5 now emits a warning instead of falling back silently.
 
 This document defines the complete JSON Schema specification for `blueprint.json`, the immutable delivery contract between the AI Agent and the `undoPPT` rendering engine.
 
