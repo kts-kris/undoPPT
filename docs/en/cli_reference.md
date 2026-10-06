@@ -1,5 +1,7 @@
 # undoPPT CLI Reference Manual
 
+> English | [简体中文](../zh/cli_reference.md)
+
 This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.8.0).
 
 ---
@@ -30,7 +32,9 @@ python3 cli.py <command> [arguments...]
 
 ## 1. `plan` (Autonomous Cognitive Planner)
 
-Analyzes user intent, classifies the request into one of 6 universal scenarios, extracts factual entities from external reference documents, and composes an audited `blueprint.json`.
+Analyzes user intent, classifies the request into one of the 12 enterprise scenarios (or a generic archetype), extracts factual entities from external reference documents, and composes an audited `blueprint.json`.
+
+> This is the **fallback author** (v3.6): a rule engine with no insight of its own. The recommended path is for the Agent to run `probe`, ask what is missing, and write the blueprint from the user's real material (see [Agent integration](agent_integration.md)). Numbers the planner writes are invented templates and appear as 待核 in the deck. It prints a readiness hint (never blocking) when the request is thin.
 
 ```bash
 python3 cli.py plan --prompt "<goal>" [options]
@@ -80,6 +84,8 @@ python3 cli.py generate --prompt "<goal>" [options]
 | `--template` | No | `None` | Optional path to enterprise PowerPoint template (`.pptx`) to deconstruct. |
 | `--tokens` | No | `presets/modern_bento.json` | Fallback design tokens JSON path if no template is provided. |
 | `--format` | No | `all` | Output format: `pptx`, `html`, or `all`. |
+| `--transition` | No | `fade` | Slide transition: `fade`, `push`, `wipe` or `none`. |
+| `--motion` | No | `off` | `narrative` turns on the narrative animations (see `build`). |
 | `--out` | No | `output` | Directory where deliverables are saved. |
 
 ### Example
@@ -193,7 +199,7 @@ python3 cli.py undo \
 Renders the presentation from a validated blueprint and design tokens. Outputs 100% native vector PowerPoint shapes, formatted tables, vector charts, and speaker notes, alongside a single-file standalone HTML presentation.
 
 ```bash
-python3 cli.py --blueprint <blueprint.json> [options]
+python3 cli.py build --blueprint <blueprint.json> [options]
 ```
 
 ### Arguments
@@ -203,6 +209,7 @@ python3 cli.py --blueprint <blueprint.json> [options]
 | `--blueprint` | **Yes** | — | Path to the validated blueprint JSON. |
 | `--tokens` | No | `presets/modern_bento.json` | Design tokens or master template tokens JSON. |
 | `--format` | No | `all` | Output format: `pptx`, `html`, or `all`. |
+| `--transition` | No | `fade` | Slide transition: `fade`, `push`, `wipe` or `none`. |
 | `--out` | No | `output` | Output directory. |
 | `--motion` | No | `off` | `narrative` turns on the three narrative animations (see below). |
 | `--final` | No | off | Delivery mode (v3.7): refuse to build while figures lack a source. |
@@ -348,7 +355,7 @@ PowerPoint is sandboxed and can only write to folders the user has granted, so t
 
 ## 10. `demo` (Showcase Pipeline)
 
-Runs a comprehensive demonstration that highlights the complete cognitive pipeline, compiles all 15 layout primitives, renders native vector charts and tables, injects speaker notes, and generates the standalone HTML drawer.
+Builds a showcase deck from a built-in blueprint: audit, native vector PPTX with speaker notes, standalone HTML, sync baseline. The deck has 8 slides that exercise 8 of the 15 layouts (cover, bento cards, architecture stack, KPI spotlight, chart, table, timeline, summary), ends on a decision-ready page, and audits at 100/100. Its figures are invented to show the layouts, so they are marked `illustrative` and the footer reads 示例数据. It writes to `output/` (git-ignored).
 
 ```bash
 python3 cli.py demo

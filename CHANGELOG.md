@@ -10,15 +10,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 Documentation corrections after the 3.5-3.8 releases. No behaviour change.
 
 ### Fixed (docs)
+- Found while translating: `cli_reference` showed `build` without the `build` subcommand, said `demo` builds all 15 layouts (it builds 8) and did not list `--transition` / `--motion`; `architecture` showed a token example whose field names matched no real preset; `blueprint_specification` did not document the decision-ready `summary` fields (`options`, `recommendation`, `sign_off_items`) or the top-level `scenario` / `presentation_config`; `scenario_anti_patterns` was still marked v3.2, still told authors to write `[Pending Verification]`, and omitted `timeline` from the S05 sequence.
 - **Statements that were false or out of date**: README (English and Chinese) still described `<p:timing>` "click-to-advance animations in PowerPoint, Keynote and WPS" and `undo` as luminance-based mode detection; `SKILL.md` (including its front-matter description) and the Chinese whitepaper still described the old animations; the testing section claimed "15 test suites pass on Python 3.10 to 3.14" (the suite is now verified on 3.12 and 3.14 only, and says so).
 - **Whitepapers**: both versions only had their version number bumped. They now describe the readiness probe, provenance, real-viewer verification and the three narrative animations, and the quality framework runs from Layer 0 (readiness) to Layer 6 (real-viewer verification).
 - `docs/en/architecture.md`: audit weighting was documented as 40/60, the code has always used 50/50; `cognitive_planner` is described as the fallback author; `undo_engine` no longer described as luminance-based; added `vision_extractor`; the data-flow diagram now shows the probe and the render check.
 - `docs/en/agent_integration.md`, `CONTRIBUTING.md`, `docs/en/scenario_anti_patterns.md`, `docs/en/cli_reference.md` had no mention of `probe`'s role, `cite`, `render-check`, motion, `--final`, the new audit codes or the new test files.
 
 ### Added (docs)
+- **Chinese versions of the key reference documents** in `docs/zh/`: CLI reference, audit codes, design system, blueprint specification, architecture, agent integration, scenario anti-patterns, and the 12 scenario outlines (moved from `docs/scenario_outlines.md`, now also in English at `docs/en/scenario_outlines.md`). Each page has a language switch. The PRDs stay Chinese-only.
 - `docs/en/audit_codes.md`: meaning and fix for every audit finding code (45; about 35 had never been documented).
 - README (English and Chinese) documentation index now lists every document; the Chinese README had none.
-- `tests/test_docs.py` (14 tests; the suite is now 158 plus 1 PowerPoint-gated): fails when a CLI command, a `core/` module, an audit or lint code, a test file or the current version is missing from the documentation, or when a documentation link is broken.
+- `tests/test_docs.py` (20 tests; the suite is now 165 plus 1 PowerPoint-gated): fails when a CLI command, a `core/` module, an audit or lint code, a test file or the current version is missing from the documentation, or when a documentation link is broken; and, for the eight key documents, when a Chinese or English version is missing, when their sections or code blocks differ, or when a command, audit code or scenario is missing from either language.
 
 ---
 
@@ -84,7 +86,7 @@ Theme: **the skeleton**. The audit cannot tell a deck built from real material f
 
 ### Added
 - **`cli.py probe`** (`core/contract_probe.py`): Cognitive Contract readiness probe. Classifies the scenario, checks Q1 thesis / Q2 audience / Q3 knowledge gap / Q4 decision plus 3-4 scenario-specific facts, and returns what to ask. Q2 and Q4 are blocking. `plan` and `generate` print the same hint but never stop.
-- **`docs/scenario_outlines.md`**: exemplar outlines for all 12 enterprise scenarios (audience gate, decision required, six pages with layout, mission and the evidence each page needs, red lines). A test keeps the documented storylines in step with the planner.
+- **`docs/en/scenario_outlines.md`**: exemplar outlines for all 12 enterprise scenarios (audience gate, decision required, six pages with layout, mission and the evidence each page needs, red lines). A test keeps the documented storylines in step with the planner.
 - **Evidence budget audit**: `THIN_CONTENT_P<n>` (body text too short for the layout) and `EVIDENCE_BUDGET_P<n>` (KPI slide with fewer than half the metrics numeric). Deduction capped at 12.
 - **`core/blueprint_compat.py`**: maps the documented blueprint fields to the renderers' fields; used by both builders.
 - `SKILL.md`: stage 1 rewritten around "not enough information, do not generate" with the probe flow and ask-first mermaid loop; `plan`/`generate` repositioned as fallback.

@@ -161,7 +161,7 @@ Skill 引擎充当高精度排版物理流水线与独立质检员，坚决接�
 ### 原则十：先问清楚，再动笔 (Ask Before You Write, v3.6)
 审计分数分不清"用真材料做的 PPT"和"凭空做的 PPT"：一句"帮我做一份关于 AI 的汇报"照样得 91.7 分。所以质量闸门必须在**上游**：
 - `cli.py probe` 检查四个契约槽位（主旨、受众、认知差、决策）以及各场景所需的事实，并返回该问用户的问题；受众与决策是阻塞项。信息不足，不生成；
-- 有证据，才有这一页：`docs/scenario_outlines.md` 列出 12 个场景里每一页需要什么；`THIN_CONTENT` / `EVIDENCE_BUDGET` 标出内容撑不起版式的页面。
+- 有证据，才有这一页：`docs/zh/scenario_outlines.md` 列出 12 个场景里每一页需要什么；`THIN_CONTENT` / `EVIDENCE_BUDGET` 标出内容撑不起版式的页面。
 
 ### 原则十一：相信真实的查看器，而不是文件本身 (Trust the Real Viewer, v3.5 / v3.8)
 本项目自己 README 里的三项承诺，第一次放到 PowerPoint 与 Chrome 里检验时都不成立：`undo` 对每份模板返回同一个默认值；动画被识别为 0 个；HTML 的一部分依赖网络。检查文件本身，证明不了查看器里看到什么。所以：

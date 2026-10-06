@@ -1,5 +1,7 @@
 # undoPPT Architecture & Engineering Deep-Dive
 
+> English | [简体中文](../zh/architecture.md)
+
 This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.8.0).
 
 ---
@@ -19,7 +21,7 @@ flowchart TD
         R -- No --> Q[Ask the user] --> A
         R -- Yes --> B[Cognitive Contract Probe Q1-Q4]
         C[Reference Notes / Docs] --> D[Document Context Ingestor]
-        B --> E[6-Scenario Classifier & Router]
+        B --> E[12-Scenario Classifier & Archetype Router]
         D --> E
         E --> F[15-Primitive Narrative Composition]
     end
@@ -51,7 +53,7 @@ flowchart TD
 ### 2.1 `core/cognitive_planner.py`
 The rule-based planning engine that transforms unstructured text into a structured, audited blueprint.
 
-> **Role (v3.6): fallback author.** It produces a well-formed generic skeleton, but it has no insight of its own: for a request as empty as "make a deck about AI" it still returns a 90+ audit score, and the numbers it writes are invented templates (they show up as 待核). The recommended path is for the Agent to ask first (`core/contract_probe.py`) and write the blueprint from the user's real material. Use the planner for quick drafts, and as the reference for the storylines in `docs/scenario_outlines.md` (a test keeps the two in step).
+> **Role (v3.6): fallback author.** It produces a well-formed generic skeleton, but it has no insight of its own: for a request as empty as "make a deck about AI" it still returns a 90+ audit score, and the numbers it writes are invented templates (they show up as 待核). The recommended path is for the Agent to ask first (`core/contract_probe.py`) and write the blueprint from the user's real material. Use the planner for quick drafts, and as the reference for the storylines in [scenario_outlines.md](scenario_outlines.md) (a test keeps the two in step).
 
 - **12 Enterprise Scenarios (v3.4)**: project charter, annual strategy/OKR, QBR, cross-team alignment, headcount review, tech RFC, post-mortem, GTM launch, enterprise RFP pitch, promotion assessment, internal tech talk, all-hands rally, each anchored in one of the archetypes below.
 - **6 Scenario Archetypes**:
@@ -171,34 +173,30 @@ Maintains human-AI pair authoring synchronization.
 
 ## 3. Presets & Design Tokens
 
-Design tokens are stored as JSON files under `presets/`. They govern palettes, typography, border radii, and density limits:
+Design tokens are stored as JSON files under `presets/`. They govern palettes, typography, border radii and density limits. This is `presets/modern_bento.json` (the default), abridged:
 
 ```json
 {
-  "theme_name": "Modern Bento",
-  "theme_mode": "light",
+  "theme": "modern_bento",
+  "name": "Modern Bento",
+  "canvas": { "aspect_ratio": "16:9", "margin_left_inches": 0.8, "margin_top_inches": 0.75 },
   "palette": {
-    "primary": "#2563EB",
-    "secondary": "#0D9488",
-    "background": "#F8FAFC",
-    "card_bg": "#FFFFFF",
-    "text_primary": "#0F172A",
-    "text_secondary": "#475569",
-    "accent": "#F59E0B"
+    "primary": "#2563EB",   "secondary": "#38BDF8",  "accent": "#F59E0B",
+    "background": "#F8FAFC", "surface": "#FFFFFF",   "surface_subtle": "#F1F5F9",
+    "text_primary": "#0F172A", "text_secondary": "#475569", "border": "#E2E8F0"
   },
   "typography": {
-    "title": { "font": "Arial", "size_pt": 24, "bold": true },
-    "body": { "font": "Calibri", "size_pt": 14, "bold": false }
+    "title":      { "font": "PingFang SC, Inter, sans-serif", "size": 34, "color": "#0F172A" },
+    "subtitle":   { "font": "PingFang SC, Inter, sans-serif", "size": 18, "color": "#475569" },
+    "body":       { "font": "PingFang SC, Inter, sans-serif", "size": 14, "color": "#475569" },
+    "kpi_number": { "font": "DIN Alternate, Arial, sans-serif", "size": 52, "color": "#2563EB" }
   },
-  "content_budget": {
-    "max_cards": 4,
-    "max_layers": 4,
-    "max_timeline_steps": 4,
-    "max_table_rows": 8,
-    "max_table_cols": 5
-  }
+  "card_style": { "border_radius": 12, "border_color": "#E2E8F0", "background": "#FFFFFF" },
+  "content_budget": { "density_tier": "balanced", "max_cards": 4, "max_title_words": 16, "max_bullet_points": 4, "max_desc_words": 40 }
 }
 ```
+
+Every field, the guarantees the engine makes whatever the tokens say (contrast, size floor, one-line header), and how tokens from a real template differ are in [Design system](design_system.md).
 
 ### Built-in Presets
 1. `modern_bento.json`: Clean modern bento grid with cool blue accents and high contrast (default).

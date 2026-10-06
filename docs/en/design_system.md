@@ -1,5 +1,7 @@
 # Design System: Tokens, Contrast and Typography (v3.8)
 
+> English | [简体中文](../zh/design_system.md)
+
 A deck takes its look from a **design tokens** file: one of the four presets in `presets/`, or the output of `cli.py undo` on a real template. This page says what the tokens contain and what the engine guarantees whatever they say.
 
 ## Token fields

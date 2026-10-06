@@ -255,15 +255,20 @@ class TestTextFidelity(unittest.TestCase):
 
 
 class TestScenarioOutlinesDoc(unittest.TestCase):
-    """docs/scenario_outlines.md must describe the storylines the engine actually produces."""
+    """docs/{en,zh}/scenario_outlines.md must describe the storylines the engine actually produces."""
+
+    PATHS = {"zh": ("docs", "zh", "scenario_outlines.md"), "en": ("docs", "en", "scenario_outlines.md")}
 
     @classmethod
     def setUpClass(cls):
-        with open(os.path.join(ROOT, "docs", "scenario_outlines.md"), encoding="utf-8") as f:
-            cls.doc = f.read()
+        cls.docs = {}
+        for lang, parts in cls.PATHS.items():
+            with open(os.path.join(ROOT, *parts), encoding="utf-8") as f:
+                cls.docs[lang] = f.read()
+        cls.doc = cls.docs["zh"]
 
-    def _sections(self):
-        parts = re.split(r"\n(?=## S\d{2} )", self.doc)[1:]
+    def _sections(self, lang="zh"):
+        parts = re.split(r"\n(?=## S\d{2} )", self.docs[lang])[1:]
         out = {}
         for part in parts:
             m = re.match(r"## S\d{2} .*?`([a-z_]+)`", part)
@@ -276,27 +281,35 @@ class TestScenarioOutlinesDoc(unittest.TestCase):
             out[m.group(1)] = layouts
         return out
 
-    def test_all_twelve_scenarios_documented(self):
-        self.assertEqual(set(self._sections()), set(SCENARIO_PROMPTS))
+    def test_all_twelve_scenarios_documented_in_both_languages(self):
+        for lang in ("zh", "en"):
+            self.assertEqual(set(self._sections(lang)), set(SCENARIO_PROMPTS), lang)
 
-    def test_outline_layouts_match_planner_storylines(self):
+    def test_outline_layouts_match_planner_storylines_in_both_languages(self):
         planner = CognitivePlanner()
         alias = {"kpi_dashboard": "metric_spotlight"}
-        for key, layouts in self._sections().items():
-            bp = planner.plan(SCENARIO_PROMPTS[key])
-            planned = [alias.get(s["layout_type"], s["layout_type"]) for s in bp["slides"]]
-            self.assertEqual([alias.get(x, x) for x in layouts], planned, key)
+        for lang in ("zh", "en"):
+            for key, layouts in self._sections(lang).items():
+                bp = planner.plan(SCENARIO_PROMPTS[key])
+                planned = [alias.get(s["layout_type"], s["layout_type"]) for s in bp["slides"]]
+                self.assertEqual([alias.get(x, x) for x in layouts], planned, f"{lang} {key}")
+
+    def test_both_languages_have_the_same_page_structure(self):
+        zh, en = self._sections("zh"), self._sections("en")
+        self.assertEqual(zh, en)
 
     def test_every_outline_has_six_pages_with_required_evidence(self):
-        for key, layouts in self._sections().items():
-            self.assertEqual(len(layouts), 6, key)
-        self.assertGreaterEqual(self.doc.count("必备血肉"), 12)
+        for lang in ("zh", "en"):
+            for key, layouts in self._sections(lang).items():
+                self.assertEqual(len(layouts), 6, f"{lang} {key}")
+        self.assertGreaterEqual(self.docs["zh"].count("必备血肉"), 12)
+        self.assertGreaterEqual(self.docs["en"].count("Evidence required"), 12)
 
     def test_skill_md_points_to_probe_and_outlines(self):
         with open(os.path.join(ROOT, "SKILL.md"), encoding="utf-8") as f:
             skill = f.read()
         self.assertIn("cli.py\" probe", skill)
-        self.assertIn("scenario_outlines.md", skill)
+        self.assertIn("docs/zh/scenario_outlines.md", skill)
         self.assertIn("信息不足，不生成", skill)
         with open(os.path.join(ROOT, ".agents", "skills", "undo-ppt", "SKILL.md"), encoding="utf-8") as f:
             self.assertEqual(f.read(), skill)

@@ -1,5 +1,7 @@
 # Audit Finding Codes
 
+> English | [简体中文](../zh/audit_codes.md)
+
 Every finding from `cli.py audit` has a code. Codes ending `_P<n>` are reported per slide (`<n>` is the page number); the rest apply to the whole deck. `warning` costs points; `info` is a nudge. (Message text in the tool is Chinese; this page is the English reference.)
 
 For the rules behind the enterprise and evidence codes see [Scenario anti-patterns](scenario_anti_patterns.md); for layout, contrast and animation problems, which `audit` cannot see because it reads only the blueprint, see `render-check` in the [CLI reference](cli_reference.md).
@@ -72,7 +74,7 @@ For the rules behind the enterprise and evidence codes see [Scenario anti-patter
 
 | Code | Level | Meaning | Fix |
 | :--- | :--- | :--- | :--- |
-| `THIN_CONTENT_P<n>` | warning | The body is shorter than the layout needs (minimums in [scenario_outlines.md](../scenario_outlines.md)). | Add facts, or merge or drop the page. |
+| `THIN_CONTENT_P<n>` | warning | The body is shorter than the layout needs (minimums in [scenario_outlines.md](scenario_outlines.md)). | Add facts, or merge or drop the page. |
 | `EVIDENCE_BUDGET_P<n>` | warning | A KPI slide where fewer than half the metrics carry a number. | Add real values or use a text layout. |
 | `UNSOURCED_FIGURES_P<n>` | warning | Figures that no `source` covers. | Add `source`, or mark `status: "todo"`. |
 | `EVIDENCE_TODO_P<n>` | warning | Figures marked `status: "todo"`. | Replace with real data before delivery. |

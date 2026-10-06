@@ -64,19 +64,20 @@ To maintain the reliability and modularity of `undoPPT`:
 6. **Nothing Silently Dropped**: Every field a blueprint can carry must reach the slide. If a renderer reads a different field name than the specification documents, add the mapping to `core/blueprint_compat.py` (a test asserts every planner-emitted string reaches both PPTX and HTML).
 7. **No Invented Numbers**: Do not add sample figures to presets, demos or planner templates without `status: "illustrative"` (or a `source`). The demo shows the rule.
 8. **Verify in a Real Viewer**: Run `python3 cli.py render-check --pptx ... --html ... --render` for any change to layout, colour, fonts or animation. The layout lint, the contrast check and the animation validator are necessary, not sufficient.
+9. **Two Languages, One Truth**: the eight key reference documents exist in English (`docs/en/`) and Chinese (`docs/zh/`). Change one, change the other in the same commit: `tests/test_docs.py` fails if a document exists in one language only, if their sections or code blocks differ, or if a fact (a command, an audit code, a scenario) is missing from either. The test cannot judge translation quality, so keep the Chinese idiomatic and the product terms consistent with the existing pages.
 
 ---
 
 ## 4. How to Add a New Layout Primitive
 
 To introduce a 16th layout primitive:
-1. **Schema Definition**: Define the primitive's name and required attributes in `docs/en/blueprint_specification.md`.
+1. **Schema Definition**: Define the primitive's name and required attributes in `docs/en/blueprint_specification.md` and `docs/zh/blueprint_specification.md`.
 2. **PPTX Implementation**: Add a rendering method `_render_<primitive_name>(slide, slide_data, tokens)` in `core/pptx_builder.py`. Use native vector shapes and avoid bitmap conversion.
 3. **HTML Implementation**: Add a rendering method `_render_<primitive_name>(slide_data, tokens)` in `core/html_builder.py` with responsive CSS.
 4. **Auditor & Content Budget**: Add density boundary rules (e.g. maximum items, text length limits) in `core/content_auditor.py` and ensure default tokens in `presets/` accommodate the primitive.
 5. **Test Coverage**: Add a test slide with the new layout primitive into `test_all_15_layouts_render` in `tests/test_engine.py`; if the planner can emit it, `tests/test_contract.py::TestRendererCoverage` already checks that both builders know the name. Add its minimum body length to `ContentAuditor.MIN_BODY_CHARS`.
 6. **Layout & Motion**: Decide whether it belongs in `FIT_LAYOUTS` (`core/layout_fit.py`) and which narrative animation it gets (`AUTO_BY_LAYOUT` in `core/motion.py`). Run `cli.py render-check --render` on a deck that uses it.
-7. **Documentation**: Update `docs/en/blueprint_specification.md`, `README.md`, `README_zh.md` and `CHANGELOG.md`.
+7. **Documentation**: Update `docs/en/blueprint_specification.md` and `docs/zh/blueprint_specification.md`, `README.md`, `README_zh.md` and `CHANGELOG.md`.
 
 ---
 

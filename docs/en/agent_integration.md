@@ -1,5 +1,7 @@
 # AI Agent Integration Guide
 
+> English | [简体中文](../zh/agent_integration.md)
+
 This guide describes how to integrate and orchestrate `undoPPT` across modern AI Agents, including **Cursor, Claude Code, OpenAI Codex, Windsurf, Trae, Tencent WorkBuddy, Google Antigravity, and OpenCode**.
 
 ---
@@ -65,7 +67,7 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ```bash
 python3 cli.py probe --prompt "<the user's request>" [--input-doc notes.md] --json
 ```
-It classifies the scenario, reports which contract slots and scenario facts are still unknown, and returns the questions to ask, blocking ones first (audience and decision). If `ready` is false, ask 2 or 3 of them, with an example each, before writing anything. The 12 scenarios and what each page needs are in [scenario_outlines.md](../scenario_outlines.md).
+It classifies the scenario, reports which contract slots and scenario facts are still unknown, and returns the questions to ask, blocking ones first (audience and decision). If `ready` is false, ask 2 or 3 of them, with an example each, before writing anything. The 12 scenarios and what each page needs are in [scenario_outlines.md](scenario_outlines.md).
 
 ### Step 1: Cognitive Contract Probe
 The Agent should act as a senior management consultant. Instead of asking generic questions, ask targeted cognitive probes:
@@ -145,3 +147,5 @@ Generate a quick 5-slide pitch deck for our AI Developer Tooling startup using u
 Include a bento comparison card, an architecture stack, a KPI metrics spotlight, and a timeline roadmap. 
 Deliver both PPTX and HTML.
 ```
+
+A request this thin will make the Agent run `probe` and ask who the investors are, what the ask is, and which figures are real before it writes anything. That is intended. If the user insists on a draft with what they gave, the Agent builds one with the missing figures marked `status: "todo"` and says which pages it left out for lack of evidence.

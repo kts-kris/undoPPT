@@ -15,7 +15,7 @@
 
 > **“认知契约（Contract）、解构母版（Undo）、图表化重构（Redo）、单文件极简交付（Zero-friction Delivery）、时刻与用户并肩（Always-in-Sync）”**  
 > 📖 **深度阅读**：[《undoPPT 设计哲学与架构协同白皮书》](DESIGN_PHILOSOPHY_zh.md)（[English](DESIGN_PHILOSOPHY.md)）—— 彻底厘清 Agent 认知大脑与 Skill 执行底座的协同分工与五重质量保障闭环。  
-> 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
+> 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/zh/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
 
@@ -29,7 +29,7 @@
 - 🌗 **对比度是保证，不是愿望。** 低于 WCAG 4.5:1（大字 3:1）的文字，会按它背后的实际填充色被修复，保持色相；品牌色填充从不被改动。深色预设的决策页（此前几乎不可读）现在可用。`design_check` 校验令牌（对比度、最小字号、层级）。
 - 🎬 **PowerPoint 真能播放的动画。** v3.3 起写入的动画 XML，PowerPoint 识别出的动画数是 **0**。新的时序树在每一页都被识别，且 `render-check` 会让 PowerPoint 来确认。动画现在**默认关闭**，只保留三种叙事动画：`reveal`、`contrast`、`build`。
 
-详见 [v3.8 PRD](docs/PRD_v3.8_SKIN_AND_POISE.md) 与 [设计系统](docs/en/design_system.md)。边界：模板的母版版式、背景图与 logo 不会放到生成的页面上；Keynote 未能验证。
+详见 [v3.8 PRD](docs/PRD_v3.8_SKIN_AND_POISE.md) 与 [设计系统](docs/zh/design_system.md)。边界：模板的母版版式、背景图与 logo 不会放到生成的页面上；Keynote 未能验证。
 
 ---
 
@@ -52,7 +52,7 @@
 审计分数分不清"用真材料做的 PPT"和"凭空做的 PPT"：一句"帮我做一份关于 AI 的汇报"照样能拿 90 多分。v3.6 把质量闸门前移。
 
 - 🧭 **`cli.py probe`**：写任何一页之前，先检查四个契约槽位（主旨、受众、认知差、决策）和场景专属事实，返回该问用户的问题。信息不足，不生成。
-- 📚 **12 个场景的优秀提纲样例**（[docs/scenario_outlines.md](docs/scenario_outlines.md)）：每个场景的听众闸门、必须拍板的事，以及每一页需要的证据。没有证据，就不该有这一页。
+- 📚 **12 个场景的优秀提纲样例**（[docs/zh/scenario_outlines.md](docs/zh/scenario_outlines.md)）：每个场景的听众闸门、必须拍板的事，以及每一页需要的证据。没有证据，就不该有这一页。
 - 🧱 **血肉预算**：`THIN_CONTENT` 与 `EVIDENCE_BUDGET` 标出内容撑不起版式的页面。
 - 🐛 **修复静默丢字**：五种图元在规格书与渲染器里用了不同的字段名，`cross_mapping` 页丢掉 90% 的文字，`content_columns` 丢掉全部要点。现在蓝图里的每一个字符串都会进入 PPTX 与 HTML。
 
@@ -112,8 +112,8 @@
 - 🎙️ **现场演播双重视野中枢 (Live Presenter HUD，按 `P` 键)**：单文件 HTML 按 `P` 键激活现场中枢，内嵌认知罗盘（主旨与受众立场向心力）、因果提词器（切页口播连词）与评委质疑应对弹药库（典型发难与权威解题对策）。
 - 🎛️ **活动决策推演沙盒 (Active Sandbox & 架构下钻)**：支持现场切换“保守 / 基准 / 突破”情景并动态重绘 KPI 跑表与图表；架构栈支持点击微服务组件即刻弹出技术规格（SLA 目标、P99、容灾回滚机制与故障隔离）。
 - 🧠 **跨工具链毫秒级意图反思飞轮 (`cli.py sync`)**：`SyncWatcher` 升级语义反思引擎，捕获人类专家在 Office/Keynote 中修改数值与结构的深层战略动机，指导 AI 智能体保持意图并肩同频。
-- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀场景避坑红线手册（[scenario_anti_patterns.md](docs/en/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准。
-- 📊 **15 大信息图元与原生矢量图表**：原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。详见 [图元蓝图规约手册](docs/en/blueprint_specification.md)。
+- 🚫 **场景避坑红线与代码级黑话拦截**：沉淀场景避坑红线手册（[scenario_anti_patterns.md](docs/zh/scenario_anti_patterns.md)），内置黑话过滤库，严禁“不仅是X更是Y”、“闭环/抓手/赋能/打法”等空洞套话，严禁伪造测试基准。
+- 📊 **15 大信息图元与原生矢量图表**：原生 PowerPoint 矢量图表（柱状/折线/饼图）、规整数据表格、多栏并列卡片、金句引用与流程推演。详见 [图元蓝图规约手册](docs/zh/blueprint_specification.md)。
 - 💡 **自动化内容与因果审计 (`cli.py audit`)**：内置场景感知审计器，兼顾商业量化数据与教学定性范例，实时评分并给出整改建议。
 - 🔍 **HTML 认知动力学抽屉 (`N` 键)**：在单文件 HTML 演示文稿中按键盘 `N` 键，随时调出当前页的推演逻辑与论据层级。
 
@@ -159,7 +159,7 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 - **可插拔 LLM 裁判**：提供 `llm_judge_fn` 钩子，支持规则本体与大模型裁判协同。
 
 ### 3. 十五大高阶原生图元组件库 (15 Infographic Primitives)
-拒绝大段无聊文本，内置 15 大工业级图表化与数据组件元语（详见 [图元规范手册](docs/en/blueprint_specification.md)）：
+拒绝大段无聊文本，内置 15 大工业级图表化与数据组件元语（详见 [图元规范手册](docs/zh/blueprint_specification.md)）：
 - 🏗️ **产品/技术架构堆叠图 (Architecture Stacks)**：分层底板、微服务组件卡片、分类标签。
 - 🍱 **Bento 多栏对比卡片 (Bento Grid Cards)**：2/3/4 栏对比、高亮方案框、要点列表。
 - 📊 **KPI 核心指标大字报 (Metric Spotlight)**：超大字体数值、同环比标签、下钻说明。
@@ -178,7 +178,7 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 
 ### 4. 模板解构引擎 (Undo Engine)
 - **真实主题读取（v3.8）**：读取模板自己的主题：配色方案（`theme1.xml`）、母版的颜色映射与背景（解析 `lumMod`/`lumOff`）、主题字体（含中文字体）。配色、明暗与字体都来自这里，品牌色从不被改写。三份 Office 主题实测得到三套不同的设计（v3.7 对它们返回的是同一个浅蓝默认值）。
-- **对比度与字号校验（v3.8）**：抽取出的令牌会按 WCAG 对比度与最小字号检查，修正记录在 `design_notes`。详见 [设计系统](docs/en/design_system.md)。
+- **对比度与字号校验（v3.8）**：抽取出的令牌会按 WCAG 对比度与最小字号检查，修正记录在 `design_notes`。详见 [设计系统](docs/zh/design_system.md)。
 - **母版槽位绝对坐标 AST 提取**：深度遍历 Slide Masters 与 Layouts，提取 `Title`、`Body`、`Subtitle`、`Footer` 的绝对坐标（英寸）与相对网格尺寸。
 - **诚实边界**：配色、明暗与字体会带过来；模板的母版版式、背景图与 logo **不会**放到生成的页面上（引擎自己绘制 16:9 版式）。
 - **嵌入式高清视觉与 Logo 提取**：自动导出母版与页面中嵌入的图片与矢量 Logo 至 `.undoppt/assets/`。
@@ -232,7 +232,7 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归、版面与契约测试套件 (158 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (165 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
@@ -323,7 +323,7 @@ python3 cli.py render-check --pptx output/presentation.pptx --html output/presen
 
 ## 🤖 在各大主流 AI Agent（Cursor、Claude Code、Codex、Windsurf、WorkBuddy 等）中使用
 
-本项目支持在各大主流 AI Agent 环境中无缝挂载使用（详见 [Agent 集成指南](docs/en/agent_integration.md)）：
+本项目支持在各大主流 AI Agent 环境中无缝挂载使用（详见 [Agent 集成指南](docs/zh/agent_integration.md)）：
 1. **Cursor / Claude Code / OpenAI Codex**：克隆到对应 Agent 的标准 skills 路径（如 `~/.claude/skills/undo-ppt` 或工作区 `.agents/skills/undo-ppt`）；
 2. **Windsurf / Trae**：在当前项目根目录 `.agents/skills/undo-ppt/` 或全局配置中直接挂载；
 3. **腾讯 WorkBuddy / 办公智能体平台**：作为办公自动化或企业自定义工作流 Skill 直接导入；
@@ -352,21 +352,23 @@ pip install -r requirements-dev.txt
 python3 -m pytest tests -q              # 或：python3 -m unittest discover -s tests
 ```
 
-158 个测试通过（另有 1 个需要 macOS 上的 PowerPoint：`UNDOPPT_TEST_POWERPOINT=1`）。已在 Python 3.12 与 3.14 上验证；代码声明支持 3.10+，但 3.10、3.11、3.13 尚未实际运行。
+165 个测试通过（另有 1 个需要 macOS 上的 PowerPoint：`UNDOPPT_TEST_POWERPOINT=1`）。已在 Python 3.12 与 3.14 上验证；代码声明支持 3.10+，但 3.10、3.11、3.13 尚未实际运行。
 
 ---
 
 ## 📚 文档索引
 
+> 下面的八份参考文档都有中英文两个版本：每份顶部都有语言切换，英文版在 `docs/en/`，中文版在 `docs/zh/`。
+
 - 📖 [设计哲学白皮书](DESIGN_PHILOSOPHY_zh.md)（[English](DESIGN_PHILOSOPHY.md)）
-- 📐 [Blueprint 规约手册](docs/en/blueprint_specification.md)（含 `source` / `status` / `motion`）
-- 💻 [CLI 命令参考](docs/en/cli_reference.md)（`probe`、`ingest`、`cite`、`render-check`、`build --final / --motion`）
-- 🚦 [审计码速查](docs/en/audit_codes.md)：每个 `audit` 码的含义与修法
-- 🎨 [设计系统](docs/en/design_system.md)：令牌、对比度与字号保证、套用企业模板
-- 🗂️ [12 个场景提纲样例](docs/scenario_outlines.md)：每个企业场景的听众闸门、决策事项与每页所需证据
-- 🚫 [场景避坑红线](docs/en/scenario_anti_patterns.md)
-- 🏗️ [引擎架构详解](docs/en/architecture.md)
-- 🔌 [AI Agent 集成指南](docs/en/agent_integration.md)
+- 📐 [Blueprint 规约手册](docs/zh/blueprint_specification.md)（含 `source` / `status` / `motion`）
+- 💻 [CLI 命令参考](docs/zh/cli_reference.md)（`probe`、`ingest`、`cite`、`render-check`、`build --final / --motion`）
+- 🚦 [审计码速查](docs/zh/audit_codes.md)：每个 `audit` 码的含义与修法
+- 🎨 [设计系统](docs/zh/design_system.md)：令牌、对比度与字号保证、套用企业模板
+- 🗂️ [12 个场景提纲样例](docs/zh/scenario_outlines.md)：每个企业场景的听众闸门、决策事项与每页所需证据
+- 🚫 [场景避坑红线](docs/zh/scenario_anti_patterns.md)
+- 🏗️ [引擎架构详解](docs/zh/architecture.md)
+- 🔌 [AI Agent 集成指南](docs/zh/agent_integration.md)
 - 🧾 [更新日志](CHANGELOG.md) 与各版 PRD：[v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)、[v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md)、[v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md)、[v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md)、[v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md)、[v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)、[v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)
 - 🤝 [贡献指南](CONTRIBUTING.md)
 

@@ -31,7 +31,7 @@ class TestCommandsAreDocumented(unittest.TestCase):
     def test_every_cli_command_is_in_the_reference_the_readmes_and_the_skill(self):
         commands = re.findall(r'subparsers\.add_parser\("([a-z\-]+)"', read("cli.py"))
         self.assertGreaterEqual(len(commands), 11)
-        for doc in ("docs/en/cli_reference.md", "README.md", "README_zh.md", "SKILL.md"):
+        for doc in ("docs/en/cli_reference.md", "docs/zh/cli_reference.md", "README.md", "README_zh.md", "SKILL.md"):
             text = read(doc)
             for cmd in commands:
                 self.assertTrue(
@@ -67,24 +67,27 @@ class TestFindingsAreExplained(unittest.TestCase):
         for c in re.findall(r'"code":\s*f?"([A-Z][A-Z_]*[A-Z])(?:_P\{[a-z_]+\})?"', src):
             codes.add(c)
         self.assertGreaterEqual(len(codes), 40)
-        doc = read("docs/en/audit_codes.md")
-        missing = sorted(c for c in codes if c not in doc)
-        self.assertEqual(missing, [], f"audit codes with no entry in docs/en/audit_codes.md: {missing}")
+        for doc_path in ("docs/en/audit_codes.md", "docs/zh/audit_codes.md"):
+            doc = read(doc_path)
+            missing = sorted(c for c in codes if c not in doc)
+            self.assertEqual(missing, [], f"audit codes with no entry in {doc_path}: {missing}")
 
     def test_every_lint_and_render_code_is_in_the_cli_reference(self):
         src = read("core/layout_lint.py") + read("core/render_check.py")
         codes = set(re.findall(r'"code":\s*"([A-Z_]+)"', src))
         self.assertIn("LOW_CONTRAST", codes)
-        doc = read("docs/en/cli_reference.md")
-        missing = sorted(c for c in codes if c not in doc)
-        self.assertEqual(missing, [], f"render-check / lint codes missing from the CLI reference: {missing}")
+        for doc_path in ("docs/en/cli_reference.md", "docs/zh/cli_reference.md"):
+            doc = read(doc_path)
+            missing = sorted(c for c in codes if c not in doc)
+            self.assertEqual(missing, [], f"render-check / lint codes missing from {doc_path}: {missing}")
 
 
 class TestVersionAndLinks(unittest.TestCase):
 
     def test_current_version_appears_where_users_look(self):
         for doc in ("README.md", "README_zh.md", "SKILL.md", "DESIGN_PHILOSOPHY.md", "DESIGN_PHILOSOPHY_zh.md",
-                    "docs/en/architecture.md", "docs/en/cli_reference.md", "docs/en/blueprint_specification.md"):
+                    "docs/en/architecture.md", "docs/en/cli_reference.md", "docs/en/blueprint_specification.md",
+                    "docs/zh/architecture.md", "docs/zh/cli_reference.md", "docs/zh/blueprint_specification.md"):
             self.assertIn(__version__, read(doc), f"{doc} does not mention {__version__}")
 
     def test_changelog_has_an_entry_for_the_current_version(self):
@@ -113,6 +116,68 @@ class TestVersionAndLinks(unittest.TestCase):
         for path in glob.glob(os.path.join(ROOT, "docs", "**", "*.md"), recursive=True):
             rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
             self.assertIn(rel, readmes, f"{rel} is not linked from either README")
+
+
+KEY_DOCS = ("cli_reference", "audit_codes", "design_system", "blueprint_specification", "architecture",
+            "agent_integration", "scenario_anti_patterns", "scenario_outlines")
+
+
+class TestBilingualParity(unittest.TestCase):
+    """The key reference docs exist in English and Chinese and stay in step.
+
+    Not a translation check (a test cannot judge that): it catches a document that exists in one language only,
+    a section added to one side, a code block that was not carried over, and facts missing from the Chinese side.
+    """
+
+    def test_every_key_doc_exists_in_both_languages_and_links_to_the_other(self):
+        for name in KEY_DOCS:
+            en, zh = f"docs/en/{name}.md", f"docs/zh/{name}.md"
+            self.assertTrue(os.path.exists(os.path.join(ROOT, en)), en)
+            self.assertTrue(os.path.exists(os.path.join(ROOT, zh)), zh)
+            self.assertIn(f"[简体中文](../zh/{name}.md)", read(en), f"{en} has no link to its Chinese version")
+            self.assertIn(f"[English](../en/{name}.md)", read(zh), f"{zh} has no link to its English version")
+
+    def test_no_orphan_document_in_either_language_folder(self):
+        for lang, other in (("en", "zh"), ("zh", "en")):
+            names = {os.path.basename(p)[:-3] for p in glob.glob(os.path.join(ROOT, "docs", lang, "*.md"))}
+            self.assertEqual(names - set(KEY_DOCS), set(), f"docs/{lang} has a document that is not in KEY_DOCS")
+            self.assertEqual(names, set(KEY_DOCS), f"docs/{lang} is missing documents")
+
+    def test_both_versions_have_the_same_section_structure(self):
+        for name in KEY_DOCS:
+            en, zh = read(f"docs/en/{name}.md"), read(f"docs/zh/{name}.md")
+            h2_en, h2_zh = len(re.findall(r"^## ", en, re.M)), len(re.findall(r"^## ", zh, re.M))
+            h3_en, h3_zh = len(re.findall(r"^### ", en, re.M)), len(re.findall(r"^### ", zh, re.M))
+            fences_en, fences_zh = en.count("```"), zh.count("```")
+            self.assertEqual((h2_en, h3_en, fences_en), (h2_zh, h3_zh, fences_zh),
+                             f"{name}: sections (##, ###) and code fences differ between languages")
+
+    def test_chinese_docs_carry_the_same_facts(self):
+        facts = {
+            "cli_reference": ["probe", "ingest", "cite", "render-check", "--final", "--motion", "reveal", "contrast", "build"],
+            "scenario_anti_patterns": [f"S{i:02d}" for i in range(1, 13)],
+            "blueprint_specification": ["options", "sign_off_items", "recommendation", "presentation_config", "source", "status"],
+            "architecture": ["layout_fit", "layout_lint", "render_check", "contract_probe", "blueprint_compat", "provenance",
+                             "ingest", "motion", "contrast", "design_check", "theme_reader", "vision_extractor"],
+            "design_system": ["check_tokens", "repair_tokens", "font_ea", "theme_source", "design_notes"],
+        }
+        for name, needles in facts.items():
+            for lang in ("en", "zh"):
+                text = read(f"docs/{lang}/{name}.md")
+                for needle in needles:
+                    self.assertIn(needle, text, f"docs/{lang}/{name}.md does not mention {needle}")
+
+    def test_every_chinese_doc_is_linked_from_the_chinese_readme_and_english_from_the_english_one(self):
+        for name in KEY_DOCS:
+            self.assertIn(f"docs/zh/{name}.md", read("README_zh.md"), f"README_zh.md does not link docs/zh/{name}.md")
+            self.assertIn(f"docs/en/{name}.md", read("README.md"), f"README.md does not link docs/en/{name}.md")
+
+    def test_chinese_docs_link_only_to_chinese_docs(self):
+        for name in KEY_DOCS:
+            for target in re.findall(r"\]\(([^)#\s]+\.md)", read(f"docs/zh/{name}.md")):
+                if target.startswith("http") or target.startswith("../en/"):
+                    continue  # the language switch at the top
+                self.assertNotIn("/en/", target, f"docs/zh/{name}.md links to an English document: {target}")
 
 
 class TestNoKnownStaleClaims(unittest.TestCase):

@@ -1,6 +1,8 @@
 # undoPPT Blueprint Specification (v3.8.0)
 
-> **Layout aliases**: `kpi_dashboard` is accepted as an alias of `metric_spotlight` (the cognitive planner emits it for QBR, annual-OKR and headcount scenarios). An unknown `layout_type` still falls back to `bento_cards`, but v3.5 now emits a warning instead of falling back silently.
+> English | [简体中文](../zh/blueprint_specification.md)
+
+> **Layout aliases**: `kpi_dashboard` is accepted as an alias of `metric_spotlight` (the cognitive planner emits it for QBR, annual-OKR and headcount scenarios). An unknown `layout_type` still falls back to `bento_cards`, but since v3.5 the builders emit a warning instead of falling back silently.
 
 This document defines the complete JSON Schema specification for `blueprint.json`, the immutable delivery contract between the AI Agent and the `undoPPT` rendering engine.
 
@@ -11,6 +13,10 @@ This document defines the complete JSON Schema specification for `blueprint.json
 A valid `blueprint.json` consists of two primary keys:
 - `contract`: Defines the top-level cognitive pillars and target outcomes.
 - `slides`: An ordered array of slide definitions conforming to one of the 15 layout primitives.
+
+Two more keys are optional:
+- `scenario`: one of the 12 enterprise scenario codes (`project_charter`, `qbr_business_review`, ...). It switches on the scenario's audit rules; for example `DECISION_ASK_MISSING` applies only to leadership-facing scenarios.
+- `presentation_config`: deck-level settings, `{"transition_effect": "fade", "motion": "narrative"}`. `transition_effect` is `fade` (default), `push`, `wipe` or `none`; `motion` is `narrative` to turn on the narrative animations (off by default; `motion_pace: "staged"` from v3.3 is an alias). Both can be overridden per slide, and `build --motion` overrides the deck.
 
 ```json
 {
@@ -70,6 +76,7 @@ A figure is a number that makes a claim: a percentage, multiple, amount of money
 - `audit` reports `UNSOURCED_FIGURES_P<n>` / `EVIDENCE_TODO_P<n>` and a figure summary.
 
 Native chart data counts as one figure group that needs a `source`. `cli.py cite` fills `source` from an ingested document and never writes `status`.
+
 ---
 
 
@@ -334,7 +341,7 @@ Maps challenges to solutions and accountable owners across organizational or arc
 ---
 
 ### 10. `summary` (Executive Takeaways & Resolutions)
-Summarizes 3 to 4 strategic takeaways and issues a concrete call to action.
+Summarizes 3 to 4 strategic takeaways and issues a concrete call to action. For a deck that asks leadership for a decision, give it the decision-ready fields below (v3.4): the page then shows the options, the recommendation and the approval list instead of the takeaways.
 
 ```json
 {
@@ -354,6 +361,33 @@ Summarizes 3 to 4 strategic takeaways and issues a concrete call to action.
   ]
 }
 ```
+
+**Decision-ready variant** (`options`, `recommendation`, `sign_off_items`). Required by the audit (`DECISION_ASK_MISSING`) for leadership-facing scenarios. When `options` is present the page draws the option cards, the recommendation bar and the approval list, and `points` are not drawn.
+
+```json
+{
+  "layout_type": "summary",
+  "narrative_arc": "call_to_action",
+  "action_title": "Decision: approve option B, start the Q1 pilot with 3M and 5 headcount",
+  "core_evidence": "Pilot budget 3M, 5 headcount; a 90% completion rate in Q3 gates phase two",
+  "options": [
+    { "name": "Option A: keep patching", "pros": "No new budget", "cons": "Manual cost stays at 80%",
+      "cost": "0 / hidden labour", "risk": "High", "recommended": false },
+    { "name": "Option B: phased pilot (recommended)", "pros": "Two business lines first, a stop point at every phase", "cons": "Needs two teams for integration",
+      "cost": "3M + 5 headcount", "risk": "Low", "recommended": true },
+    { "name": "Option C: full rewrite", "pros": "Highest ceiling", "cons": "About 18 months, continuity risk",
+      "cost": "20M+", "risk": "Very high", "recommended": false }
+  ],
+  "recommendation": "Recommend option B: 3M buys a verifiable 94.8% completion rate by Q3; release phase two only if it is met.",
+  "sign_off_items": [
+    "1. Approve the 3M budget and 5 headcount; start the project in Q1",
+    "2. Name one owner each from the platform team and the two pilot business lines",
+    "3. Confirm the Q3 gate: completion rate of at least 90% before phase two"
+  ]
+}
+```
+
+Use 2 or 3 options with exactly one `recommended: true`, and 3 approval items.
 
 ---
 

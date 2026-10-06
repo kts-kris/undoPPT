@@ -4,7 +4,7 @@ ROLE (v3.6): this planner is the *fallback* author. It produces a well-formed ge
 rules, but it has no insight of its own: given "帮我做一份关于 AI 的汇报" it still returns a 90+ audit
 score. The recommended path is for the Agent to ask (see core/contract_probe.py), then write the
 blueprint from the user's real material, using this planner only for quick drafts and as a reference
-for the documented storylines (docs/scenario_outlines.md).
+for the documented storylines (docs/en/scenario_outlines.md).
 
 Transforms user intent ("一句话提示词") and optional grounded context/documents
 into a complete, fully-formed, audited presentation blueprint (blueprint.json).

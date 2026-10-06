@@ -167,7 +167,7 @@ In talent reviews, project debriefs, and specialized corporate decks, presenters
 ### Principle 10: Ask Before You Write (v3.6)
 An audit score cannot tell a deck built from real material from one built from nothing: "帮我做一份关于 AI 的汇报" still scored 91.7. The quality gate therefore sits **upstream**:
 - `cli.py probe` checks the four contract slots (thesis, audience, knowledge gap, decision) and the facts each scenario needs, and returns the questions to ask. Audience and decision are blocking. Not enough information means no generation;
-- A page exists only if the evidence for it does: `docs/scenario_outlines.md` lists, for each of the 12 scenarios, what every page needs, and `THIN_CONTENT` / `EVIDENCE_BUDGET` flag pages whose content cannot carry their layout.
+- A page exists only if the evidence for it does: `docs/en/scenario_outlines.md` lists, for each of the 12 scenarios, what every page needs, and `THIN_CONTENT` / `EVIDENCE_BUDGET` flag pages whose content cannot carry their layout.
 
 ### Principle 11: Trust the Real Viewer, Not the File (v3.5, v3.8)
 Three promises in this project's own README turned out false the first time they were checked in PowerPoint and Chrome: `undo` returned the same default for every template, the animations were recognised as none, and parts of the HTML needed a network. Checking the file proves nothing about what a viewer shows. So:

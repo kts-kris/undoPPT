@@ -1,10 +1,12 @@
 # undoPPT Scenario Anti-Pattern & Red Lines Specification
 
-> **Version**: v3.2.0  
+> English | [简体中文](../zh/scenario_anti_patterns.md)
+
+> **Version**: v3.8.0 (written in v3.2.0; extended in v3.4, v3.6 and v3.7)  
 > **Status**: Official Engineering Standard  
 > **Audience**: AI Agents (Cognitive Planners) & Reviewers
 
-This document defines the strict anti-pattern guidelines, red lines, buzzword blacklists, and rhetorical quality requirements across all 6 scenario archetypes supported by `undoPPT`. Both the AI Agent (during prompt composition) and the deterministic auditor (`cli.py audit`) strictly adhere to these rules.
+This document defines the strict anti-pattern guidelines, red lines, buzzword blacklists, and rhetorical quality requirements across the 6 scenario archetypes supported by `undoPPT` (section 2) and the 12 enterprise scenarios built on them (section 3). Both the AI Agent (during prompt composition) and the deterministic auditor (`cli.py audit`) strictly adhere to these rules.
 
 ---
 
@@ -20,7 +22,7 @@ The following phrases and jargon patterns are strictly prohibited. The automated
 | **Formulaic AI Clichés** | `不仅是...，更是...`<br>`不仅...而且...`<br>`...是...的必由之路/坚实基石`<br>`为什么/凭什么/怎么做` | Empty rhetorical inflation. State the factual assertion directly with concrete causal mechanisms. |
 | **Abstract Management Jargon** | `打法`, `闭环`, `抓手`, `赋能`, `底层逻辑`<br>`颗粒度`, `盘活`, `破局`, `解构`, `对齐` (without concrete actions) | Empty buzzwords masking lack of substance. Use specific verbs: `构建`, `降低`, `交付`, `测试`, `重构`, `量化`. |
 | **Passive / Neutral Titles** | `现状分析`, `系统架构`, `背景介绍`<br>`项目概况`, `思考与探索`, `总结与回顾`<br>`Overview`, `Introduction`, `Architecture` | Every slide title must be an **Action Title** stating a conclusion or judgment (e.g., `Pain Point: ...` or `Result: ...`). |
-| **Fabricated Metrics & False Proof** | Inventing decimal numbers, fake benchmarks, or unverified outage root causes | If empirical proof is unavailable, explicitly label with `[Pending Verification]` or `[Business Assumption]`. Never disguise assumptions as verified data. |
+| **Fabricated Metrics & False Proof** | Inventing decimal numbers, fake benchmarks, or unverified outage root causes | If empirical proof is unavailable, do not write the number as fact: give it a `source`, or mark it `status: "estimate"`, `"illustrative"` or `"todo"` (shown on the slide as 估算, 示例数据 or 待核). Never disguise assumptions as verified data. |
 | **Decorative Clutter & Card Walls** | Stacking 8+ cards just to fill canvas; rainbow neon gradients; glow card effects | Brevity and structure force clarity. Stick strictly to primitive capacity budgets (e.g., 2~4 Bento cards max). |
 
 ---
@@ -114,7 +116,7 @@ In enterprise settings, presentation decks serve high-stakes decision makers. Th
 | `S02` | `annual_strategy_okr` | `strategic_planning` | "Are targets realistic? Are resources aligned?" | `cover` → `horizons_curve` → `cross_mapping` → `bento_cards` → `kpi_dashboard` → `summary` |
 | `S03` | `qbr_business_review` | `general_informative` | "Is the gap caused by market or execution?" | `cover` → `kpi_dashboard` → `data_chart` → `bento_cards` → `timeline` → `summary` |
 | `S04` | `cross_team_alignment` | `general_informative` | "Why our team? Will API changes break our sprint?" | `cover` → `bento_cards` → `process_flow` → `standard_table` → `timeline` → `summary` |
-| `S05` | `team_headcount_review`| `general_informative` | "What is the marginal ROI per new hire?" | `cover` → `kpi_dashboard` → `cross_mapping` → `standard_table` → `summary` (Headcount Sign-off) |
+| `S05` | `team_headcount_review`| `general_informative` | "What is the marginal ROI per new hire?" | `cover` → `kpi_dashboard` → `cross_mapping` → `standard_table` → `timeline` → `summary` (Headcount Sign-off) |
 | `S06` | `tech_rfc_review` | `tech_architecture` | "Is this over-engineered? What is the rollback plan?" | `cover` → `bento_cards` → `architecture_stack` → `standard_table` → `process_flow` → `summary` |
 | `S07` | `post_mortem_review` | `tech_architecture` | "Why was alert late? How to guarantee zero recurrence?" | `cover` → `timeline` → `bento_cards` → `matrix_2x2` → `content_columns` → `summary` |
 | `S08` | `product_launch_gtm` | `product_pitch` | "Do customers actually pay? How do we seed adoption?" | `cover` → `matrix_2x2` → `bento_cards` → `standard_table` → `timeline` → `summary` |
@@ -131,12 +133,12 @@ The `ContentAuditor` and `SemanticAuditor` verify these red lines deterministica
 
 1. **Buzzword Scanning**: Regex pattern match against `BUZZWORD_BLACKLIST`. Each match triggers a structural deduction and an actionable finding; since v3.7 the finding also carries a concrete rewrite (`suggestion`), e.g. 闭环 becomes "name the stages that close, such as alert, locate, roll back, review", 抓手 becomes "name the action and its owner".
 2. **Action Title Check**: Verifies that titles start with conclusion keywords or active verbs, flagging passive titles like "Overview" or "Status".
-3. **Core Evidence Density**: Scans for verifiable numbers (`%`, `ms`, `x`, currency, counts) or explicit assumption markers (`[Pending Verification]`).
+3. **Core Evidence Density**: Scans for verifiable numbers (`%`, `ms`, `x`, currency, counts) in `core_evidence` and the slide body. Since v3.7 every figure must also say where it comes from (see items 10 and 11).
 4. **Inter-Slide Transitions**: Ensures transitions belong to recognized rhetorical families (`contrast`, `causality`, `breakthrough`, `progression`, `evidence`, `action`).
 5. **Decision-Ready Ask Audit (`DECISION_ASK_MISSING`)**: Verifies that leadership-facing decks feature explicit options or sign-off requests in closing slides.
 6. **Objective Benchmark Audit (`BENCHMARK_UNBALANCED`)**: Flags comparative tables that lack trade-offs or multidimensional balance.
 7. **Promotion Attribution Audit (`PROMOTION_LAUNDRY_LIST`)**: Flags fragmented task laundry lists in promotion and career reviews lacking quantified business outcomes.
-8. **Thin Content (`THIN_CONTENT_P<n>`, v3.6)**: The slide body (headers excluded) is shorter than its layout needs, so the layout is dressing up too little. Add facts or merge the page. Minimums per layout are in [scenario_outlines.md](../scenario_outlines.md).
+8. **Thin Content (`THIN_CONTENT_P<n>`, v3.6)**: The slide body (headers excluded) is shorter than its layout needs, so the layout is dressing up too little. Add facts or merge the page. Minimums per layout are in [scenario_outlines.md](scenario_outlines.md).
 9. **Evidence Budget (`EVIDENCE_BUDGET_P<n>`, v3.6)**: A KPI slide where fewer than half the metrics carry a number.
 10. **Unsourced Figures (`UNSOURCED_FIGURES_P<n>`, v3.7)**: Figures on the slide that no `source` covers. Give the slide or the item a `source`, or mark it `status: "todo"`; do not let a number look like a fact.
 11. **Placeholder Evidence (`EVIDENCE_TODO_P<n>`, v3.7)**: Figures marked `status: "todo"`. They must be replaced with real data before delivery (`build --final` refuses to build while any remain). `EVIDENCE_ESTIMATE_P<n>` and `EVIDENCE_ILLUSTRATIVE_P<n>` are informational: the footer labels the slide 估算 or 示例数据.

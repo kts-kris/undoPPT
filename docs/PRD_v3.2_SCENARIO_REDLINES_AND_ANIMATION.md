@@ -229,7 +229,7 @@
    - 建立 `BUZZWORD_BLACKLIST` 过滤库与 6 大场景防套话规则引擎；
    - 升级 `core/content_auditor.py` 与 `core/semantic_auditor.py`。
 2. **里程碑 2 (Week 1)**：
-   - 编写 `docs/en/scenario_anti_patterns.md` 与更新 `SKILL.md`；
+   - 编写 `docs/zh/scenario_anti_patterns.md` 与更新 `SKILL.md`；
    - 更新 `DESIGN_PHILOSOPHY_zh.md` 白皮书，确立两项新原则。
 3. **里程碑 3 (Week 2)**：
    - 在 `core/pptx_builder.py` 实现标准 OOXML `<p:transition>` 注入；

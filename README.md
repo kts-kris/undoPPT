@@ -52,7 +52,7 @@ See the [v3.7 PRD](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md).
 An audit score cannot tell a deck built from real material from one built from nothing: "帮我做一份关于 AI 的汇报" still scores 90+. v3.6 moves the quality gate upstream.
 
 - 🧭 **`cli.py probe`**: before any slide is written, checks the four contract slots (thesis, audience, knowledge gap, decision) plus scenario-specific facts, and returns the questions to ask. Not enough information means no generation.
-- 📚 **12 exemplar outlines** ([docs/scenario_outlines.md](docs/scenario_outlines.md)): per scenario, the audience gate, the decision required, and for every page the evidence it needs. No evidence, no page.
+- 📚 **12 exemplar outlines** ([docs/en/scenario_outlines.md](docs/en/scenario_outlines.md)): per scenario, the audience gate, the decision required, and for every page the evidence it needs. No evidence, no page.
 - 🧱 **Evidence budget**: `THIN_CONTENT` and `EVIDENCE_BUDGET` flag slides whose content cannot carry their layout.
 - 🐛 **Fixed silent data loss**: five layouts used different field names in the spec and in the renderers, so a `cross_mapping` slide lost 90% of its text and `content_columns` lost every bullet. Every blueprint string now reaches the PPTX and the HTML.
 
@@ -235,7 +235,7 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression, layout and contract tests (158 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (165 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
@@ -356,12 +356,14 @@ The skill executes the **Rhythm A Deep Guided SOP**:
 
 ## 📚 Detailed Documentation Suite
 
+> The eight reference documents below are also available in Chinese: each has a language switch at its top, and the Chinese versions live in `docs/zh/`.
+
 - 📖 [Design Philosophy Whitepaper](DESIGN_PHILOSOPHY.md) ([Chinese Version](DESIGN_PHILOSOPHY_zh.md))
 - 📐 [Blueprint Specification (15 Layout Primitives, `source` / `status` / `motion`)](docs/en/blueprint_specification.md)
 - 💻 [CLI Command Reference](docs/en/cli_reference.md) (`probe`, `ingest`, `cite`, `render-check`, `build --final / --motion`)
 - 🚦 [Audit Finding Codes](docs/en/audit_codes.md): what every `audit` code means and how to fix it
 - 🎨 [Design System](docs/en/design_system.md): tokens, contrast and typography guarantees, bringing a corporate template
-- 🗂️ [12 Scenario Outlines](docs/scenario_outlines.md): the audience gate, decision and per-page evidence for each enterprise scenario
+- 🗂️ [12 Scenario Outlines](docs/en/scenario_outlines.md): the audience gate, decision and per-page evidence for each enterprise scenario
 - 🚫 [Scenario Anti-Patterns](docs/en/scenario_anti_patterns.md)
 - 🏗️ [Engine Architecture Deep Dive](docs/en/architecture.md)
 - 🔌 [AI Agent Integration Guide](docs/en/agent_integration.md)
@@ -378,7 +380,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest tests -q              # or: python3 -m unittest discover -s tests
 ```
 
-158 tests pass (plus 1 that needs a macOS PowerPoint: `UNDOPPT_TEST_POWERPOINT=1`). Verified on Python 3.12 and 3.14; the code declares 3.10+ but 3.10, 3.11 and 3.13 have not been run.
+165 tests pass (plus 1 that needs a macOS PowerPoint: `UNDOPPT_TEST_POWERPOINT=1`). Verified on Python 3.12 and 3.14; the code declares 3.10+ but 3.10, 3.11 and 3.13 have not been run.
 
 ---
 

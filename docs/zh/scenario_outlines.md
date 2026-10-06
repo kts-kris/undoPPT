@@ -1,6 +1,8 @@
 # 12 个企业场景的优秀提纲样例 (Scenario Outlines)
 
-> **版本**：v3.6.0
+> [English](../en/scenario_outlines.md) | 简体中文
+
+> **版本**：v3.8.0
 > **用途**：Agent 在写 `blueprint.json` 之前，先对照本文确定"这页该不该存在、需要什么证据、用哪个图元"。
 > **与引擎的关系**：下表的页序与图元和 `cli.py plan` 的输出一致（`kpi_dashboard` 是 `metric_spotlight` 的别名）；Agent 可以改页序，但**不能删掉"必备血肉"**。
 
