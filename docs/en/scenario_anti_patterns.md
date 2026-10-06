@@ -129,11 +129,15 @@ In enterprise settings, presentation decks serve high-stakes decision makers. Th
 
 The `ContentAuditor` and `SemanticAuditor` verify these red lines deterministically:
 
-1. **Buzzword Scanning**: Regex pattern match against `BUZZWORD_BLACKLIST`. Each match triggers a structural deduction and an actionable finding.
+1. **Buzzword Scanning**: Regex pattern match against `BUZZWORD_BLACKLIST`. Each match triggers a structural deduction and an actionable finding; since v3.7 the finding also carries a concrete rewrite (`suggestion`), e.g. 闭环 becomes "name the stages that close, such as alert, locate, roll back, review", 抓手 becomes "name the action and its owner".
 2. **Action Title Check**: Verifies that titles start with conclusion keywords or active verbs, flagging passive titles like "Overview" or "Status".
 3. **Core Evidence Density**: Scans for verifiable numbers (`%`, `ms`, `x`, currency, counts) or explicit assumption markers (`[Pending Verification]`).
 4. **Inter-Slide Transitions**: Ensures transitions belong to recognized rhetorical families (`contrast`, `causality`, `breakthrough`, `progression`, `evidence`, `action`).
 5. **Decision-Ready Ask Audit (`DECISION_ASK_MISSING`)**: Verifies that leadership-facing decks feature explicit options or sign-off requests in closing slides.
 6. **Objective Benchmark Audit (`BENCHMARK_UNBALANCED`)**: Flags comparative tables that lack trade-offs or multidimensional balance.
 7. **Promotion Attribution Audit (`PROMOTION_LAUNDRY_LIST`)**: Flags fragmented task laundry lists in promotion and career reviews lacking quantified business outcomes.
+8. **Thin Content (`THIN_CONTENT_P<n>`, v3.6)**: The slide body (headers excluded) is shorter than its layout needs, so the layout is dressing up too little. Add facts or merge the page. Minimums per layout are in [scenario_outlines.md](../scenario_outlines.md).
+9. **Evidence Budget (`EVIDENCE_BUDGET_P<n>`, v3.6)**: A KPI slide where fewer than half the metrics carry a number.
+10. **Unsourced Figures (`UNSOURCED_FIGURES_P<n>`, v3.7)**: Figures on the slide that no `source` covers. Give the slide or the item a `source`, or mark it `status: "todo"`; do not let a number look like a fact.
+11. **Placeholder Evidence (`EVIDENCE_TODO_P<n>`, v3.7)**: Figures marked `status: "todo"`. They must be replaced with real data before delivery (`build --final` refuses to build while any remain). `EVIDENCE_ESTIMATE_P<n>` and `EVIDENCE_ILLUSTRATIVE_P<n>` are informational: the footer labels the slide 估算 or 示例数据.
 

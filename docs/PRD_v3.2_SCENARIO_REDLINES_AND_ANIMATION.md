@@ -1,6 +1,8 @@
 # undoPPT v3.2.0 产品需求文档 (PRD)
 ## 场景避坑红线体系与动效认知呈现架构 (Scenario Anti-Patterns & Motion Architecture)
 
+> **更正说明（2026-10-06，v3.8.0）**：本文是历史需求文档，保持原样。其中关于"原生 `<p:timing>` 点击步进动画"在 Office / Keynote / WPS 中生效的描述**不成立**：本文所述的动画 XML，PowerPoint 实测识别出的动画对象数为 0。v3.8.0 已重写，并改为默认关闭、仅保留三种叙事动画，详见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md) 与 [CHANGELOG](../CHANGELOG.md)。
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

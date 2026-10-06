@@ -110,8 +110,8 @@ In corporate leadership, upward management, cross-functional alignment, and care
 - ⚖️ **Executive Decision-Ready Closing Primitive**: Structured closing slides featuring an options matrix, highlighted recommendations, and an explicit sign-off checklist (`sign_off_items`). Interactive HTML checkboxes allow live toggling during leadership meetings; native PPTX renders crisp, high-contrast decision cards.
 - 🔬 **Multi-Dimensional External Benchmarking Rigor (`BENCHMARK_UNBALANCED`)**: Code-level enforcement of 3-way benchmarking (Industry Tier 1, Open Source/New Entrant, Status Quo/Self-developed) and mandatory disclosure of proposal trade-offs and frictions, barring superficial "all-win" hype.
 - 🎖️ **Authentic Career Attribution Protocol (`PROMOTION_LAUNDRY_LIST`)**: Enforces STAR structure and isolates personal net increments from company/market tailwinds, blocking routine duty dumps lacking hard metrics.
-- 🎬 **PPTX Native OOXML `<p:timing>` Animation Sequences**: Generates standard ECMA-376 time node trees, enabling genuine step-by-step click-to-advance animations in PowerPoint, Keynote, and WPS.
-- ⚡ **15 Primitives Semantic Kinetic Physics**: Inner-topological dynamics (bottom-up architecture assembly, flowing light beam timelines, and smooth count-up physics 0% -> 94.8%) dynamically calibrated to narrative arcs.
+- 🎬 **Narrative Animations (off by default)**: three types, each tied to a reason: `reveal` (one idea per click), `contrast` (the alternatives first, then the recommended one), `build` (data arrives piece by piece). The timing tree follows what PowerPoint itself writes, and `render-check` asks PowerPoint to confirm it recognises every animated shape. Keynote could not be verified. (v3.3–v3.7 wrote a tree PowerPoint did not recognise at all.)
+- ⚡ **Narrative-arc pacing**: animation durations follow the slide's narrative arc (conflict 250ms, evidence 600ms). In the HTML deck, count-up and flowing-pulse effects run only in narrative mode (`build --motion narrative`).
 - 🎙️ **Live Presenter HUD (`P` Key / Cognitive Copilot in HTML)**: Press `P` in standalone HTML to open the dual-view HUD featuring the Cognitive Compass, Transition Teleprompter, and Objection Playbook.
 - 🎛️ **Active Decision Sandbox & Architecture Drilldown**: Real-time scenario switcher tab (*Conservative*, *Baseline*, *Aggressive*) with instant metric/chart recalculation; click any microservice in architecture stacks to drill down into SLA specs, P99 latency, calling chains, and disaster recovery fallbacks.
 - 🧠 **Cross-Toolchain Strategic Intent Reflection (`cli.py sync`)**: `SyncWatcher` infers human experts' strategic motivations (metric elevation, scope focusing, posture change) from local manual edits.
@@ -179,9 +179,11 @@ Say goodbye to boring text slides. Built-in layout primitives include (see [Blue
 - 💬 **Keynote Hero Quote (`keynote_quote`)**: Centered typography spotlight for insights, expert citations, and key takeaways.
 - 🔄 **Process Flow (`process_flow`)**: Horizontal multi-step workflow with sequence numbers and milestone descriptions.
 
-### 4. Deep Master AST Decompiler (Undo Engine)
+### 4. Template Deconstruction (Undo Engine)
+- **Real Theme Reader (v3.8)**: Reads the template's own theme: the colour scheme (`theme1.xml`), the master's colour map and background (resolving `lumMod`/`lumOff`), and the theme fonts including the East Asian font. The palette, `light`/`dark` mode and fonts come from there, and the brand colour is never rewritten. Tested on three Office themes: three different designs (v3.7 returned the same light-blue default for all of them).
+- **Contrast and size check (v3.8)**: Extracted tokens are checked against WCAG contrast and minimum type sizes; fixes are recorded in `design_notes`. See [Design System](docs/en/design_system.md).
 - **Placeholder Coordinate Extraction**: Traverses Slide Masters and Layouts to calculate absolute coordinates (inches) and grid bounds for `Title`, `Body`, `Subtitle`, and `Footer`.
-- **Automatic Theme Mode Detection**: Computes canvas and shape luminance to classify presentations into `light` or `dark` mode and maps contrasting typography palettes.
+- **Honest limit**: palette, mode and fonts carry over; the template's slide masters, background artwork and logos are **not** placed on generated slides (the builders draw their own 16:9 layouts).
 - **Embedded Media & Logo Export**: Extracts raster images and vector logos embedded in corporate master decks into `.undoppt/assets/`.
 
 ### 5. Dual-Format Delivery & Cognitive Inspection
@@ -233,12 +235,13 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression, layout and contract tests (144 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (158 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
 │   ├── test_flesh.py
-│   └── test_motion_design.py
+│   ├── test_motion_design.py
+│   └── test_docs.py                # docs must keep up with the code
 ├── output/                         # Generated deliverables (git-ignored; rebuild with `cli.py demo`)
 ├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
 ├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
@@ -341,10 +344,12 @@ Once loaded, trigger the skill naturally in conversation:
 > *"Help me create an enterprise AI strategy proposal for the board. I have attached our company PPT template."*
 
 The skill executes the **Rhythm A Deep Guided SOP**:
+0. **Readiness Probe**: runs `probe` first; **if there is not enough information it asks you questions instead of generating**;
 1. **Cognitive Contract Probe**: Gathers core thesis, audience stance, knowledge delta, and desired action;
-2. **Template Deconstruction**: Decompiles the template into typography, palettes, and slot bounds;
-3. **Blueprint Composition & QA**: Maps content to 15 layout primitives and executes 10-dimension cognitive quality audits;
-4. **Dual-Format Delivery**: Produces editable PPTX (with speaker notes) and standalone HTML (with `N`-key inspector);
+2. **Template Deconstruction**: Reads the template's real theme (palette, light/dark mode, fonts);
+3. **Blueprint Composition, Provenance & QA**: Maps content to 15 layout primitives, gives every number an origin (`ingest` / `cite`), and runs the 10-dimension audit plus the thin-content and unsourced-figure checks;
+4. **Dual-Format Delivery**: A draft first (unsourced figures carry a 待核 badge), then `--final` for an editable PPTX (with speaker notes) and an offline standalone HTML; add `--motion narrative` for a deck that will be presented live;
+4.5. **Render Check**: renders in PowerPoint and Chrome and checks overflow, contrast and animations;
 5. **Continuous Sync**: Senses and respects manual edits made by the human presenter.
 
 ---
@@ -352,22 +357,28 @@ The skill executes the **Rhythm A Deep Guided SOP**:
 ## 📚 Detailed Documentation Suite
 
 - 📖 [Design Philosophy Whitepaper](DESIGN_PHILOSOPHY.md) ([Chinese Version](DESIGN_PHILOSOPHY_zh.md))
-- 📐 [Blueprint Specification (15 Layout Primitives)](docs/en/blueprint_specification.md)
-- 💻 [CLI Command Reference](docs/en/cli_reference.md)
+- 📐 [Blueprint Specification (15 Layout Primitives, `source` / `status` / `motion`)](docs/en/blueprint_specification.md)
+- 💻 [CLI Command Reference](docs/en/cli_reference.md) (`probe`, `ingest`, `cite`, `render-check`, `build --final / --motion`)
+- 🚦 [Audit Finding Codes](docs/en/audit_codes.md): what every `audit` code means and how to fix it
+- 🎨 [Design System](docs/en/design_system.md): tokens, contrast and typography guarantees, bringing a corporate template
+- 🗂️ [12 Scenario Outlines](docs/scenario_outlines.md): the audience gate, decision and per-page evidence for each enterprise scenario
+- 🚫 [Scenario Anti-Patterns](docs/en/scenario_anti_patterns.md)
 - 🏗️ [Engine Architecture Deep Dive](docs/en/architecture.md)
 - 🔌 [AI Agent Integration Guide](docs/en/agent_integration.md)
+- 🧾 [Changelog](CHANGELOG.md) and the PRDs: [v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md), [v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md), [v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md), [v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md), [v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md), [v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md), [v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)
 - 🤝 [Contributing Guide](CONTRIBUTING.md)
 
 ---
 
 ## 🧪 Automated Testing
 
-Run the full unit and regression test suite:
+Run the full unit, regression and layout suite:
 ```bash
-python3 -m unittest discover -s tests -v
+pip install -r requirements-dev.txt
+python3 -m pytest tests -q              # or: python3 -m unittest discover -s tests
 ```
 
-All 15 test suites pass cleanly across Python 3.10, 3.11, 3.12, 3.13, and 3.14.
+158 tests pass (plus 1 that needs a macOS PowerPoint: `UNDOPPT_TEST_POWERPOINT=1`). Verified on Python 3.12 and 3.14; the code declares 3.10+ but 3.10, 3.11 and 3.13 have not been run.
 
 ---
 

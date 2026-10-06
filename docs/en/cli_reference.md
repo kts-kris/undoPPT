@@ -110,6 +110,21 @@ python3 cli.py audit --blueprint <blueprint.json> [options]
 | `--blueprint` | **Yes** | — | Path to the blueprint JSON file to inspect. |
 | `--tokens` | No | `presets/modern_bento.json` | Design tokens path for density budget validation. |
 
+### Finding codes
+
+The full list, with meaning and fix for every code, is in [Audit finding codes](audit_codes.md). The ones added since v3.1:
+
+| Code | Since | Meaning |
+| :--- | :--- | :--- |
+| `DECISION_ASK_MISSING`, `BENCHMARK_UNBALANCED`, `PROMOTION_LAUNDRY_LIST` | v3.4 | Enterprise rigor rules (see [Scenario anti-patterns](scenario_anti_patterns.md)). |
+| `THIN_CONTENT_P<n>` | v3.6 | Slide body too short for its layout. |
+| `EVIDENCE_BUDGET_P<n>` | v3.6 | KPI slide where fewer than half the metrics carry a number. |
+| `UNSOURCED_FIGURES_P<n>` | v3.7 | Figures no `source` covers. |
+| `EVIDENCE_TODO_P<n>` | v3.7 | Figures marked `status: "todo"`. |
+| `EVIDENCE_ESTIMATE_P<n>`, `EVIDENCE_ILLUSTRATIVE_P<n>` | v3.7 | Informational: the slide is labelled 估算 / 示例数据. |
+
+Buzzword findings carry a `suggestion` with a concrete rewrite. The output includes a `Figures:` line (total / unsourced / todo / estimate / illustrative). Layout and contrast problems are not blueprint findings: they come from `render-check` and the lint that `build` prints.
+
 ### Example
 
 ```bash
@@ -120,7 +135,7 @@ python3 cli.py audit --blueprint .undoppt/blueprint.json
 
 ```text
 ================================================================
- COGNITIVE & NARRATIVE DYNAMICS QUALITY AUDIT REPORT (v3.1.0)
+ COGNITIVE & NARRATIVE DYNAMICS QUALITY AUDIT REPORT
 ================================================================
  Overall Score:    94.5/100 (Grade: EXCELLENT)
  Structural Score: 95.0/100
@@ -316,6 +331,10 @@ Exit code is `1` when any finding is reported, `0` otherwise.
 | `TEXT_OVERLAP` | Two text blocks overlap. |
 | `BLANK_BAND` | More than 35% of the slide height is one empty horizontal band (the slide has too little content). |
 | `HTML_OVERFLOW_BOTTOM` / `HTML_OVERFLOW_RIGHT` | HTML content extends past the 1340x754 canvas. |
+| `HTML_NO_REPORT` | The page did not report its layout in static mode (the page failed to load). |
+| `LOW_CONTRAST` | (v3.8) Text colour too close to the fill behind it: below 4.5:1, or 3:1 for text of 18pt (14pt bold) and up. The layout pass normally repairs these, so one here means a colour it could not reach. |
+| `MOTION_INVALID` | (v3.8) The animation tree is malformed: a click step that does not wait for a click, an effect on a missing shape, duplicate ids. |
+| `MOTION_NOT_RECOGNIZED` | (v3.8) The file animates N shapes but PowerPoint recognises fewer. Needs `--render` with PowerPoint. |
 
 ### Setup for `--render`
 

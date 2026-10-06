@@ -5,15 +5,15 @@ description: >-
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 12 enterprise operational scenarios (project charter, annual strategy/OKR, QBR, cross-team alignment, headcount/budget review, RFC, post-mortem, GTM launch, RFP pitch, promotion assessment, internal tech talk, all-hands rally) anchored in 6 base archetypes with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows, Decision-Ready Ask Summary);
-  (3) native editable vector PPTX with speaker notes & ECMA-376 timing sequences, and single-file standalone HTML with Cognitive Inspector (N key) and Live Presenter HUD (P key);
+  (3) native editable vector PPTX with speaker notes and optional narrative animations (reveal / contrast / build, off by default), and single-file offline standalone HTML with Cognitive Inspector (N key) and Live Presenter HUD (P key);
   (4) 10-dimension content quality protocol with scenario-aware rhetorical causal audit (cli.py audit) enforcing decision-ready ask closing, 3-way benchmarking, and STAR promotion attribution;
-  (5) deep master template deconstruction (cli.py undo) and real-time AST sync watcher with strategic intent reflection (cli.py sync);
-  (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
+  (5) template deconstruction that reads the real theme (colours, master background, fonts; cli.py undo) and real-time AST sync watcher with strategic intent reflection (cli.py sync);
+  (6) an ask-first contract probe (cli.py probe), data provenance with 待核 marking (ingest / cite / build --final), contrast and layout verification in real viewers (cli.py render-check), and an active decision sandbox, adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
 # undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.8.0)
 
-`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
+`undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注，可选叙事动画）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
 ---
 
@@ -55,11 +55,11 @@ description: >-
    - 数据与表现：`standard_table`, `data_chart`, `content_columns`, `keynote_quote`, `process_flow`
 
 7. **100% 原生双端高精交付**
-   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象；自动注入场景演讲口播备注与 `<p:timing>` 原生时序步进。
+   - **PPTX**: 原生矢量形状、规整表格与 `CategoryChartData` 矢量图表对象；自动注入场景演讲口播备注；可选叙事动画（`--motion narrative`，默认关闭）。
    - **HTML**: 单文件自包含 HTML，内置 `P` 键演播中枢 HUD、`N` 键认知抽屉、活动决策推演沙盒与交互式勾选审批清单。
 
 8. **图元内生语义动力学与活动沙盒（Semantic Dynamics & Active Sandbox）**
-   - 15 大图元内生语义物理动效（架构栈自下而上扎根、时间轴脉冲流光、KPI 跑表、阶梯攀升）。
+   - 动效只服务叙事，且默认关闭：开启 `--motion narrative` 后，架构栈自下而上、路线图节点与卡片同步、KPI 逐个划入；HTML 的跑数与流光也仅在该模式下运行。
    - HTML 端支持切换保守/基准/激进情境重算图表，架构栈原位下钻 SLA 依赖。
 
 
@@ -223,7 +223,7 @@ python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --final 
 ```
 草稿阶段用普通 `build`（带"待核"徽标，方便和用户一起补数据）；对外交付用 `--final`。
 交付产物：
-- `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注、ECMA-376 `<p:timing>` 原生时序步进）
+- `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注；开启 `--motion narrative` 时含叙事动画）
 - `output/presentation.html`（单文件自包含、Tailwind 排版、`P` 键演播中枢 HUD、`N` 键认知抽屉、情景切换决策沙盒）
 
 ### 动画（身姿，v3.8）

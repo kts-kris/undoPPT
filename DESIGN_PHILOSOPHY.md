@@ -85,9 +85,9 @@ The Agent handles high-freedom, context-heavy cognitive tasks that demand deep s
 ### 2.2 What is the undoPPT Skill Engine Responsible For? (Hard Execution Foundation, Geometry & Quality Gates)
 The Skill engine acts as an automated precision typesetting pipeline and independent quality inspector:
 
-1. **Deep Master AST Decompiler (Undo Engine)**:
+1. **Template Deconstruction (Undo Engine)**:
+   - Reads the template's real theme (colour scheme, master background and colour map, theme fonts including the East Asian font) to build the palette, the `dark` / `light` mode and the typography; the brand colour is never rewritten;
    - Traverses Slide Masters and Layouts to extract coordinates (in inches) and relative grid proportions for `Title`, `Body`, `Subtitle`, and `Footer` placeholders;
-   - Computes canvas luminance to classify the visual style as `dark` or `light` mode;
    - Exports embedded high-resolution raster images and vector logos to `.undoppt/assets/`.
 2. **Design Token Enforcement & Content Budgets**:
    - Centralizes palettes, secondary colors, contrasting surface tones, border radii, and typographic hierarchies;
@@ -99,8 +99,10 @@ The Skill engine acts as an automated precision typesetting pipeline and indepen
    - **Automated Speaker Notes Injection**: Writes slide missions, rhetorical transitions, and conversational talking points into PowerPoint Speaker Notes;
    - **Single-File Standalone HTML**: Compiles self-contained HTML with Tailwind CSS, full-screen presentation mode, and a slide-out Cognitive Inspector drawer triggered by the `N` key.
 4. **10-Dimension Dual Cognitive Quality Auditor (Content & Semantic Auditors)**:
-   - Evaluates blueprints independently of the LLM: verifies structural redlines, rhetorical transitions, thesis centroid alignment, and empirical evidence weights.
-5. **Sub-10ms Always-in-Sync Watcher**:
+   - Evaluates blueprints independently of the LLM: verifies structural redlines, rhetorical transitions, thesis centroid alignment, empirical evidence weights, evidence budget and the provenance of every figure.
+5. **Readiness Probe and Real-Viewer Verification**:
+   - Before authoring, `probe` reports what is still unknown and the questions to ask; after building, `render-check` renders in PowerPoint and Chrome and reports what a viewer would see.
+6. **Sub-10ms Always-in-Sync Watcher**:
    - Uses SHA-256 fingerprinting to detect external edits in `<10ms` and generates semantic AST diffs.
 
 ---
@@ -123,20 +125,21 @@ Traditional AI presentation tools operate as one-way black boxes: once a user ed
 A critical failure of AI-generated content is hiding conceptual vacuum behind pompous buzzwords ("不仅是X更是Y", "closed-loop flywheels", "5 battlefronts").  
 `undoPPT` enforces an **uncompromising anti-buzzword discipline and truth-in-evidence standard**:
 - **Deterministic Blacklist Interception**: Automated regex filtering blocks empty jargon and formulaic AI clichés;
-- **Empirical Rigor**: Disallow fabricated benchmarks or fake precision. If empirical proof is missing, explicit labels like `[Pending Verification]` or `[Design Assumption]` are mandatory;
+- **Empirical Rigor (v3.7)**: Disallow fabricated benchmarks or fake precision. Every number can carry a `source` and a `status` (`verified` / `estimate` / `illustrative` / `todo`); a figure with no source is marked **待核** on the slide, in the speaker notes and in the inspector, and `build --final` refuses to build while any remain. `ingest` and `cite` carry origins (`file:line`) from a document into the blueprint, and never credit a number that has none;
 - **6 Archetype Red Lines**: Tech architecture mandates latency distributions (P50/P99) and rollback gates; product decks mandate unit economics; strategic plans require explicit not-to-do lists.
 
 ### Principle 5: Motion as Cognitive Pacing (Cognitive Restraint)
 Presentation animation commonly degrades into circus-like acrobatics or vanishes entirely into lifeless static cards.  
 `undoPPT` mandates that **motion exists solely to guide audience attention and pace cognitive disclosure**:
 - **Restrained Transitions**: Subtle slide transitions (`fade` / `push`) rather than distracting rotations or acrobatics;
-- **Primitive Staged Reveals**: Bento cards stagger in, architecture stacks assemble from bottom-up, maturity ladders climb step-by-step. The standalone HTML deck supports spacebar sub-step presentation mode, while PPTX maintains universal compatibility.
+- **Off by default, three types when on (v3.8)**: `reveal` (one idea per click), `contrast` (the alternatives first, then the recommended one) and `build` (data arrives piece by piece). Each exists for a reason in the telling; everything decorative is gone. A deck for reading gets none;
+- **Proven in a real viewer**: the animation tree follows what PowerPoint itself writes, and `render-check` asks PowerPoint how many shapes it recognises. (From v3.3 to v3.7 the tree was one PowerPoint did not recognise at all, which no test of the file alone could have shown.)
 
 ### Principle 6: Semantic Kinetic Physics
 Legacy AI tools force LLMs to guess bounding-box coordinates and hardcode flight paths for every button and textbox.  
-`undoPPT` establishes that **topology determines physics and semantics dictate gravity**:
-- Each of the 15 layout primitives inherently encodes its own cognitive physical behaviors (architecture stacks lock bottom-up, timeline beams ignite stage nodes sequentially, metric counters count up with precision, matrix quadrants focus deliberately);
-- The AI Agent expends zero tokens on micro-coordinates; the engine maps narrative arcs directly to kinetic physics.
+`undoPPT` establishes that **topology determines grouping and the narrative arc sets the pace**:
+- The engine groups a slide's shapes into click steps from its geometry (a roadmap node moves with its card, architecture stacks assemble from the bottom, a highlighted card arrives last), and animation durations follow the narrative arc;
+- The AI Agent expends zero tokens on micro-coordinates. In the HTML deck, count-up and flowing-pulse effects are decorative and run only in narrative mode.
 
 ### Principle 7: Elevating Static Slideware to an Active Decision Sandbox
 The fatal vulnerability of traditional presentations is instant collapse when an executive questions hypothetical parameters.  
@@ -161,18 +164,33 @@ In talent reviews, project debriefs, and specialized corporate decks, presenters
 
 
 
-## 4. Guaranteeing Quality: The 5-Layer Certainty Closed-Loop Framework
+### Principle 10: Ask Before You Write (v3.6)
+An audit score cannot tell a deck built from real material from one built from nothing: "帮我做一份关于 AI 的汇报" still scored 91.7. The quality gate therefore sits **upstream**:
+- `cli.py probe` checks the four contract slots (thesis, audience, knowledge gap, decision) and the facts each scenario needs, and returns the questions to ask. Audience and decision are blocking. Not enough information means no generation;
+- A page exists only if the evidence for it does: `docs/scenario_outlines.md` lists, for each of the 12 scenarios, what every page needs, and `THIN_CONTENT` / `EVIDENCE_BUDGET` flag pages whose content cannot carry their layout.
 
-`undoPPT` incorporates a **5-Layer Quality Assurance Closed-Loop** from user input to final delivery:
+### Principle 11: Trust the Real Viewer, Not the File (v3.5, v3.8)
+Three promises in this project's own README turned out false the first time they were checked in PowerPoint and Chrome: `undo` returned the same default for every template, the animations were recognised as none, and parts of the HTML needed a network. Checking the file proves nothing about what a viewer shows. So:
+- `cli.py render-check` renders in PowerPoint and Chrome and reports what it finds (overflow, empty bands, low contrast, animations PowerPoint does not recognise);
+- Text must reach WCAG contrast against the fill actually behind it, and a brand colour used as a fill is never rewritten; the text on it adapts instead.
+
+## 4. Guaranteeing Quality: The Layered Certainty Closed-Loop Framework
+
+`undoPPT` incorporates a **layered Quality Assurance Closed-Loop** from user input to final delivery. Layers 1 to 5 are the original five; v3.6 added a readiness gate in front (Layer 0) and v3.5/v3.8 a real-viewer check behind (Layer 6):
 
 ```mermaid
 flowchart LR
-    A[Layer 1: Cognitive Contract] -->|Eliminates Ramble| B[Layer 2: 15-Primitive Schema]
+    Z[Layer 0: Readiness Probe] -->|Eliminates Generating From Nothing| A[Layer 1: Cognitive Contract]
+    A -->|Eliminates Ramble| B[Layer 2: 15-Primitive Schema]
     B -->|Eliminates Text Dumps| C[Layer 3: Design Tokens & Budgets]
     C -->|Eliminates Visual Chaos| D[Layer 4: Dual Audit & Self-Healing]
     D -->|Eliminates Broken Logic| E[Layer 5: Native Vector Deliverables]
-    E -->|Enables Editability & Cues| F[Consulting-Grade Presentation]
+    E -->|Enables Editability & Cues| V[Layer 6: Real-Viewer Verification]
+    V -->|Eliminates Broken Output| F[Consulting-Grade Presentation]
 ```
+
+### Layer 0: Readiness Probe — Prevents Generating From Nothing
+- `cli.py probe` runs before any slide is written and returns what is still unknown, as questions to ask; audience and decision are blocking.
 
 ### Layer 1: Cognitive Contract First — Prevents Off-Topic Rambling
 - Adheres to Q1–Q4 probes before any generation starts;
@@ -184,18 +202,25 @@ flowchart LR
 - Eliminates meaningless decorative clutter in favor of structured evidence.
 
 ### Layer 3: Design Tokens Penetration — Guarantees Visual Cohesion
-- Controls palettes, radii, and typography using master templates or preset themes (`modern_bento`, `consulting_minimalist`, `tech_keynote`, `enterprise_architecture`);
+- Controls palettes, radii, and typography using master templates or preset themes (`modern_bento`, `consulting_minimalist`, `tech_keynote`, `enterprise_architecture`). `undo` reads a template's real theme (colour scheme, master background, fonts) rather than guessing from slides (v3.8);
+- Contrast and size are guaranteed whatever the tokens say: text is repaired to WCAG 4.5:1 against the fill behind it, and text below 12pt is raised where the card has room;
 - Changing brand themes dynamically updates the presentation without requiring semantic edits in the blueprint.
 
 ### Layer 4: 10-Dimension Dual Auditing & Self-Correction Loop — Automated Pre-Delivery QA
 Before rendering, blueprints pass through `cli.py audit`:
 - **Structural Constraints**: Verifies card counts, architecture layers, table dimensions, and headline phrasing;
+- **Evidence and Provenance (v3.6, v3.7)**: `THIN_CONTENT`, `EVIDENCE_BUDGET`, `UNSOURCED_FIGURES`, `EVIDENCE_TODO`; banned words come with a concrete rewrite;
 - **Semantic Rhetoric**: Evaluates causal, contrast, and breakthrough conjunctions, checks for hard evidence (percentages, metrics, case studies), and confirms audience objection resolution;
 - **Self-Correction Refinement Loop**: If the audit score drops below 85, the engine automatically patches weaknesses until the blueprint achieves an excellent rating.
 
 ### Layer 5: Native Vector Deliverables & Speaker Notes Injection — Real-World Usability
 - **Fully Editable**: 100% vector shapes, tables, and charts editable directly in PowerPoint and Keynote without third-party plugins;
-- **Presentation Safety Net**: Slide missions, causal transition prompts, and conversational talking points are embedded into PowerPoint Speaker Notes, enabling confident delivery.
+- **Presentation Safety Net**: Slide missions, causal transition prompts, conversational talking points and the sources of every figure are embedded into PowerPoint Speaker Notes, enabling confident delivery;
+- **Offline HTML**: the standalone HTML inlines its runtime and works with no network (v3.5).
+
+### Layer 6: Real-Viewer Verification — Prevents Output That Only Looks Right in the File
+- `cli.py render-check` renders the PPTX in PowerPoint (or LibreOffice) and the HTML in Chrome at desktop and phone widths, and asks PowerPoint how many shapes it recognises as animated;
+- A static layout lint (overflow, overlaps, wrapped titles, low contrast) runs on every `build` and needs no renderer.
 
 ---
 

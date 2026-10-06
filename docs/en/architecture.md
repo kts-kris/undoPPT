@@ -15,7 +15,9 @@ Traditional AI presentation tools fail because they conflate two fundamentally d
 ```mermaid
 flowchart TD
     subgraph CognitiveLayer [Cognitive Brain: AI Agent]
-        A[User Prompt / Brief] --> B[Cognitive Contract Probe Q1-Q4]
+        A[User Prompt / Brief] --> R{Readiness Probe: enough information?}
+        R -- No --> Q[Ask the user] --> A
+        R -- Yes --> B[Cognitive Contract Probe Q1-Q4]
         C[Reference Notes / Docs] --> D[Document Context Ingestor]
         B --> E[6-Scenario Classifier & Router]
         D --> E
@@ -36,6 +38,8 @@ flowchart TD
         L -- Yes --> N[Dual-Format Vector Physical Builders]
         N --> O1[Native Vector PPTX + Notes]
         N --> O2[Standalone HTML + N-Key Drawer]
+        O1 --> V[Render Check: PowerPoint + Chrome + animation probe]
+        O2 --> V
         O1 --> P[Sync Watcher: Baseline Hashing]
     end
 ```
@@ -45,7 +49,11 @@ flowchart TD
 ## 2. Core Modules
 
 ### 2.1 `core/cognitive_planner.py`
-The autonomous planning engine responsible for transforming unstructured text into structured, audited blueprints.
+The rule-based planning engine that transforms unstructured text into a structured, audited blueprint.
+
+> **Role (v3.6): fallback author.** It produces a well-formed generic skeleton, but it has no insight of its own: for a request as empty as "make a deck about AI" it still returns a 90+ audit score, and the numbers it writes are invented templates (they show up as 待核). The recommended path is for the Agent to ask first (`core/contract_probe.py`) and write the blueprint from the user's real material. Use the planner for quick drafts, and as the reference for the storylines in `docs/scenario_outlines.md` (a test keeps the two in step).
+
+- **12 Enterprise Scenarios (v3.4)**: project charter, annual strategy/OKR, QBR, cross-team alignment, headcount review, tech RFC, post-mortem, GTM launch, enterprise RFP pitch, promotion assessment, internal tech talk, all-hands rally, each anchored in one of the archetypes below.
 - **6 Scenario Archetypes**:
   - `strategic_planning`: Emphasizes organizational alignment, 2x2 priority matrices, maturity ladders, and 3-horizons governance.
   - `tech_architecture`: Emphasizes component stacks, decoupled tiers, SLA metrics, and phased rollout roadmaps.
@@ -78,14 +86,16 @@ Enforces physical layout redlines and content budgets across all 15 layout primi
 - **Title Voice Check**: Flags passive headlines (e.g., *"Market Overview"*, *"Current Status"*) and mandates action-oriented conclusion titles (e.g., *"Pain Point: Fragmentation drives 80% manual overhead"*).
 - **Content Budget Redlines**: Validates card counts (2–4), architecture layers (3–4), table dimensions (≤ 8 rows, ≤ 5 columns), and chart categories (≤ 8).
 - **Speaker Notes Verification**: Verifies that slide missions and transitions are populated.
-- **Unified Scoring**: Combines structural score (40%) and semantic score (60%) into an overall 100-point rating.
+- **Unified Scoring**: Combines the structural score (50%) and the semantic score (50%) into an overall 100-point rating. (Earlier revisions of this page said 40/60; the code has always used 50/50.)
+- **Rule sets added since v3.4**: evidence budget (`THIN_CONTENT`, `EVIDENCE_BUDGET`, v3.6), provenance (`UNSOURCED_FIGURES`, `EVIDENCE_TODO`, v3.7) and buzzword replacement suggestions (v3.7).
 
 ---
 
 ### 2.4 `core/undo_engine.py`
 The reverse-engineering module for enterprise PowerPoint templates.
 - **OpenXML AST Slot Parsing**: Scans `SlideMaster` and `SlideLayout` trees in `.pptx` packages to extract absolute coordinates (`left`, `top`, `width`, `height` in inches) for Title, Body, Subtitle, and Footer placeholders.
-- **Canvas Luminance Analysis**: Computes RGB luminance of slide backgrounds and dominant shapes to infer `theme_mode` (`light` vs. `dark`) and selects high-contrast text palettes.
+- **Real Theme Reading (v3.8)**: Reads the template's own theme through `core/theme_reader.py` (colour scheme, master background and colour map, theme fonts) and derives the palette, `theme_mode` and typography from it. Before v3.8 this module only scanned explicit RGB fills on slides, which real templates do not have, so every template came back as the same default. The old scan remains as a fallback when a file has no readable theme.
+- **Token Check (v3.8)**: The extracted tokens go through `core/design_check.py` (contrast, minimum sizes, hierarchy); margins are clamped to what the builders' grid can use.
 - **Embedded Asset Extraction**: Extracts embedded high-resolution raster images (PNG, JPEG) and vector shapes to `.undoppt/assets/` for brand preservation.
 
 ---
@@ -95,7 +105,8 @@ The deterministic PowerPoint generation pipeline powered by `python-pptx`.
 - **100% Native Vector Shapes**: Renders geometric containers, rounded cards, and category badges as pure vector shapes (**never rasterized bitmaps**).
 - **Native Vector Charts**: Utilizes `CategoryChartData` to generate clustered column, line, and pie charts. Charts remain completely editable via native Office and Keynote spreadsheets.
 - **Structured Data Tables**: Automatically calculates column widths, zebra-striped row fills, and contrasting borders.
-- **Speaker Notes Stream Injection**: Serializes `mission`, `transition`, and conversational talking points into the slide's underlying `notes_slide` XML part.
+- **Speaker Notes Stream Injection**: Serializes `mission`, `transition`, conversational talking points, and (v3.7) the sources and 待核 figures of the slide into the slide's underlying `notes_slide` XML part.
+- **Post-Render Passes (v3.5-v3.8)**: after each slide is drawn, `core/layout_fit.py` fits the title, cards and fonts, a source footer and 待核 badge are added, and text colours are repaired to WCAG contrast; `core/motion.py` then adds the optional narrative animations.
 
 ---
 
@@ -147,6 +158,9 @@ WCAG contrast maths and per-run backdrop detection. The layout lint reports `LOW
 
 ### 2.6.11 `core/theme_reader.py` (v3.8)
 Reads a real template's theme: the colour scheme, the master's colour map and background (including `lumMod` / `lumOff`), and the major / minor / East Asian fonts. `undo` derives the palette from it. See [Design system](design_system.md).
+
+### 2.6.12 `core/vision_extractor.py`
+A second way to produce design tokens, for the case where there is no usable template: `create_tokens_from_style_spec` builds a full token set (palette, typography, card style) from a handful of style parameters (theme name, primary colour, background colour, dark mode, font). It does not read any file.
 
 ### 2.7 `core/sync_watcher.py`
 Maintains human-AI pair authoring synchronization.

@@ -107,8 +107,8 @@
 - ⚖️ **终局“请领导决策与审批清单”高阶图元**：收尾页告别空洞问答，结构化输出方案对比矩阵、推荐主选方案与审批清单（Sign-off Items）。在 PPTX 端渲染原生高对比度决策卡片，在 HTML 端支持现场点击勾选批准决议（现场演示即决议）。
 - 🔬 **外部对标充分性审查协议（三维参照系）**：代码级拦截单维度浅层拉踩，要求覆盖「行业 Tier-1 标杆」、「开源/新锐方案」与「现状/自研方案」三维参照系；强制自述本方案的代价（成本、迁移摩擦、适用边界、复杂度），杜绝盲目宣称“全面领先”。
 - 🎖️ **晋升述职战功真实归因协议**：严格执行 STAR 结构化归因，以代码规则严格拦截流水账（“参与了/负责了...”）；核验个人在团队成果中的“净增量贡献（Net Increment）”，严禁将公司业务自然增长的大盘红利包装为个人战功。
-- 🎬 **PPTX 原生 OOXML `<p:timing>` 动效时序生成**：自动构建 ECMA-376 时间节点树，在 Office / Keynote / WPS 中获得原生单击步进进入效果（Click-to-advance sequence）。
-- ⚡ **15 大图元内生语义动力学与节拍时钟**：架构栈自底向上沉稳装配、时间轴流光粒子点亮、KPI 跑数物理锁定（0% -> 94.8%），叙事弧线自适应节奏控制（冲突 250ms 紧迫切入、突破光晕扩散、实证平缓跑数）。
+- 🎬 **叙事动画（默认关闭）**：三种类型，各有理由：`reveal` 逐条出现（一次点击一个观点）、`contrast` 对比先后（先出现备选，再出现推荐）、`build` 数据递进（数据一块一块出现）。时序树按 PowerPoint 自己的写法生成，`render-check` 会让 PowerPoint 确认它识别了每个动画对象；Keynote 未能验证。（v3.3–v3.7 写入的时序树，PowerPoint 一个也不识别。）
+- ⚡ **叙事弧线节奏**：动画时长随页面的叙事弧线变化（冲突 250ms、实证 600ms）。HTML 中的数字跑表与流光仅在叙事模式下运行（`build --motion narrative`）。
 - 🎙️ **现场演播双重视野中枢 (Live Presenter HUD，按 `P` 键)**：单文件 HTML 按 `P` 键激活现场中枢，内嵌认知罗盘（主旨与受众立场向心力）、因果提词器（切页口播连词）与评委质疑应对弹药库（典型发难与权威解题对策）。
 - 🎛️ **活动决策推演沙盒 (Active Sandbox & 架构下钻)**：支持现场切换“保守 / 基准 / 突破”情景并动态重绘 KPI 跑表与图表；架构栈支持点击微服务组件即刻弹出技术规格（SLA 目标、P99、容灾回滚机制与故障隔离）。
 - 🧠 **跨工具链毫秒级意图反思飞轮 (`cli.py sync`)**：`SyncWatcher` 升级语义反思引擎，捕获人类专家在 Office/Keynote 中修改数值与结构的深层战略动机，指导 AI 智能体保持意图并肩同频。
@@ -176,9 +176,11 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 - 💬 **金句引用与破局卡片 (Keynote Quote) [v3.0]**：大师名言/核心洞见视觉居中强化与 Key Takeaway 启示。
 - 🔄 **横向流程推进步骤 (Process Flow) [v3.0]**：带序号胶囊与阶段推演的横向流程图。
 
-### 4. 母版 AST 深度逆向解构引擎 (Deep Master AST Decompiler)
+### 4. 模板解构引擎 (Undo Engine)
+- **真实主题读取（v3.8）**：读取模板自己的主题：配色方案（`theme1.xml`）、母版的颜色映射与背景（解析 `lumMod`/`lumOff`）、主题字体（含中文字体）。配色、明暗与字体都来自这里，品牌色从不被改写。三份 Office 主题实测得到三套不同的设计（v3.7 对它们返回的是同一个浅蓝默认值）。
+- **对比度与字号校验（v3.8）**：抽取出的令牌会按 WCAG 对比度与最小字号检查，修正记录在 `design_notes`。详见 [设计系统](docs/en/design_system.md)。
 - **母版槽位绝对坐标 AST 提取**：深度遍历 Slide Masters 与 Layouts，提取 `Title`、`Body`、`Subtitle`、`Footer` 的绝对坐标（英寸）与相对网格尺寸。
-- **自动明亮/暗黑主题模式识别**：智能检测背景与形状亮度，自适应判定 `theme_mode` 并映射高对比度文字与卡片配色。
+- **诚实边界**：配色、明暗与字体会带过来；模板的母版版式、背景图与 logo **不会**放到生成的页面上（引擎自己绘制 16:9 版式）。
 - **嵌入式高清视觉与 Logo 提取**：自动导出母版与页面中嵌入的图片与矢量 Logo 至 `.undoppt/assets/`。
 
 ### 5. 双端极简交付与认知自省 (Dual-Format Delivery & Notes Inspection)
@@ -230,12 +232,13 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归、版面与契约测试套件 (144 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (158 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
 │   ├── test_flesh.py
-│   └── test_motion_design.py
+│   ├── test_motion_design.py
+│   └── test_docs.py                # 文档必须跟上代码
 ├── output/                         # 生成的交付物（已加入 .gitignore，可用 `cli.py demo` 重建）
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
@@ -331,20 +334,41 @@ python3 cli.py render-check --pptx output/presentation.pptx --html output/presen
 > *“帮我准备一份面向管理层的企业级 AI 战略规划汇报，我有一个公司的模板 PPT。”*
 
 Skill 会自动进入 **Rhythm A 深度引导流程**：
+0. **就绪探针**：先用 `probe` 判断信息够不够——**信息不足就先向您提问，不直接生成**；
 1. **认知契约与深度探针**：主动澄清核心论题、受众立场偏好、认知差与终局行动目标；
-2. **模板解构与规范学习**：接收并解析您的模板，提炼色彩与版式规范；
-3. **蓝图编排与质量审计**：规划每页的图表化元语并执行 10 维内容质量动力学审核；
-4. **双模交付**：交付内置演讲备注的 PPTX + 内置认知动力学抽屉的单文件 HTML；
+2. **模板解构与规范学习**：读取您模板的真实主题（配色、明暗、字体）；
+3. **蓝图编排、出处与质量审计**：规划每页的图表化元语；用 `ingest` / `cite` 给每个数字一个出处；执行 10 维内容质量审核，以及"内容撑不撑得起版式""数字有没有出处"的检查；
+4. **双模交付**：先出草稿（没有出处的数字带"待核"徽标），确认后用 `--final` 交付内置演讲备注的 PPTX + 可离线使用的单文件 HTML；需要现场演讲时再加 `--motion narrative`；
+4.5. **渲染验证**：用 PowerPoint 与 Chrome 真实渲染并检查溢出、对比度与动画；
 5. **实时协同**：感知您的每一次本地手动调整并持续保持同频！
 
 ---
 
 ## 🧪 自动化测试验证
 
-运行单元与集成测试套件：
+运行单元、回归与版面测试套件：
 ```bash
-python3 -m unittest discover -s tests -v
+pip install -r requirements-dev.txt
+python3 -m pytest tests -q              # 或：python3 -m unittest discover -s tests
 ```
+
+158 个测试通过（另有 1 个需要 macOS 上的 PowerPoint：`UNDOPPT_TEST_POWERPOINT=1`）。已在 Python 3.12 与 3.14 上验证；代码声明支持 3.10+，但 3.10、3.11、3.13 尚未实际运行。
+
+---
+
+## 📚 文档索引
+
+- 📖 [设计哲学白皮书](DESIGN_PHILOSOPHY_zh.md)（[English](DESIGN_PHILOSOPHY.md)）
+- 📐 [Blueprint 规约手册](docs/en/blueprint_specification.md)（含 `source` / `status` / `motion`）
+- 💻 [CLI 命令参考](docs/en/cli_reference.md)（`probe`、`ingest`、`cite`、`render-check`、`build --final / --motion`）
+- 🚦 [审计码速查](docs/en/audit_codes.md)：每个 `audit` 码的含义与修法
+- 🎨 [设计系统](docs/en/design_system.md)：令牌、对比度与字号保证、套用企业模板
+- 🗂️ [12 个场景提纲样例](docs/scenario_outlines.md)：每个企业场景的听众闸门、决策事项与每页所需证据
+- 🚫 [场景避坑红线](docs/en/scenario_anti_patterns.md)
+- 🏗️ [引擎架构详解](docs/en/architecture.md)
+- 🔌 [AI Agent 集成指南](docs/en/agent_integration.md)
+- 🧾 [更新日志](CHANGELOG.md) 与各版 PRD：[v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)、[v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md)、[v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md)、[v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md)、[v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md)、[v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)、[v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)
+- 🤝 [贡献指南](CONTRIBUTING.md)
 
 ---
 

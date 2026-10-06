@@ -5,6 +5,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [Unreleased]
+
+Documentation corrections after the 3.5-3.8 releases. No behaviour change.
+
+### Fixed (docs)
+- **Statements that were false or out of date**: README (English and Chinese) still described `<p:timing>` "click-to-advance animations in PowerPoint, Keynote and WPS" and `undo` as luminance-based mode detection; `SKILL.md` (including its front-matter description) and the Chinese whitepaper still described the old animations; the testing section claimed "15 test suites pass on Python 3.10 to 3.14" (the suite is now verified on 3.12 and 3.14 only, and says so).
+- **Whitepapers**: both versions only had their version number bumped. They now describe the readiness probe, provenance, real-viewer verification and the three narrative animations, and the quality framework runs from Layer 0 (readiness) to Layer 6 (real-viewer verification).
+- `docs/en/architecture.md`: audit weighting was documented as 40/60, the code has always used 50/50; `cognitive_planner` is described as the fallback author; `undo_engine` no longer described as luminance-based; added `vision_extractor`; the data-flow diagram now shows the probe and the render check.
+- `docs/en/agent_integration.md`, `CONTRIBUTING.md`, `docs/en/scenario_anti_patterns.md`, `docs/en/cli_reference.md` had no mention of `probe`'s role, `cite`, `render-check`, motion, `--final`, the new audit codes or the new test files.
+
+### Added (docs)
+- `docs/en/audit_codes.md`: meaning and fix for every audit finding code (45; about 35 had never been documented).
+- README (English and Chinese) documentation index now lists every document; the Chinese README had none.
+- `tests/test_docs.py` (14 tests; the suite is now 158 plus 1 PowerPoint-gated): fails when a CLI command, a `core/` module, an audit or lint code, a test file or the current version is missing from the documentation, or when a documentation link is broken.
+
+---
+
 ## [3.8.0] - 2026-10-06
 
 Theme: **the skin and the poise**. Contrast and typography become guarantees, `undo` finally reads real templates, and animation is cut down to three that serve the telling.

@@ -34,10 +34,14 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Rhythm A: Deep Guided SOP (Default for High-Stakes Presentations)           │
 │                                                                             │
+│ 0. Readiness Probe (probe)           ➔  Not enough information: ask, don't  │
+│                                         generate                            │
 │ 1. Cognitive Contract Probe (Q1-Q4)  ➔  Clarify thesis, audience & goals    │
-│ 2. Master Template Deconstruction    ➔  Decompile template AST & slots      │
-│ 3. Blueprint Authoring & Audit       ➔  Compose 15-primitive JSON & check   │
-│ 4. Dual-Format Rendering             ➔  Generate PPTX (Notes) & HTML        │
+│ 2. Template Deconstruction (undo)    ➔  Read the template's real theme      │
+│ 3. Blueprint Authoring, Provenance   ➔  Compose 15-primitive JSON; ingest / │
+│    & Audit                              cite sources; audit                 │
+│ 4. Dual-Format Rendering             ➔  Draft build, then --final to ship   │
+│ 4.5 Render Check                     ➔  Verify in PowerPoint and Chrome     │
 │ 5. Turn-by-Turn Sync Tracking        ➔  Sense human external modifications  │
 └─────────────────────────────────────────────────────────────────────────────┘
 
@@ -50,9 +54,18 @@ npx skills add https://github.com/kts-kris/undoPPT --skill undo-ppt
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+> **Rhythm B is a fallback.** The one-shot planner is a rule engine with no insight of its own: given a request as empty as "make a deck about AI" it still returns a 90+ audit score. Its numbers are invented templates (they show up as 待核 in the deck). Use it for a quick draft or when no Agent is available, and tell the user which figures are placeholders.
+
 ---
 
 ## 3. Rhythm A: Step-by-Step SOP
+
+### Step 0: Readiness Probe (v3.6)
+**Not enough information means no generation.** Run the probe on the user's request, verbatim:
+```bash
+python3 cli.py probe --prompt "<the user's request>" [--input-doc notes.md] --json
+```
+It classifies the scenario, reports which contract slots and scenario facts are still unknown, and returns the questions to ask, blocking ones first (audience and decision). If `ready` is false, ask 2 or 3 of them, with an example each, before writing anything. The 12 scenarios and what each page needs are in [scenario_outlines.md](../scenario_outlines.md).
 
 ### Step 1: Cognitive Contract Probe
 The Agent should act as a senior management consultant. Instead of asking generic questions, ask targeted cognitive probes:
@@ -68,14 +81,22 @@ python3 cli.py undo --template /path/to/template.pptx --out .undoppt/design_toke
 ```
 If no template is provided, default to `presets/modern_bento.json`.
 
+`undo` (v3.8) reads the template's **real theme**: colour scheme, master background, and fonts including the East Asian font; dark templates come out dark and the brand colour is kept. What it does not do: place the template's master layouts, background artwork or logos on the generated slides, or output 4:3. Say so to the user rather than promising a full master carry-over. See the [Design System](design_system.md).
+
 ### Step 3: Blueprint Composition & Auditing
 The Agent composes `.undoppt/blueprint.json` conforming to the [Blueprint Specification](blueprint_specification.md), mapping each slide into one of the 15 layout primitives.
 
-The Agent immediately triggers the quality auditor:
+**Give every number an origin (v3.7).** If the user supplied a document or table, extract its figures with their origins and link them into the blueprint; never invent a number, and mark a placeholder `status: "todo"`:
+```bash
+python3 cli.py ingest --input-doc notes.md --out .undoppt/facts.json     # .md / .txt / .csv
+python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.json
+```
+
+The Agent then triggers the quality auditor:
 ```bash
 python3 cli.py audit --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json
 ```
-If the overall score is below 85, the Agent refines headlines into action-first statements and reinforces quantitative evidence.
+If the overall score is below 85, the Agent refines headlines into action-first statements and reinforces quantitative evidence. `THIN_CONTENT` and `EVIDENCE_BUDGET` mean the content cannot carry the layout: go back for material, do not adjust the layout. `UNSOURCED_FIGURES` and `EVIDENCE_TODO` mean figures still need an origin or a real value.
 
 ### Step 4: Dual-Format Rendering
 Once audited and approved:
@@ -83,8 +104,19 @@ Once audited and approved:
 python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json --format all
 ```
 Deliverables produced:
-- `output/presentation.pptx` (Editable vector shapes, formatted tables, vector charts, speaker notes);
-- `output/presentation.html` (Standalone single-file HTML with `N`-key Cognitive Inspector).
+- `output/presentation.pptx` (Editable vector shapes, formatted tables, vector charts, speaker notes with sources);
+- `output/presentation.html` (Standalone single-file HTML that works offline, with `N`-key Cognitive Inspector).
+
+A plain `build` is for drafts: figures with no source carry an amber `待核` badge, which is the honest marker of work still to do. To ship, use `--final`: it refuses to build while any figure lacks a source or is a placeholder, and hides the badges.
+
+**Motion is off by default.** Add `--motion narrative` only for a deck that will be presented live (types: `reveal`, `contrast`, `build`; see the [CLI reference](cli_reference.md)). A deck for reading should have none. Keynote playback is unverified.
+
+### Step 4.5: Verify What Was Built (v3.5, v3.8)
+The audit sees the blueprint, not the result. Check the deliverables:
+```bash
+python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
+```
+It renders in PowerPoint and Chrome and reports overflow, wrapped titles, empty bands, low contrast and animations PowerPoint does not recognise. `build` already runs the static layout lint and prints warnings.
 
 ### Step 5: Always-in-Sync Tracking
 At the start of subsequent conversation turns, the Agent runs:
