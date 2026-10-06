@@ -1,6 +1,6 @@
 # undoPPT Architecture & Engineering Deep-Dive
 
-This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.6.0).
+This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.7.0).
 
 ---
 
@@ -133,6 +133,11 @@ The Blueprint Specification and the planner use one set of field names for sever
 
 ### 2.6.7 Evidence budget (v3.6, in `core/content_auditor.py`)
 `THIN_CONTENT_P<n>`: the slide's body text (headers excluded) is shorter than its layout needs, which means the layout is dressing up too little content. `EVIDENCE_BUDGET_P<n>`: a KPI slide where fewer than half the metrics carry a number. Minimum body lengths are set to about half of what the planner's own decks contain. Total deduction is capped at 12 points.
+
+### 2.6.8 `core/provenance.py` and `core/ingest.py` (v3.7)
+`provenance.scan_slide` finds the figures on a slide (percentages, multiples, money, durations, counted units; not years, quarters or structural counts), works out which are covered by a `source` (slide-level or nested), and classifies them by `status`. Renderers use `provenance_labels` for the footer and 待核 badge and `notes_block` for the speaker notes; the auditor uses the scan for `UNSOURCED_FIGURES` / `EVIDENCE_TODO` (deduction capped at 10). `ingest.extract_facts` reads Markdown, text and CSV and returns figures with `file:line` or `file:row·column` origins; `provenance.attach_sources` links them to a blueprint conservatively (see CLI reference).
+
+The footer and badge are added after the layout pass (`layout_fit`), so they never shift the content block.
 
 ### 2.7 `core/sync_watcher.py`
 Maintains human-AI pair authoring synchronization.

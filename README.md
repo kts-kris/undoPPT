@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.6.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,20 @@
 > 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
+
+---
+
+## 🥩 What's New in v3.7.0: Every Number Says Where It Came From
+
+A number with no origin reads like evidence and cannot be checked. v3.7 makes provenance part of the blueprint.
+
+- 🏷️ **`source` / `status`** on slides and items. A figure with no source is **待核**: an amber badge on the slide, a `来源：…` footer, and a sources block in the speaker notes and the N-key inspector.
+- 📥 **`cli.py ingest` and `cite`**: pull figures out of `.md` / `.txt` / `.csv` with their `file:line` origins, then link them to the blueprint. Linking is conservative: a partial match never credits a number that has no source.
+- 🚦 **`build --final`**: delivery mode. Refuses to build while any figure lacks a source or is a placeholder.
+- 🧪 **The demo now follows its own rules**: it ends on a decision-ready page, uses no banned words, and labels its invented figures as 示例数据. It audits at 100/100 with no warnings (v3.6: 8 findings).
+- ✍️ **Buzzword fixes**: each flagged word comes with how to rewrite it.
+
+See the [v3.7 PRD](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md).
 
 ---
 
@@ -183,6 +197,8 @@ undoPPT/
 │   ├── vision_extractor.py         # Visual heuristic analyzer
 │   ├── pptx_builder.py             # 15-primitive native vector PPTX builder (charts, tables, notes)
 │   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer, offline)
+│   ├── provenance.py               # Figure detection, source coverage, 待核 marking
+│   ├── ingest.py                   # Extract data points with file:line origins (md/txt/csv)
 │   ├── contract_probe.py           # Contract readiness probe (what is still unknown before authoring)
 │   ├── blueprint_compat.py         # Documented blueprint fields -> renderer fields (no silent data loss)
 │   ├── layout_fit.py               # Content-adaptive layout pass (title fit, card fit, font floor, centering)
@@ -201,10 +217,11 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression, layout and contract tests (68 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (105 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
-│   └── test_contract.py
+│   ├── test_contract.py
+│   └── test_flesh.py
 ├── output/                         # Generated deliverables (git-ignored; rebuild with `cli.py demo`)
 ├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
 ├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
@@ -266,14 +283,21 @@ python3 cli.py probe --prompt "智能客服业务立项答辩，申请首期预�
 ```
 Reports which contract slots and scenario facts are still unknown, and the questions to ask first. `plan`/`generate` print the same hint when readiness is low.
 
-### 8. Verify the Layout (Render Check)
+### 8. Give Every Number an Origin (Ingest, Cite, Final)
+```bash
+python3 cli.py ingest --input-doc notes.md --out .undoppt/facts.json
+python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.json
+python3 cli.py build --blueprint .undoppt/blueprint.json --final   # refuses while any figure is 待核
+```
+
+### 9. Verify the Layout (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # static lint, no renderer needed
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
 ```
 `--render` needs `pip install -r requirements-dev.txt` plus PowerPoint (macOS) or LibreOffice for PPTX, and Chrome for HTML.
 
-### 9. Run Demo Showcase
+### 10. Run Demo Showcase
 ```bash
 python3 cli.py demo
 ```

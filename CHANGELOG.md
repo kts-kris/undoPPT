@@ -5,6 +5,33 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.7.0] - 2026-10-06
+
+Theme: **the flesh**. A number with no origin reads like evidence and cannot be checked. v3.7 makes provenance part of the blueprint and fixes the demo, which contradicted the tool's own rules.
+
+### Added
+- **Data provenance**: optional `source` and `status` (`verified` / `estimate` / `illustrative` / `todo`) on slides and nested items (`core/provenance.py`). Figures with no covering source are **待核**: an amber `待核 N 项` badge on the slide, a `来源：…` footer (prefixed 估算 / 示例数据 when applicable), a sources block in the speaker notes, and a Sources row in the Cognitive Inspector (N key).
+- **`cli.py ingest`** (`core/ingest.py`): extracts figures from `.md` / `.txt` / `.csv` with `file:line` or `file:row·column` origins. **`cli.py cite`** links blueprint figures to those facts. Source linking is conservative: a page-level `source` covers every figure on the slide, so it is written only when every unsourced figure was matched; a partial match writes `source_candidates` and leaves the figures flagged. `cite` never sets `status`.
+- **`cli.py build --final`**: delivery mode. Refuses to build (exit 1) while figures lack a source or are `todo`, and hides the badges. Plain `build` keeps them for drafts.
+- **Audit**: `UNSOURCED_FIGURES_P<n>`, `EVIDENCE_TODO_P<n>` (deduction capped at 10), informational `EVIDENCE_ESTIMATE_P<n>` / `EVIDENCE_ILLUSTRATIVE_P<n>`, and a figure summary in `audit` output and the audit result.
+- **Buzzword replacement suggestions**: each flagged word (闭环, 抓手, 赋能, 打法, 颗粒度, 底层逻辑, 盘活, 解构, 破局) now carries a concrete way to rewrite it (`suggestion` field and in the message).
+- `docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md`; 37 new tests (suite is now 105).
+
+### Changed
+- **The demo now shows the product's own rules.** It used to trigger 8 audit findings (4 buzzwords, 3 unquantified evidence slides, 1 thesis drift) and ended on a plain four-bullet slide with no decision. It now ends on a decision-ready page (three options with one recommended, a recommendation and a sign-off list), is free of banned words, and labels its invented figures `illustrative` so they cannot pass for real data. It audits at 100/100 with no warnings.
+- **Font floor** raises only runs smaller than 12pt and leaves headings alone; short labels are never wrapped by it. This keeps headings on one line (the v3.5 version enlarged whole frames and could orphan a character, e.g. "…场景\n层").
+- Decision-page sign-off box now ends at 7.0in so it clears the footer.
+
+### Known limits
+- Figure detection is pattern-based. It will miss figures written as words ("三成") and may count a unit-bearing number that is not a claim.
+- A match from `cite` shows a number appears in the document, not that it supports the same claim; `verified` is a human decision.
+- Excel is not read directly; export to CSV.
+
+### Roadmap
+- **v3.8.0** Skin polish and motion: typography and contrast rules, real-template trials, three narrative animations verified in PowerPoint and Keynote.
+
+---
+
 ## [3.6.0] - 2026-10-06
 
 Theme: **the skeleton**. The audit cannot tell a deck built from real material from one built from nothing, so v3.6 moves the quality gate upstream: ask first, write the outline from evidence, and stop dressing thin content in big layouts.
@@ -31,7 +58,7 @@ Theme: **the skeleton**. The audit cannot tell a deck built from real material f
 - On decision-ready summary pages, `points` are not drawn when `options` are present (by design: the options, recommendation and sign-off list take the page).
 
 ### Roadmap
-- **v3.7.0** Flesh: `source`/`status` fields, "to verify" marking, `cli.py ingest`, decision-ready demo.
+- v3.7.0 Flesh: done (see above).
 - **v3.8.0** Skin polish and motion.
 
 ---

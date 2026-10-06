@@ -160,8 +160,25 @@ def _holder_height_in(shape, cards) -> float:
     return _in(shape.height)
 
 
+def paragraph_line_counts(tf, width_in: float, scale: float = 1.0) -> List[int]:
+    """Estimated wrapped line count per paragraph (same heuristic as estimate_text_height_in)."""
+    ml = tf.margin_left if tf.margin_left is not None else Inches(0.1)
+    mr = tf.margin_right if tf.margin_right is not None else Inches(0.1)
+    avail_pt = max((width_in * 72 - (Emu(ml).pt + Emu(mr).pt)) * 0.96, 10)
+    counts = []
+    for p in tf.paragraphs:
+        width = sum(text_width_pt(t, (size or DEFAULT_FONT_PT) * scale, bold) for t, size, bold in _para_runs(p))
+        counts.append(max(1, math.ceil(width / avail_pt)) if width else 1)
+    return counts
+
+
 def enforce_min_font(slide, floor_pt: float = MIN_FONT_PT):
-    """Scale up frames whose smallest run is under floor_pt, backing off if the text would overflow."""
+    """Raise runs smaller than floor_pt to floor_pt. Larger runs (headings) are left alone.
+
+    Raising only the small runs keeps headings on one line (no orphan characters) at the cost of a flatter
+    hierarchy. If the result would overflow the card, or wrap a paragraph that fitted on one line, retry with
+    a lower floor, down to the original sizes.
+    """
     cards = [s for s in slide.shapes if _is_empty_card(s)]
     changed = 0
     for shape in slide.shapes:
@@ -178,14 +195,28 @@ def enforce_min_font(slide, floor_pt: float = MIN_FONT_PT):
         smallest = min(r.font.size.pt for r in runs)
         if smallest >= floor_pt:
             continue
-        factor = min(MAX_FLOOR_SCALE, floor_pt / smallest)
+        original = [(r, r.font.size) for r in runs]
         avail = _holder_height_in(shape, cards)
         width = _in(shape.width)
-        while factor > 1.02 and estimate_text_height_in(tf, width, scale=factor) > avail:
-            factor -= 0.04
-        if factor > 1.02:
-            _scale_fonts(tf, factor)
+        base_lines = paragraph_line_counts(tf, width, 1.0)
+        # Only short labels must stay on one line; sentences are allowed to wrap when enlarged.
+        is_label = [len(p.text.strip()) <= 16 for p in tf.paragraphs]
+        target = floor_pt
+        applied = False
+        while target > smallest + 0.4:
+            for r, size in original:
+                r.font.size = Pt(max(size.pt, target)) if size.pt < target else size
+            lines_now = paragraph_line_counts(tf, width, 1.0)
+            wrapped = any(lab and b == 1 and n > 1 for lab, b, n in zip(is_label, base_lines, lines_now))
+            if estimate_text_height_in(tf, width) <= avail and not wrapped:
+                applied = True
+                break
+            target -= 0.5
+        if applied:
             changed += 1
+        else:
+            for r, size in original:
+                r.font.size = size
     return changed
 
 

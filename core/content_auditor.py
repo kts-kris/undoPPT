@@ -17,6 +17,7 @@ import json
 import re
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+from core import provenance
 from core.semantic_auditor import SemanticAuditor
 
 
@@ -36,6 +37,19 @@ class ContentAuditor:
     ]
 
     VALID_TRANSITIONS = {"fade", "push", "wipe", "none"}
+
+    # v3.7: a banned word comes with what to write instead, so the Agent can fix it while drafting.
+    BUZZWORD_SUGGESTIONS = {
+        "闭环": "写出闭合的具体环节，例如“告警 → 定位 → 回滚 → 复核”；或直接说“端到端自动完成”",
+        "抓手": "写出具体动作和负责人，例如“由平台组在 Q3 前上线灰度开关”",
+        "赋能": "写出提供了什么：工具、数据、培训还是权限，以及多少人在用",
+        "打法": "写出具体做法：谁、对谁、做什么、用什么渠道",
+        "颗粒度": "改说“细到哪一级”，例如“按客户 + 渠道 + 周”",
+        "底层逻辑": "直接说原理或因果：因为 A，所以 B",
+        "盘活": "写出重新利用了什么资源，带来多少增量",
+        "解构": "改说“拆成几部分”，并列出这几部分",
+        "破局": "说明突破的是哪一个具体障碍，以及怎么突破",
+    }
 
     def __init__(self, tokens: Optional[Dict[str, Any]] = None, llm_judge_fn: Optional[Callable] = None):
         self.tokens = tokens or {}
@@ -93,6 +107,11 @@ class ContentAuditor:
         findings.extend(evid_findings)
         struct_score -= evid_deduction
 
+        # --- 3.7 Audit Provenance (v3.7: does every figure say where it came from?) ---
+        prov_findings, prov_deduction = self._audit_provenance(slides)
+        findings.extend(prov_findings)
+        struct_score -= prov_deduction
+
         struct_score = max(0, min(100, struct_score))
 
         # --- 4. Deep Semantic & Rhetorical Audit (v2.5.0) ---
@@ -121,6 +140,7 @@ class ContentAuditor:
             "grade": grade,
             "total_slides": len(slides),
             "findings": findings,
+            "provenance": provenance.scan_blueprint(slides)["totals"],
             "passed": final_score >= 70
         }
 
@@ -255,6 +275,8 @@ class ContentAuditor:
                         "level": "warning",
                         "code": f"BUZZWORD_DETECTED_P{page_num}",
                         "message": f"第 {page_num} 页检测到空洞 AI 套话/黑话：'{m.group()}'（{desc}）。请遵循场景避坑红线，替换为具体事实机制与量化动作。"
+                                   + (f" 建议：{self.BUZZWORD_SUGGESTIONS[m.group()]}。" if m.group() in self.BUZZWORD_SUGGESTIONS else ""),
+                        "suggestion": self.BUZZWORD_SUGGESTIONS.get(m.group(), ""),
                     })
                     if not buzzword_found:
                         deduction += 2
@@ -437,6 +459,51 @@ class ContentAuditor:
                     })
                     deduction += 3
         return findings, min(deduction, self.EVIDENCE_DEDUCTION_CAP)
+
+    PROVENANCE_DEDUCTION_CAP = 10
+
+    def _audit_provenance(self, slides: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
+        """v3.7: every figure needs a source or an honest status.
+
+        UNSOURCED_FIGURES  figures nothing covers (no `source`, not `illustrative`)
+        EVIDENCE_TODO      figures marked `status: todo` (placeholders)
+        EVIDENCE_ESTIMATE / EVIDENCE_ILLUSTRATIVE  informational: shown to the audience as 估算 / 示例数据
+        """
+        findings: List[Dict[str, Any]] = []
+        deduction = 0
+        for idx, slide in enumerate(slides):
+            page = idx + 1
+            scan = provenance.scan_slide(slide)
+            uniq = lambda items: list(dict.fromkeys(f["text"] for f in items))  # noqa: E731
+            if scan["unsourced"]:
+                figs = uniq(scan["unsourced"])
+                findings.append({
+                    "level": "warning",
+                    "code": f"UNSOURCED_FIGURES_P{page}",
+                    "message": f"第 {page} 页有 {len(figs)} 个数字没有出处：{'、'.join(figs[:4])}{'…' if len(figs) > 4 else ''}。"
+                               f"给页面或对应条目加 `source`（文件:行号、链接或“用户口述”），拿不到就标 `status: todo`，不要让它看起来像事实。",
+                })
+                deduction += 2
+            if scan["todo"]:
+                findings.append({
+                    "level": "warning",
+                    "code": f"EVIDENCE_TODO_P{page}",
+                    "message": f"第 {page} 页有 {len(uniq(scan['todo']))} 个数字仍是占位（status: todo）：{'、'.join(uniq(scan['todo'])[:4])}。交付前必须替换为真实数据。",
+                })
+                deduction += 2
+            if scan["estimate"]:
+                findings.append({
+                    "level": "info",
+                    "code": f"EVIDENCE_ESTIMATE_P{page}",
+                    "message": f"第 {page} 页的 {len(uniq(scan['estimate']))} 个数字是估算值，页脚会标注“估算”，宣讲时请说明依据。",
+                })
+            if scan["illustrative"]:
+                findings.append({
+                    "level": "info",
+                    "code": f"EVIDENCE_ILLUSTRATIVE_P{page}",
+                    "message": f"第 {page} 页的数字是示例数据（页脚会标注“示例数据”），不能当作真实业务数据对外使用。",
+                })
+        return findings, min(deduction, self.PROVENANCE_DEDUCTION_CAP)
 
     def _audit_enterprise_rules(
         self,

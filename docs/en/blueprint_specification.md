@@ -57,7 +57,19 @@ Every slide object **must** include the following standard metadata attributes, 
 | `motion` | `object` (optional) | Primitive-level staged reveal config: `{"staged_reveal": true, "stagger_delay_ms": 150}`. |
 | `sandbox` | `object` (optional) | Active Decision Sandbox config: `{"enabled": true, "scenarios": { "conservative": {...}, "aggressive": {...} }}`. |
 | `hud_notes` | `object` (optional) | Presenter HUD coaching notes: `{"objection_defense": [{"skepticism": "...", "counter": "..."}]}`. |
+| `source` | `string \| string[]` (optional, v3.7) | Where the slide's figures come from: `"notes.md:L7"`, a CSV cell, a URL, `"用户口述 2026-10-06"`. On a slide it covers every figure on it; on a nested item (one metric, one card) it covers that item only. |
+| `status` | `string` (optional, v3.7) | Trust level of the figures: `verified`, `estimate` (shown as 估算), `illustrative` (invented to show a layout; shown as 示例数据) or `todo` (placeholder; always flagged). Same scoping as `source`. |
 
+### Provenance (v3.7)
+
+A figure is a number that makes a claim: a percentage, multiple, amount of money, duration or counted unit (`18%`, `3x`, `¥8,600`, `47分钟`, `5个人头`). Years, quarters (`Q3`), priorities (`P0`) and structural counts ("3 个支柱") are not figures. A figure with no `source` covering it is *unsourced*. Unsourced and `todo` figures are **待核** (to verify):
+
+- the PPTX/HTML slide shows an amber `待核 N 项` badge (hidden by `build --final`, which instead refuses to build);
+- the footer shows `来源：…` (prefixed `估算 ·` or `示例数据 ·` when the status says so);
+- the speaker notes and the Cognitive Inspector (N key) list the sources and the figures still to verify;
+- `audit` reports `UNSOURCED_FIGURES_P<n>` / `EVIDENCE_TODO_P<n>` and a figure summary.
+
+Native chart data counts as one figure group that needs a `source`. `cli.py cite` fills `source` from an ingested document and never writes `status`.
 ---
 
 

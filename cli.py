@@ -18,7 +18,9 @@ import sys
 from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
 from core.contract_probe import probe as probe_contract
+from core import provenance as provenance_mod
 from core.html_builder import build_standalone_html
+from core.ingest import extract_facts
 from core.layout_lint import lint_pptx
 from core.pptx_builder import build_presentation
 from core.sync_watcher import SyncWatcher
@@ -33,13 +35,13 @@ DEMO_BLUEPRINT = {
             "stance": "关注落地可靠性、改造成本与人机交互确定性"
         },
         "knowledge_delta": {
-            "known_baseline": ["传统单轮 LLM 对话无法闭环长程任务", "企业系统异构且复杂度高"],
+            "known_baseline": ["传统单轮 LLM 对话无法独立完成长程任务", "企业系统异构且复杂度高"],
             "blindspots_and_pains": ["传统被动方案人工介入成本高达 80%", "固定规则 RPA 面对非结构化长尾场景极其脆弱"]
         },
         "target_outcomes": {
             "understand": "多智能体协同运行时的‘交互-调度-工具’三层解耦架构",
             "believe": "标准化 Skill 规范配合双向协同感知能将端到端完成率提升至 94.8%",
-            "act": "批准 Q2 试点破局阶段技术预研立项并分配专项研发资源"
+            "act": "批准 Q1 试点立项，并分配首期 300 万预算与 5 个人头"
         }
     },
     "slides": [
@@ -57,7 +59,7 @@ DEMO_BLUEPRINT = {
             "narrative_arc": "conflict",
             "mission": "击穿听众对现有方案的侥幸心理，建立系统性重构的紧迫性",
             "transition": "【冲突】然而现存的两大传统方案，在真实生产环境下均已触碰天花板",
-            "action_title": "痛点：传统被动方案与规则 RPA 难以支撑工业级自主闭环",
+            "action_title": "痛点：传统被动方案与规则 RPA 难以支撑工业级自主运行",
             "core_evidence": "传统方案人工介入成本高达 80%，而 Agentic 系统综合效率提升 400%+",
             "title": "传统 AI 方案 vs Agentic AI 核心维度对比",
             "subtitle": "打破单点工具局限，迈向具备长程规划与工具调用能力的自主智能体系统",
@@ -65,7 +67,7 @@ DEMO_BLUEPRINT = {
                 {
                     "tag": "TRADITIONAL LLM",
                     "title": "被动对话型方案",
-                    "desc": "以单轮或短程问答为主，缺乏环境感知与外部工具执行能力，无法闭环复杂业务。",
+                    "desc": "以单轮或短程问答为主，缺乏环境感知与外部工具执行能力，无法独立完成复杂业务。",
                     "bullets": ["单向文本输出为主", "无状态上下文易丢失", "人工介入成本高达 80%"],
                     "highlight": False
                 },
@@ -79,7 +81,7 @@ DEMO_BLUEPRINT = {
                 {
                     "tag": "AGENTIC SYSTEM",
                     "title": "新一代自主协同集群",
-                    "desc": "基于动态意图推理、多子智能体拓扑与沙箱工具链，实现全自主端到端闭环交付。",
+                    "desc": "基于动态意图推理、多子智能体拓扑与沙箱工具链，实现全自主的端到端交付。",
                     "bullets": ["动态规划与自我反思", "毫秒级双向感知同步", "综合效率提升 400%+"],
                     "highlight": True
                 }
@@ -89,9 +91,9 @@ DEMO_BLUEPRINT = {
             "layout_type": "architecture_stack",
             "narrative_arc": "breakthrough",
             "mission": "给出根本解法，证明平台具备高可用、分层解耦与工具沙箱控制力",
-            "transition": "【突破】因此，我们必须构建‘交互-中枢-沙箱’三层闭环架构",
+            "transition": "【突破】因此，我们必须构建‘交互-中枢-沙箱’三层解耦架构",
             "action_title": "方案：构建高可用、多租户、安全可信赖的智能体全生命周期中枢",
-            "core_evidence": "三层架构严格解耦，沙箱隔离保障企业级安全合规",
+            "core_evidence": "三层架构解耦，故障域隔离到单租户，核心链路 P99 延迟 < 120ms",
             "title": "新一代企业级 Agentic AI 平台三层技术架构",
             "subtitle": "构建高可用、多租户、安全可信赖的智能体全生命周期运行时中枢",
             "layers": [
@@ -103,7 +105,7 @@ DEMO_BLUEPRINT = {
                 {
                     "name": "智能体中枢调度层",
                     "desc": "意图与长程规划核心",
-                    "items": ["意图研判探针", "模板解析解构引擎", "协同感知哨兵", "质量规约审计员"]
+                    "items": ["意图研判探针", "模板解析引擎", "协同感知哨兵", "质量规约审计员"]
                 },
                 {
                     "name": "工具底座与沙箱层",
@@ -209,7 +211,7 @@ DEMO_BLUEPRINT = {
         {
             "layout_type": "standard_table",
             "narrative_arc": "evidence",
-            "mission": "以结构化规整矩阵清晰对照核心能力成熟度与落地保障",
+            "mission": "以结构化矩阵对照 Agentic AI 企业级架构各组件的能力成熟度与落地保障",
             "transition": "【细化】进一步通过功能与合规成熟度矩阵，锁定各组件能力层级",
             "action_title": "规约：构建高可用、多租户、工具沙箱三位一体的落地护城河",
             "core_evidence": "100% 覆盖安全隔离与审计合规要求，故障自愈恢复耗时 <10s",
@@ -218,7 +220,7 @@ DEMO_BLUEPRINT = {
             "headers": ["模块组件", "技术能力", "延迟/SLA", "自愈策略", "合规评级"],
             "rows": [
                 ["意图研判探针", "上下文语义解析与盲区嗅探", "<50ms", "自适应多轮澄清", "L4 级安全"],
-                ["解构分析引擎", "多版式 AST 逆向与母版穿透", "<120ms", "启发式降级映射", "原生矢量认证"],
+                ["版式分析引擎", "多版式 AST 逆向与母版穿透", "<120ms", "启发式降级映射", "原生矢量认证"],
                 ["协同感知哨兵", "文件指纹与非侵入增量感知", "<8ms", "状态快照自动回滚", "100% 审计追踪"],
                 ["工具沙箱集群", "容器化隔离代码与 MCP 执行", "<200ms", "超时阻断与隔离恢复", "金融级沙箱"]
             ]
@@ -229,12 +231,12 @@ DEMO_BLUEPRINT = {
             "mission": "给出低风险渐进式落地路径，打消听众对迁移风险的顾虑",
             "transition": "【落地】为确保业务平滑过渡，推行‘试点-建设-推广-生态’四步走路线",
             "action_title": "路径：分阶段稳步推进智能体在核心业务线的全域渗透",
-            "core_evidence": "Q1 试点验证，Q2 平台就绪，Q3 规模推广，Q4 自主进化闭环",
+            "core_evidence": "四个季度分阶段推进：Q1 先在 2 条业务线试点，Q3 扩展到 30% 业务量",
             "title": "企业落地推行路线与关键里程碑",
             "subtitle": "分阶段稳步推进智能体在核心业务线的全场景渗透与规模化应用",
             "steps": [
                 {
-                    "time": "2026 Q1 · 试点破局",
+                    "time": "2026 Q1 · 试点验证",
                     "title": "场景原型验证",
                     "items": ["核心业务场景 POC", "模板解析标准库搭建", "研发环境私有化联调"]
                 },
@@ -249,8 +251,8 @@ DEMO_BLUEPRINT = {
                     "items": ["全公司级统一规范推广", "知识库实时双向同步", "效能分析仪表板运行"]
                 },
                 {
-                    "time": "2026 Q4 · 生态赋能",
-                    "title": "自主进化闭环",
+                    "time": "2026 Q4 · 生态扩展",
+                    "title": "自主进化",
                     "items": ["智能体自学习演进机制", "开放生态开发者支持", "商业回报全面兑现"]
                 }
             ]
@@ -258,34 +260,58 @@ DEMO_BLUEPRINT = {
         {
             "layout_type": "summary",
             "narrative_arc": "call_to_action",
-            "mission": "发起明确行动号召，锁定立项决策与资源分配动作",
-            "transition": "【号召】万事俱备，建议立即启动第一阶段试点立项与研发协同",
-            "action_title": "决议：恪守认知动力学与母版穿透准则，启动 Q1 试点立项",
-            "core_evidence": "信息充分性与认知契约已就绪，建议立即批准团队编制与算力配额",
-            "title": "战略实施建议与收官结论",
-            "subtitle": "以信息充分性为牵引，坚守安全合规与人机并肩双向协同原则",
-            "points": [
+            "mission": "呈现三个可行方案与推荐结论，请决策委员会当场拍板",
+            "transition": "【号召】三条路径的代价已经摆在桌面上，请今天做出选择",
+            "action_title": "决议：批准方案 B，启动 Q1 试点立项，首期 300 万与 5 个人头",
+            "core_evidence": "试点预算 300 万、5 个人头；Q3 前以 94.8% 自主完成率作为扩大投入的门禁",
+            "title": "方案比选与请决策事项",
+            "subtitle": "对比三条路径，明确推荐理由与待批清单",
+            "options": [
                 {
-                    "title": "恪守认知动力学契约准则",
-                    "desc": "在方案设计前坚决完成深度需求探针与认知差分析，杜绝信息贫血时仓促决策。"
+                    "name": "方案 A：维持现状，继续打补丁",
+                    "pros": "零追加预算，现网无扰动",
+                    "cons": "人工介入成本维持 80%，半年内触及扩展瓶颈",
+                    "cost": "0 元追加 / 人力隐性损耗",
+                    "risk": "高（业务增长受限）",
+                    "recommended": False
                 },
                 {
-                    "title": "推行母版规范强穿透机制",
-                    "desc": "以统一 Design Tokens 统领全局，保障全生命周期在跨团队、跨工具间视觉与语义一致性。"
+                    "name": "方案 B：分阶段试点立项（推荐）",
+                    "pros": "两条业务线先行，自主完成率目标 94.8%，每阶段有止损点",
+                    "cons": "需抽调 2 个团队参与首期联调",
+                    "cost": "首期 300 万 + 5 个人头",
+                    "risk": "低（Q3 门禁未过则停止追加）",
+                    "recommended": True
                 },
                 {
-                    "title": "坚持极简无摩擦的双模交付",
-                    "desc": "PPTX 原生矢量对象保障可二次编辑，单文件 HTML 解决大屏与无依赖跨平台极速分发。"
-                },
-                {
-                    "title": "构建 Always-in-Sync 协同飞轮",
-                    "desc": "依托毫秒级指纹与语义 AST 感知，随时理解并尊重人类专家的每一步手动调整，保持同频。"
+                    "name": "方案 C：全域一次性重构",
+                    "pros": "架构天花板最高，一步到位",
+                    "cons": "周期约 18 个月，现网连续性风险大",
+                    "cost": "预计 2,000 万以上",
+                    "risk": "极高（收益存在较大不确定性）",
+                    "recommended": False
                 }
+            ],
+            "recommendation": "推荐方案 B：以 300 万换取 Q3 前可验证的 94.8% 自主完成率；达标后再释放二期预算，未达标则止损。",
+            "sign_off_items": [
+                "1. 批准首期预算 300 万与 5 个人头，Q1 正式立项",
+                "2. 指派平台组与两条试点业务线各 1 名负责人组成联合专班",
+                "3. 确认 Q3 门禁：自主完成率 ≥ 90% 方可进入二期"
+            ],
+            "points": [
+                {"title": "试点先行", "desc": "两条业务线先验证，再决定是否扩大。"},
+                {"title": "门禁释放预算", "desc": "二期预算以 Q3 的实测完成率为准。"},
+                {"title": "联合专班", "desc": "平台组与业务线共担交付，避免推诿。"}
             ]
         }
     ]
 }
 
+# The demo's figures are invented to show layouts: label them so they cannot pass for real data (v3.7).
+for _slide in DEMO_BLUEPRINT["slides"]:
+    _slide.setdefault("source", "undoPPT 演示数据（虚构）")
+    _slide.setdefault("status", "illustrative")
+DEMO_BLUEPRINT["scenario"] = "project_charter"
 
 def cmd_undo(args):
     """Deconstruct template command."""
@@ -314,20 +340,31 @@ def cmd_build(args):
     with open(tokens_path, "r", encoding="utf-8") as f:
         tokens = json.load(f)
 
+    final = getattr(args, "final", False)
+    if final:
+        scan = provenance_mod.scan_blueprint(blueprint)
+        if scan["totals"]["to_verify"]:
+            print(f"[x] --final: {scan['totals']['to_verify']} figure(s) still need a source or a real value. Not building.")
+            for i, sl in enumerate(scan["slides"], 1):
+                for f in sl["to_verify"][:6]:
+                    print(f"    - slide {i}: {f['text']}  ({'todo' if f['status'] == 'todo' else 'no source'})")
+            sys.exit(1)
+
     out_dir = args.out or "output"
     os.makedirs(out_dir, exist_ok=True)
     watcher = SyncWatcher()
 
     if args.format in ("pptx", "all"):
         pptx_out = os.path.join(out_dir, "presentation.pptx")
-        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None))
+        build_presentation(blueprint, tokens, pptx_out, default_transition=getattr(args, "transition", None),
+                           show_provenance_badges=not final)
         watcher.record_baseline(pptx_out)
         print(f"[✓] PPTX generated successfully: {pptx_out}")
         _print_lint_warnings(pptx_out)
 
     if args.format in ("html", "all"):
         html_out = os.path.join(out_dir, "presentation.html")
-        build_standalone_html(blueprint, tokens, html_out)
+        build_standalone_html(blueprint, tokens, html_out, show_provenance_badges=not final)
         watcher.record_baseline(html_out)
         print(f"[✓] Standalone HTML generated successfully: {html_out}")
 
@@ -345,6 +382,38 @@ def _print_readiness_hint(prompt, doc_path=None, context=None):
     for q in r["questions"][:4]:
         print(f"      - {q}")
     print("    （详见 `cli.py probe`；本命令不会因此中止。）")
+
+
+def cmd_ingest(args):
+    """Extract data points (with their origin) from a Markdown / text / CSV document."""
+    facts = extract_facts(args.input_doc)
+    out_file = args.out or ".undoppt/facts.json"
+    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(facts, f, ensure_ascii=False, indent=2)
+    print(f"[✓] {len(facts)} data point(s) extracted from {args.input_doc} -> {out_file}")
+    for fact in facts[:8]:
+        print(f"    - {fact['value']:<10s} {fact['label'][:22]:<22s} @ {fact['source']}")
+    if len(facts) > 8:
+        print(f"    ... and {len(facts) - 8} more")
+
+
+def cmd_cite(args):
+    """Link blueprint figures to extracted facts and record their sources."""
+    with open(args.blueprint, "r", encoding="utf-8") as f:
+        blueprint = json.load(f)
+    with open(args.facts, "r", encoding="utf-8") as f:
+        facts = json.load(f)
+    linked, report = provenance_mod.attach_sources(blueprint, facts)
+    out_file = args.out or args.blueprint
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(linked, f, ensure_ascii=False, indent=2)
+    print(f"[✓] {len(report['linked'])} slide(s) fully sourced, {len(report['partial'])} partially matched, "
+          f"{len(report['unmatched'])} figure(s) with no matching fact -> {out_file}")
+    for item in report["partial"]:
+        print(f"    [!] slide {item['slide']}: partial match, written to source_candidates only (figures stay flagged)")
+    for item in report["unmatched"][:8]:
+        print(f"    [ ] slide {item['slide']}: {item['figure']} has no source in the document")
 
 
 def cmd_probe(args):
@@ -485,6 +554,10 @@ def cmd_audit(args):
         print(f"      · Skepticism Defense: {subs.get('skepticism_defense', 0)} / 100")
     print(f"  • Quality Grade:    {res['grade']}")
     print(f"  • Total Slides:     {res['total_slides']}")
+    prov = res.get("provenance", {})
+    if prov.get("figures"):
+        print(f"  • Figures:          {prov['figures']} total | {prov['unsourced']} unsourced | {prov['todo']} todo | "
+              f"{prov['estimate']} estimate | {prov['illustrative']} illustrative")
     print(f"  • Result:           {'[PASS] High-Impact Presentation' if res['passed'] else '[WARN] Cognitive Optimization Needed'}")
     print("----------------------------------------------------------------")
     if not res["findings"]:
@@ -631,7 +704,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.6.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.7.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan
@@ -664,6 +737,7 @@ def main():
     p_build.add_argument("--format", choices=["pptx", "html", "all"], default="all", help="Output format")
     p_build.add_argument("--transition", choices=["fade", "push", "wipe", "none"], default=None, help="Slide transition effect (default: fade)")
     p_build.add_argument("--out", default="output", help="Output directory")
+    p_build.add_argument("--final", action="store_true", help="Delivery mode: refuse to build while figures lack a source or are todo; hide 待核 badges")
 
     # audit
     p_audit = subparsers.add_parser("audit", help="Audit presentation blueprint for cognitive quality")
@@ -673,6 +747,15 @@ def main():
     # sync
     p_sync = subparsers.add_parser("sync", help="Check for external user edits")
     p_sync.add_argument("--target", default="output/presentation.pptx", help="Target file path to check")
+
+    # ingest / cite
+    p_ing = subparsers.add_parser("ingest", help="Extract data points with their origin from a .md/.txt/.csv document")
+    p_ing.add_argument("--input-doc", required=True, help="Source document")
+    p_ing.add_argument("--out", default=None, help="Output facts JSON (default .undoppt/facts.json)")
+    p_cite = subparsers.add_parser("cite", help="Link blueprint figures to extracted facts and record their sources")
+    p_cite.add_argument("--blueprint", required=True, help="Blueprint JSON")
+    p_cite.add_argument("--facts", required=True, help="Facts JSON from `ingest`")
+    p_cite.add_argument("--out", default=None, help="Output blueprint (default: overwrite the input)")
 
     # probe
     p_probe = subparsers.add_parser("probe", help="Check whether a request has enough information to write a good deck")
@@ -711,6 +794,10 @@ def main():
         cmd_audit(args)
     elif args.command == "sync":
         cmd_sync(args)
+    elif args.command == "ingest":
+        cmd_ingest(args)
+    elif args.command == "cite":
+        cmd_cite(args)
     elif args.command == "probe":
         cmd_probe(args)
     elif args.command == "render-check":

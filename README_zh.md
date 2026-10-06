@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.6.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,20 @@
 > 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
+
+---
+
+## 🥩 v3.7.0 新增：每个数字都说清楚从哪来
+
+没有出处的数字，读起来像证据，却无法核验。v3.7 把出处变成蓝图的一部分。
+
+- 🏷️ **`source` / `status`**：可写在页面或条目上。没有出处的数字是 **待核**：页面右上角的琥珀色徽标、页脚的 `来源：…`，以及演讲备注和 `N` 键抽屉里的出处清单。
+- 📥 **`cli.py ingest` 与 `cite`**：从 `.md` / `.txt` / `.csv` 抽取数字并保留 `文件:行号` 出处，再回填到蓝图。回填很保守：只匹配到一部分时，不会给没有出处的数字"背书"。
+- 🚦 **`build --final`**：交付模式。仍有数字没有出处或是占位时拒绝构建。
+- 🧪 **demo 现在遵守自己的规则**：以决策闭环页收尾，不含禁用词，编造的数字标注为"示例数据"，审计 100 分且无警告（v3.6 是 8 条）。
+- ✍️ **套话替换建议**：每个被标记的词都附带具体改写方式。
+
+详见 [v3.7 PRD](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)。
 
 ---
 
@@ -180,6 +194,8 @@ undoPPT/
 │   ├── vision_extractor.py         # 视觉启发式解析器
 │   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
 │   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉，可离线)
+│   ├── provenance.py               # 数字识别、出处覆盖、待核标记
+│   ├── ingest.py                   # 抽取带 文件:行号 出处的数据点 (md/txt/csv)
 │   ├── contract_probe.py           # 认知契约探针（动笔前还缺哪些信息）
 │   ├── blueprint_compat.py         # 文档字段 -> 渲染器字段映射（杜绝静默丢字）
 │   ├── layout_fit.py               # 内容自适应版面（标题适配、卡片收缩、字号地板、居中）
@@ -198,10 +214,11 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归、版面与契约测试套件 (68 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (105 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
-│   └── test_contract.py
+│   ├── test_contract.py
+│   └── test_flesh.py
 ├── output/                         # 生成的交付物（已加入 .gitignore，可用 `cli.py demo` 重建）
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
@@ -262,7 +279,14 @@ python3 cli.py probe --prompt "智能客服业务立项答辩，申请首期预�
 ```
 报告哪些契约槽位和场景事实还不知道，以及应先问的问题。完备度低时，`plan`/`generate` 也会打印同样的提示。
 
-### 8. 版面验证 (Render Check)
+### 8. 给每个数字一个出处 (Ingest / Cite / Final)
+```bash
+python3 cli.py ingest --input-doc notes.md --out .undoppt/facts.json
+python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.json
+python3 cli.py build --blueprint .undoppt/blueprint.json --final   # 仍有待核数字时拒绝构建
+```
+
+### 9. 版面验证 (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # 静态 lint，无需渲染器
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render

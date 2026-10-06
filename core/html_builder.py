@@ -16,6 +16,7 @@ import re
 import warnings
 from typing import Any, Dict, List
 
+from core import provenance
 from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
 
 _TAILWIND_RUNTIME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "tailwindcss-play-3.4.17.js")
@@ -1048,7 +1049,7 @@ def _generate_default_objections(slide: Dict[str, Any]) -> List[Dict[str, str]]:
         ]
 
 
-def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str) -> str:
+def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: str, show_provenance_badges: bool = True) -> str:
     """Generate a single-file standalone HTML presentation with zero external dependencies."""
     p = tokens.get("palette", {})
     slides_content_list = []
@@ -1079,6 +1080,17 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         mission_attr = html.escape(str(slide_data.get("mission", "")), quote=True)
         transition_attr = html.escape(str(slide_data.get("transition", "")), quote=True)
         evidence_attr = html.escape(str(slide_data.get("core_evidence", "")), quote=True)
+        prov = provenance.provenance_labels(slide_data)
+        sources_attr = html.escape(str("；".join(prov["scan"]["sources"])), quote=True)
+        verify_attr = html.escape(str(prov["to_verify"]), quote=True)
+        footer_html = (
+            f'<div class="provenance-footer absolute bottom-2 left-12 right-12 text-[11px] text-slate-400 truncate">{html.escape(prov["footer"])}</div>'
+            if prov["footer"] else ""
+        )
+        badge_html = (
+            f'<div class="provenance-badge absolute top-3 right-6 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-400">待核 {prov["to_verify"]} 项</div>'
+            if (show_provenance_badges and prov["to_verify"]) else ""
+        )
 
         presentation_meta["slides"].append({
             "slide_index": idx,
@@ -1101,8 +1113,12 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
                  data-arc="{arc_attr}"
                  data-mission="{mission_attr}"
                  data-transition="{transition_attr}"
-                 data-evidence="{evidence_attr}">
+                 data-evidence="{evidence_attr}"
+                 data-sources="{sources_attr}"
+                 data-unverified="{verify_attr}">
           {inner_html}
+          {footer_html}
+          {badge_html}
         </section>
         """)
 
@@ -1322,6 +1338,10 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">核心论据 (Evidence)</div>
         <div id="note-evidence" class="text-emerald-400 font-medium leading-relaxed"></div>
       </div>
+      <div>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">数据出处与待核 (Sources)</div>
+        <div id="note-sources" class="text-slate-300 leading-relaxed"></div>
+      </div>
     </div>
   </aside>
 
@@ -1358,6 +1378,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     const noteMission = document.getElementById('note-mission');
     const noteTransition = document.getElementById('note-transition');
     const noteEvidence = document.getElementById('note-evidence');
+    const noteSources = document.getElementById('note-sources');
     const stepBtn = document.getElementById('step-btn');
 
     let metaData = {{ contract: {{}}, slides: [] }};
@@ -1396,6 +1417,12 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
       if (noteMission) noteMission.textContent = slideEl.dataset.mission || '未定义单页认知使命';
       if (noteTransition) noteTransition.textContent = slideEl.dataset.transition || '承接前文，自然演进';
       if (noteEvidence) noteEvidence.textContent = slideEl.dataset.evidence || '结构性量化支撑';
+      if (noteSources) {{
+        const src = slideEl.dataset.sources;
+        const n = parseInt(slideEl.dataset.unverified || '0', 10);
+        noteSources.textContent = (src ? '来源：' + src : '本页没有登记数据来源') + (n ? `（待核 ${{n}} 项）` : '');
+        noteSources.className = n ? 'text-amber-300 leading-relaxed' : 'text-slate-300 leading-relaxed';
+      }}
     }}
 
     function updatePresenterHUD(idx) {{

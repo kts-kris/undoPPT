@@ -24,6 +24,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml import parse_xml
 from pptx.util import Inches, Pt
 
+from core import provenance
 from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
 from core.layout_fit import fit_title_size, normalize_slide, pick_font
 
@@ -707,7 +708,7 @@ def render_summary_slide(prs, slide_data: Dict[str, Any], tokens: Dict[str, Any]
             curr_y += 0.65
 
         if sign_off_items:
-            remain_h = max(1.2, 7.1 - curr_y)
+            remain_h = max(1.2, 7.0 - curr_y)
             chk_box = slide.shapes.add_shape(
                 MSO_SHAPE.ROUNDED_RECTANGLE,
                 Inches(start_x),
@@ -2017,6 +2018,42 @@ RENDERERS = {
 }
 
 
+def _add_provenance(slide, slide_data: Dict[str, Any], tokens: Dict[str, Any], show_badge: bool = True):
+    """v3.7: source footer ("来源 / 估算 / 示例数据") and an amber 待核 badge when figures lack a source."""
+    labels = provenance.provenance_labels(slide_data)
+    palette = tokens.get("palette", {})
+    body_font = pick_font(tokens.get("typography", {}).get("body", {}).get("font"))
+    if labels["footer"]:
+        tb = slide.shapes.add_textbox(Inches(0.8), Inches(7.12), Inches(11.7), Inches(0.3))
+        tb.name = "undoppt-footer"
+        tf = tb.text_frame
+        tf.word_wrap = True
+        tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+        run = tf.paragraphs[0].add_run()
+        run.text = labels["footer"]
+        run.font.size = Pt(10)
+        run.font.name = body_font
+        run.font.color.rgb = _hex_to_rgb(palette.get("text_secondary", "#64748B"))
+    if show_badge and labels["to_verify"]:
+        pill = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(11.2), Inches(0.72), Inches(1.33), Inches(0.3))
+        pill.name = "undoppt-badge"
+        pill.adjustments[0] = 0.5
+        pill.fill.solid()
+        pill.fill.fore_color.rgb = RGBColor(254, 243, 199)
+        pill.line.color.rgb = RGBColor(245, 158, 11)
+        pill.line.width = Pt(1)
+        tf = pill.text_frame
+        tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        r = p.add_run()
+        r.text = f"待核 {labels['to_verify']} 项"
+        r.font.size = Pt(10.5)
+        r.font.bold = True
+        r.font.name = body_font
+        r.font.color.rgb = RGBColor(146, 64, 14)
+
+
 def _inject_cognitive_notes(slide, slide_data: Dict[str, Any], contract: Optional[Dict[str, Any]] = None):
     """Inject cognitive metadata into native PowerPoint speaker notes."""
     notes_lines = []
@@ -2054,6 +2091,7 @@ def _inject_cognitive_notes(slide, slide_data: Dict[str, Any], contract: Optiona
         notes_lines.append(f"【承上启下 / Transition】{transition}")
     if core_evidence:
         notes_lines.append(f"【核心论据 / Evidence】{core_evidence}")
+    notes_lines.extend(provenance.notes_block(slide_data))
     if notes_custom:
         notes_lines.append(f"【演讲备注 / Notes】\n{notes_custom}")
 
@@ -2260,7 +2298,8 @@ def _inject_slide_element_timings(slide, slide_data: Dict[str, Any], tokens: Dic
         pass
 
 
-def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str, default_transition: Optional[str] = None) -> str:
+def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str, default_transition: Optional[str] = None,
+                       show_provenance_badges: bool = True) -> str:
     """Compile blueprint into a clean vector PowerPoint presentation."""
     prs = Presentation()
     # 16:9 standard dimensions
@@ -2293,6 +2332,7 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
 
         current_slide = prs.slides[-1]
         normalize_slide(current_slide, tokens, layout_type)
+        _add_provenance(current_slide, slide_data, tokens, show_badge=show_provenance_badges)
         slide_contract = contract if idx == 0 else None
         _inject_cognitive_notes(current_slide, slide_data, contract=slide_contract)
 

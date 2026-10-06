@@ -1,7 +1,7 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.6.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.7.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 12 enterprise operational scenarios (project charter, annual strategy/OKR, QBR, cross-team alignment, headcount/budget review, RFC, post-mortem, GTM launch, RFP pitch, promotion assessment, internal tech talk, all-hands rally) anchored in 6 base archetypes with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows, Decision-Ready Ask Summary);
@@ -11,7 +11,7 @@ description: >-
   (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.6.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.7.0)
 
 `undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
@@ -185,15 +185,40 @@ python3 "<SKILL_ROOT>/cli.py" plan --prompt "<提示词>" [--input-doc <file.md>
 
 字段名以第 2 节规约为准；`content_columns` 的 `points`/`tag`、`cross_mapping` 的 `layer/current/target/action` 等文档字段，引擎会自动映射到渲染卡片（`core/blueprint_compat.py`），无需手工换名。
 
-运行 10 维认知质量与深度语义审计（v3.6 新增 `THIN_CONTENT`：正文撑不起版式；`EVIDENCE_BUDGET`：指标页缺数值——这两项都是"血肉不足"的信号，应回去补材料，而不是调版式）：
+运行 10 维认知质量与深度语义审计（`UNSOURCED_FIGURES` / `EVIDENCE_TODO` 检查数字出处；套话告警会附带"建议替换为"的具体写法，起草时自查即可；v3.6 新增 `THIN_CONTENT`：正文撑不起版式；`EVIDENCE_BUDGET`：指标页缺数值——这两项都是"血肉不足"的信号，应回去补材料，而不是调版式）：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" audit --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json
 ```
 
+### 阶段 3.5 · 数据出处 (Provenance, v3.7)
+**一个没有出处的数字，读起来像证据，却无法核验——这是最危险的"血肉"。** 蓝图里每个数字都必须说清楚从哪来：
+
+| 字段 | 含义 |
+|---|---|
+| `source` | 数字的来源：`"notes.md:L7"`、CSV 单元格、链接、`"用户口述 2026-10-06"`。写在页面上覆盖整页，写在某个条目（如一个 metric）里只覆盖该条目 |
+| `status` | `verified` 已核对；`estimate` 有依据但不精确（页脚标"估算"）；`illustrative` 为展示版式编造的示例（页脚标"示例数据"）；`todo` 占位，必须替换 |
+
+**流程**：用户给了文档或表格 → `cli.py ingest` 抽取带出处的数据点 → 写蓝图 → `cli.py cite` 按数值把出处回填到蓝图 → `cli.py audit` 查看 `UNSOURCED_FIGURES`。
+
+```bash
+python3 "<SKILL_ROOT>/cli.py" ingest --input-doc notes.md --out .undoppt/facts.json   # 支持 .md/.txt/.csv；Excel 请先导出 CSV
+python3 "<SKILL_ROOT>/cli.py" cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.json
+```
+
+**铁律**：
+1. **不编造数字。** 用户没给的数字，不要写进蓝图；要写就标 `status: "todo"`，让它显示为"待核"。
+2. 没有出处的数字会在页面右上角显示琥珀色 `待核 N 项` 徽标，备注与认知抽屉里也会列出——这是草稿的诚实标记，不是 bug。
+3. `cite` 只写出处、不写 `status`：匹配只证明"数字出现在文档里"，不证明"用在同一个论断上"，`verified` 由人来定。部分匹配时只写 `source_candidates`，数字仍保持待核。
+4. 演示/模板里为展示版式而编的数字，必须标 `illustrative`。
+
 ### 阶段 4 · 双端高精构建 (Build)
 ```bash
 python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --tokens presets/modern_bento.json --format all --out output
+
+# 交付模式：仍有数字没有出处或是占位时拒绝构建，并隐藏"待核"徽标
+python3 "<SKILL_ROOT>/cli.py" build --blueprint .undoppt/blueprint.json --final --out output
 ```
+草稿阶段用普通 `build`（带"待核"徽标，方便和用户一起补数据）；对外交付用 `--final`。
 交付产物：
 - `output/presentation.pptx`（原生矢量对象、图表、表格、演讲备注、ECMA-376 `<p:timing>` 原生时序步进）
 - `output/presentation.html`（单文件自包含、Tailwind 排版、`P` 键演播中枢 HUD、`N` 键认知抽屉、情景切换决策沙盒）
@@ -220,6 +245,10 @@ python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 ## 4. CLI 快速调用参考
 
 ```bash
+# -1. 抽取文档中带出处的数据点 / 把出处回填到蓝图
+python3 "<SKILL_ROOT>/cli.py" ingest --input-doc <file.md|csv> [--out facts.json]
+python3 "<SKILL_ROOT>/cli.py" cite --blueprint <blueprint.json> --facts <facts.json>
+
 # 0. 认知契约探针：信息够不够？（先问再做）
 python3 "<SKILL_ROOT>/cli.py" probe --prompt "<提示词>" [--input-doc <file.md>] [--json]
 

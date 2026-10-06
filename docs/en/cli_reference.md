@@ -1,6 +1,6 @@
 # undoPPT CLI Reference Manual
 
-This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.6.0).
+This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.7.0).
 
 ---
 
@@ -20,6 +20,8 @@ python3 cli.py <command> [arguments...]
 | `undo` | Master template deconstruction & token extraction | Enterprise `.pptx` | `.undoppt/design_tokens.json`, assets |
 | `build` | Dual-format vector presentation rendering | Blueprint, Design Tokens | `presentation.pptx`, `presentation.html` |
 | `sync` | Detect external manual edits by human presenter | Target `.pptx` file | Semantic AST diff summary |
+| `ingest` | Extract data points with their origin from a document | `.md` / `.txt` / `.csv` | `.undoppt/facts.json` |
+| `cite` | Link blueprint figures to extracted facts and record sources | Blueprint, facts JSON | Blueprint with `source` fields |
 | `probe` | Check whether a request has enough information before authoring | Prompt, optional Reference Doc | Readiness, missing facts, questions to ask |
 | `render-check` | Verify the layout of built deliverables | `.pptx`, `.html` | Findings report, rendered PNGs |
 | `demo` | Run full showcase demonstration pipeline | *None* | Complete audited demo presentations |
@@ -218,7 +220,24 @@ python3 cli.py sync --target output/presentation.pptx
 
 ---
 
-## 7. `probe` (Cognitive Contract Readiness, v3.6)
+## 7. `ingest` and `cite` (Data Provenance, v3.7)
+
+`ingest` pulls every figure out of a source document and keeps where it came from; `cite` writes those origins into a blueprint.
+
+```bash
+python3 cli.py ingest --input-doc notes.md --out .undoppt/facts.json
+python3 cli.py cite --blueprint .undoppt/blueprint.json --facts .undoppt/facts.json
+```
+
+Each fact: `{"label": "营收", "value": "1.2亿", "context": "...", "section": "立项", "source": "notes.md:L3"}`. Markdown and text give `file:L<line>`; CSV gives `file:第<row>行·<column>` and uses a unit in the header, e.g. `数值(万元)` + `1200` becomes `1200万元`. Excel is rejected: export the sheet to CSV.
+
+`cite` matches blueprint figures to facts by value. A slide-level `source` covers every figure on the slide, so it is written **only when every unsourced figure on that slide was matched**; a partial match writes `source_candidates` instead and the figures stay flagged. `cite` never sets `status`: a match shows the number appears in the document, not that it supports the same claim.
+
+`build --final` is the delivery mode: it refuses to build (exit 1) while any figure lacks a source or is `todo`, and hides the `待核` badges. A plain `build` keeps the badges so a draft shows what still needs data.
+
+---
+
+## 8. `probe` (Cognitive Contract Readiness, v3.6)
 
 The audit scores a blueprint's structure and cannot tell a deck built from real material from one built from nothing: a request as thin as "帮我做一份关于 AI 的汇报" still scores 90+. `probe` runs *before* authoring and reports what is still unknown.
 
@@ -240,7 +259,7 @@ python3 cli.py probe --prompt "..." --input-doc notes.md --json
 
 ---
 
-## 8. `render-check` (Layout Verification, v3.5)
+## 9. `render-check` (Layout Verification, v3.5)
 
 The audit scores a blueprint; it cannot see the rendered result. `render-check` closes that gap in two layers:
 
@@ -290,7 +309,7 @@ PowerPoint is sandboxed and can only write to folders the user has granted, so t
 
 ---
 
-## 9. `demo` (Showcase Pipeline)
+## 10. `demo` (Showcase Pipeline)
 
 Runs a comprehensive demonstration that highlights the complete cognitive pipeline, compiles all 15 layout primitives, renders native vector charts and tables, injects speaker notes, and generates the standalone HTML drawer.
 
