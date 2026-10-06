@@ -2,5 +2,5 @@
 Presentation Deconstruction & Intelligent Re-engineering Engine
 """
 
-__version__ = "3.5.0"
+__version__ = "3.6.0"
 __author__ = "undoPPT Team"

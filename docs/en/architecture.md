@@ -1,6 +1,6 @@
 # undoPPT Architecture & Engineering Deep-Dive
 
-This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.5.0).
+This document details the internal architecture, module separation, data flows, and engineering mechanics of the `undoPPT` presentation engine (v3.6.0).
 
 ---
 
@@ -124,6 +124,15 @@ Real-render verification. PPTX goes through PowerPoint (macOS) or LibreOffice to
 
 ### 2.6.4 HTML canvas model (v3.5)
 The HTML deliverable is a fixed 1340x754 canvas scaled with a CSS transform to fit the viewport (`fitStage`), so layout is identical on every screen. `fitBody` then scales each slide body up to 1.4x to use the free height under the header, and back down if it would overflow. The Tailwind runtime is inlined from `core/vendor/`, so the file has no network dependency.
+
+### 2.6.5 `core/contract_probe.py` (v3.6)
+Readiness probe that runs before any slide is written. Reuses the planner's scenario classifier, then checks the four universal contract slots and 3-4 scenario-specific facts per scenario (`SCENARIOS`) against the prompt and optional reference document. Returns a readiness ratio, the blocking slots (audience and decision) and an ordered list of questions for the Agent to ask.
+
+### 2.6.6 `core/blueprint_compat.py` (v3.6)
+The Blueprint Specification and the planner use one set of field names for several layouts; the renderers were written against another. Until v3.5 the gap was silent (a `cross_mapping` slide lost 90% of its text; `content_columns` lost every bullet). `normalize_slide` maps the documented fields (`points`, `tag`, `layer/current/target/action`, `horizon/name/kpi`, `step/focus`, `axes`) to the renderers' fields without overriding anything already in the renderer schema. Both builders call it. `tests/test_contract.py::TestTextFidelity` asserts that every string in a blueprint reaches the PPTX and the HTML.
+
+### 2.6.7 Evidence budget (v3.6, in `core/content_auditor.py`)
+`THIN_CONTENT_P<n>`: the slide's body text (headers excluded) is shorter than its layout needs, which means the layout is dressing up too little content. `EVIDENCE_BUDGET_P<n>`: a KPI slide where fewer than half the metrics carry a number. Minimum body lengths are set to about half of what the planner's own decks contain. Total deduction is capped at 12 points.
 
 ### 2.7 `core/sync_watcher.py`
 Maintains human-AI pair authoring synchronization.

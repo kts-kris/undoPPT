@@ -5,6 +5,37 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [3.6.0] - 2026-10-06
+
+Theme: **the skeleton**. The audit cannot tell a deck built from real material from one built from nothing, so v3.6 moves the quality gate upstream: ask first, write the outline from evidence, and stop dressing thin content in big layouts.
+
+### Added
+- **`cli.py probe`** (`core/contract_probe.py`): Cognitive Contract readiness probe. Classifies the scenario, checks Q1 thesis / Q2 audience / Q3 knowledge gap / Q4 decision plus 3-4 scenario-specific facts, and returns what to ask. Q2 and Q4 are blocking. `plan` and `generate` print the same hint but never stop.
+- **`docs/scenario_outlines.md`**: exemplar outlines for all 12 enterprise scenarios (audience gate, decision required, six pages with layout, mission and the evidence each page needs, red lines). A test keeps the documented storylines in step with the planner.
+- **Evidence budget audit**: `THIN_CONTENT_P<n>` (body text too short for the layout) and `EVIDENCE_BUDGET_P<n>` (KPI slide with fewer than half the metrics numeric). Deduction capped at 12.
+- **`core/blueprint_compat.py`**: maps the documented blueprint fields to the renderers' fields; used by both builders.
+- `SKILL.md`: stage 1 rewritten around "not enough information, do not generate" with the probe flow and ask-first mermaid loop; `plan`/`generate` repositioned as fallback.
+- `docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md`; 24 new tests (suite is now 68).
+
+### Fixed
+- **Text silently dropped from slides.** The spec and planner describe `cross_mapping`, `horizons_curve`, `maturity_ladder`, `matrix_2x2` and `content_columns` with one set of field names; the renderers read another. Measured on the 12 scenario decks, a `cross_mapping` slide lost 90% of its text, `horizons_curve` 74%, `maturity_ladder` 50%, `content_columns` 60%, `matrix_2x2` 44%. After the fix every blueprint string reaches the PPTX and the HTML for these layouts (0% lost).
+- Architecture-stack layer descriptions were hidden for 4-layer stacks.
+- "内部技术分享 / 技术分享 / 经验分享" prompts were classified as `general_informative` instead of `internal_tech_talk`.
+- Blueprints now carry the engine version (`core.__version__`) instead of a hard-coded string.
+
+### Changed
+- `cognitive_planner` is documented as the **fallback** author: it has no insight of its own and returns a 90+ score for a request as empty as "帮我做一份关于 AI 的汇报". The recommended path is Agent-authored blueprints after the probe.
+
+### Known limits
+- The probe detects whether a fact is *mentioned*, not whether it is right.
+- On decision-ready summary pages, `points` are not drawn when `options` are present (by design: the options, recommendation and sign-off list take the page).
+
+### Roadmap
+- **v3.7.0** Flesh: `source`/`status` fields, "to verify" marking, `cli.py ingest`, decision-ready demo.
+- **v3.8.0** Skin polish and motion.
+
+---
+
 ## [3.5.0] - 2026-10-06
 
 Theme: **the skin floor**. A deck that audits at 94/100 can still render broken. v3.5 renders the deliverables in PowerPoint and Chrome and fixes what that shows.
@@ -35,7 +66,7 @@ Theme: **the skin floor**. A deck that audits at 94/100 can still render broken.
 - The planner classifies "内部技术分享" prompts as `general_informative` instead of `internal_tech_talk` (planned for v3.6).
 
 ### Roadmap
-- **v3.6.0** Skeleton: per-scenario contract probes, 12 exemplar outlines, `EVIDENCE_BUDGET` pre-check.
+- v3.6.0 Skeleton: done (see above).
 - **v3.7.0** Flesh: `source`/`status` fields, "to verify" marking, `cli.py ingest`, decision-ready demo.
 - **v3.8.0** Skin polish and motion: typography/contrast rules, real-template trials, three narrative animations verified in PowerPoint and Keynote.
 

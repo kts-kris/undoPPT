@@ -88,6 +88,11 @@ class ContentAuditor:
         findings.extend(ent_findings)
         struct_score -= ent_deduction
 
+        # --- 3.6 Audit Evidence Budget (v3.6: does each slide have enough flesh to stand on?) ---
+        evid_findings, evid_deduction = self._audit_evidence_budget(slides)
+        findings.extend(evid_findings)
+        struct_score -= evid_deduction
+
         struct_score = max(0, min(100, struct_score))
 
         # --- 4. Deep Semantic & Rhetorical Audit (v2.5.0) ---
@@ -367,6 +372,71 @@ class ContentAuditor:
                     deduction += 2
 
         return findings, deduction
+
+    # Body text a slide must carry before its layout is worth showing (characters, titles excluded).
+    MIN_BODY_CHARS = {
+        "bento_cards": 80, "content_columns": 90, "columns": 90, "timeline": 70, "process_flow": 70,
+        "horizons_curve": 60, "cross_mapping": 90, "maturity_ladder": 90, "matrix_2x2": 60,
+        "standard_table": 60, "summary": 60, "keynote_quote": 30, "metric_spotlight": 40,
+        "kpi_dashboard": 40, "architecture_stack": 30,
+    }
+    # Never body text, at any depth.
+    NON_BODY_KEYS = {
+        "layout_type", "narrative_arc", "mission", "transition", "speaker_notes", "motion_pace",
+        "transition_effect", "tag", "highlight", "recommended", "chart_type", "step", "level", "horizon",
+    }
+    # Slide-level header fields: body text excludes them, but a card's own `title` is body text.
+    SLIDE_HEADER_KEYS = {"title", "action_title", "subtitle", "core_evidence"}
+    EVIDENCE_LAYOUTS = {"metric_spotlight", "kpi_dashboard"}
+    EVIDENCE_DEDUCTION_CAP = 12
+
+    @classmethod
+    def _body_text(cls, node: Any, key: str = "") -> str:
+        if key in cls.NON_BODY_KEYS:
+            return ""
+        if isinstance(node, str):
+            return node
+        if isinstance(node, dict):
+            return " ".join(cls._body_text(v, k) for k, v in node.items())
+        if isinstance(node, list):
+            return " ".join(cls._body_text(v, key) for v in node)
+        return ""
+
+    def _audit_evidence_budget(self, slides: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
+        """v3.6: flag slides without enough body text or quantitative proof to justify their layout.
+
+        THIN_CONTENT     the slide body is shorter than its layout needs (a layout of three one-line titles).
+        EVIDENCE_BUDGET  a KPI slide has too few numeric values. (Evidence-arc slides with no number at all are
+                         already reported by the semantic auditor as UNQUANTIFIED_EVIDENCE.)
+        """
+        findings: List[Dict[str, Any]] = []
+        deduction = 0
+        for idx, slide in enumerate(slides):
+            page = idx + 1
+            layout = slide.get("layout_type", "")
+            if layout in ("cover", "data_chart", "chart"):
+                continue
+            body = re.sub(r"\s+", "", self._body_text({k: v for k, v in slide.items() if k not in self.SLIDE_HEADER_KEYS}))
+            need = self.MIN_BODY_CHARS.get(layout)
+            if need and len(body) < need:
+                findings.append({
+                    "level": "warning",
+                    "code": f"THIN_CONTENT_P{page}",
+                    "message": f"第 {page} 页（{layout}）正文只有 {len(body)} 字，低于该图元所需的 {need} 字。内容不足以撑起这个版式：补充事实与数据，或合并/删除此页。",
+                })
+                deduction += 3
+
+            if layout in self.EVIDENCE_LAYOUTS:
+                metrics = slide.get("metrics", [])
+                numeric = sum(1 for m in metrics if re.search(r"\d", str(m.get("value", ""))))
+                if metrics and numeric < max(2, (len(metrics) + 1) // 2):
+                    findings.append({
+                        "level": "warning",
+                        "code": f"EVIDENCE_BUDGET_P{page}",
+                        "message": f"第 {page} 页是指标页，但 {len(metrics)} 项指标中只有 {numeric} 项带数值。没有数值的指标不是指标：补充真实数据，或改用文字图元。",
+                    })
+                    deduction += 3
+        return findings, min(deduction, self.EVIDENCE_DEDUCTION_CAP)
 
     def _audit_enterprise_rules(
         self,

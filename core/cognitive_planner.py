@@ -1,4 +1,10 @@
-"""cognitive_planner.py - Autonomous Grounded Cognitive Planner for undoPPT Engine (v3.5.0).
+"""cognitive_planner.py - Autonomous Grounded Cognitive Planner for undoPPT Engine (v3.6.0).
+
+ROLE (v3.6): this planner is the *fallback* author. It produces a well-formed generic skeleton from
+rules, but it has no insight of its own: given "帮我做一份关于 AI 的汇报" it still returns a 90+ audit
+score. The recommended path is for the Agent to ask (see core/contract_probe.py), then write the
+blueprint from the user's real material, using this planner only for quick drafts and as a reference
+for the documented storylines (docs/scenario_outlines.md).
 
 Transforms user intent ("一句话提示词") and optional grounded context/documents
 into a complete, fully-formed, audited presentation blueprint (blueprint.json).
@@ -338,7 +344,7 @@ class CognitivePlanner:
             }
 
         # S11: Internal Tech Talk
-        elif any(kw in combined for kw in ["技术内训", "团队内训", "内部培训", "tech talk", "开发者分享", "方法论内训", "业务内训"]) or (("培训" in combined or "内训" in combined) and ("技术" in combined or "内部" in combined or "工程" in combined or "架构" in combined)):
+        elif any(kw in combined for kw in ["技术内训", "团队内训", "内部培训", "tech talk", "开发者分享", "方法论内训", "业务内训", "技术分享", "内部分享", "经验分享", "分享会", "赋能培训"]) or (("培训" in combined or "内训" in combined) and ("技术" in combined or "内部" in combined or "工程" in combined or "架构" in combined)):
             subject = "核心技术与方法论"
             m = re.search(r"([\u4e00-\u9fa5a-zA-Z0-9]{2,8})(?:技术|内部)?(?:内训|培训|talk|分享)", core_text)
             if m and m.group(1) not in ["一个", "一份", "关于", "技术"]:

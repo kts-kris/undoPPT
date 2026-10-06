@@ -4,7 +4,7 @@
 
 **Next-Generation Presentation Deconstruction & Intelligent Re-engineering Super Agent & Engine**
 
-[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.6.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,19 @@
 > 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
+
+---
+
+## 🦴 What's New in v3.6.0: Ask First, Then Write
+
+An audit score cannot tell a deck built from real material from one built from nothing: "帮我做一份关于 AI 的汇报" still scores 90+. v3.6 moves the quality gate upstream.
+
+- 🧭 **`cli.py probe`**: before any slide is written, checks the four contract slots (thesis, audience, knowledge gap, decision) plus scenario-specific facts, and returns the questions to ask. Not enough information means no generation.
+- 📚 **12 exemplar outlines** ([docs/scenario_outlines.md](docs/scenario_outlines.md)): per scenario, the audience gate, the decision required, and for every page the evidence it needs. No evidence, no page.
+- 🧱 **Evidence budget**: `THIN_CONTENT` and `EVIDENCE_BUDGET` flag slides whose content cannot carry their layout.
+- 🐛 **Fixed silent data loss**: five layouts used different field names in the spec and in the renderers, so a `cross_mapping` slide lost 90% of its text and `content_columns` lost every bullet. Every blueprint string now reaches the PPTX and the HTML.
+
+See the [v3.6 PRD](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md).
 
 ---
 
@@ -170,6 +183,8 @@ undoPPT/
 │   ├── vision_extractor.py         # Visual heuristic analyzer
 │   ├── pptx_builder.py             # 15-primitive native vector PPTX builder (charts, tables, notes)
 │   ├── html_builder.py             # Single-file standalone HTML presentation compiler (N-key drawer, offline)
+│   ├── contract_probe.py           # Contract readiness probe (what is still unknown before authoring)
+│   ├── blueprint_compat.py         # Documented blueprint fields -> renderer fields (no silent data loss)
 │   ├── layout_fit.py               # Content-adaptive layout pass (title fit, card fit, font floor, centering)
 │   ├── layout_lint.py              # Static geometry lint for built PPTX (overflow, overlap, wrapped titles)
 │   ├── render_check.py             # Real-render verification via PowerPoint/LibreOffice and headless Chrome
@@ -186,9 +201,10 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression and layout tests (44 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (68 passing)
 │   ├── test_engine.py
-│   └── test_layout.py
+│   ├── test_layout.py
+│   └── test_contract.py
 ├── output/                         # Generated deliverables (git-ignored; rebuild with `cli.py demo`)
 ├── .undoppt/                       # Internal metadata cache (tokens, blueprints, diffs, assets)
 ├── cli.py                          # Unified CLI entrypoint (plan / generate / undo / build / audit / sync / demo)
@@ -244,14 +260,20 @@ Detect changes after manually modifying slides in PowerPoint or Keynote:
 python3 cli.py sync --target output/presentation.pptx
 ```
 
-### 7. Verify the Layout (Render Check)
+### 7. Check the Request Before Writing (Probe)
+```bash
+python3 cli.py probe --prompt "智能客服业务立项答辩，申请首期预算，预期人效提升 40%"
+```
+Reports which contract slots and scenario facts are still unknown, and the questions to ask first. `plan`/`generate` print the same hint when readiness is low.
+
+### 8. Verify the Layout (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # static lint, no renderer needed
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
 ```
 `--render` needs `pip install -r requirements-dev.txt` plus PowerPoint (macOS) or LibreOffice for PPTX, and Chrome for HTML.
 
-### 8. Run Demo Showcase
+### 9. Run Demo Showcase
 ```bash
 python3 cli.py demo
 ```

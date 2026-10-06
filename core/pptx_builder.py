@@ -24,6 +24,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml import parse_xml
 from pptx.util import Inches, Pt
 
+from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
 from core.layout_fit import fit_title_size, normalize_slide, pick_font
 
 
@@ -251,7 +252,7 @@ def render_architecture_stack_slide(prs, slide_data: Dict[str, Any], tokens: Dic
 
         # Layer description under name if space allows
         desc = layer.get("desc", "")
-        if desc and layer_height > 1.1:
+        if desc and layer_height > 0.85:
             p_desc = tf_badge.add_paragraph()
             p_desc.alignment = PP_ALIGN.CENTER
             run_d = p_desc.add_run()
@@ -2282,6 +2283,7 @@ def build_presentation(blueprint: Any, tokens: Dict[str, Any], output_path: str,
     active_default_transition = default_transition or global_transition
 
     for idx, slide_data in enumerate(slides):
+        slide_data = normalize_blueprint_slide(slide_data)
         layout_type = slide_data.get("layout_type", "bento_cards")
         renderer = RENDERERS.get(layout_type)
         if renderer is None:

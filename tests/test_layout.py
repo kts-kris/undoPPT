@@ -245,8 +245,8 @@ class TestStandaloneHtml(unittest.TestCase):
 
 class TestVersion(unittest.TestCase):
 
-    def test_version_is_3_5_x(self):
-        self.assertTrue(__version__.startswith("3.5."), __version__)
+    def test_version_is_3_x(self):
+        self.assertRegex(__version__, r"^3\.[5-9]\.\d+$")
 
     def test_planner_stamps_engine_version(self):
         bp = CognitivePlanner().plan("季度业务复盘 QBR")

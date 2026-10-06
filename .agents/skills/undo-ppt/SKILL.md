@@ -1,7 +1,7 @@
 ---
 name: undo-ppt
 description: >-
-  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.5.0).
+  Next-generation Presentation Deconstruction & Intelligent Re-engineering Super Skill (undoPPT v3.6.0).
   Use this skill whenever the user wants to generate, redesign, deconstruct, or co-edit presentations (PPTX or Standalone HTML).
   Specializes in: (1) multi-scenario generic cognitive planning across 12 enterprise operational scenarios (project charter, annual strategy/OKR, QBR, cross-team alignment, headcount/budget review, RFC, post-mortem, GTM launch, RFP pitch, promotion assessment, internal tech talk, all-hands rally) anchored in 6 base archetypes with zero domain hardcoding;
   (2) 15 high-fidelity layout primitives (Bento, Architecture Stacks, KPI Dashboards, Timelines, 2x2 Matrices, Maturity Ladders, Three Horizons, Cross Mappings, Tables, Native Charts, Columns, Quotes, Process Flows, Decision-Ready Ask Summary);
@@ -11,7 +11,7 @@ description: >-
   (6) 15 primitives semantic kinetic physics and active decision sandbox adhering to the Design Philosophy Whitepaper (DESIGN_PHILOSOPHY.md).
 ---
 
-# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.5.0)
+# undoPPT: Presentation Deconstruction & Intelligent Re-engineering Super Skill (v3.6.0)
 
 `undoPPT` 是一个工业级通用智能演示文稿解构与重构引擎。它深度解析模板母版与规范，全面解耦领域硬编码，支持企业 **12 大核心实战场景**（立项答辩、年度战略、QBR复盘、跨团队拉通、人头预算评审、RFC架构评审、故障复盘、GTM产品发布、大客户竞标、晋升述职、技术内训、全员动员）并锚定于 6 大通用场景原型。系统严格遵循“软性认知与硬性约束解耦”的设计哲学（详见 [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) / [中文白皮书](DESIGN_PHILOSOPHY_zh.md) 与 [Blueprint 规约手册](docs/en/blueprint_specification.md)）：Agent 充当战略顾问与认知主编，Skill 充当物理排版流水线与独立质检员。引擎提供 **15 大高阶信息图元**（含决策闭环对比卡、原生矢量图表与规整数据表格），交付 100% 可编辑的原生矢量 PPTX（内置场景口播演讲备注与 `<p:timing>` 原生时序步进）与零依赖单文件 HTML（内置 `P` 键演播中枢 HUD、`N` 键认知抽屉与活动决策沙盒），支持全生命周期双向意图反思。
 
@@ -125,8 +125,11 @@ AI Agent 既可以通过 CLI 生成，也可以**直接编写 `blueprint.json`**
 
 ```mermaid
 graph TD
-    A[用户提出需求 / 输入文档] --> B[阶段 1: 认知契约探针 Q1~Q4 识别 6 大场景之一]
-    B --> C{是否提供模板?}
+    A[用户提出需求 / 输入文档] --> B[阶段 1: probe 认知契约探针 Q1~Q4 + 场景专属事实]
+    B --> R{信息足够?}
+    R -- 否 --> Q[先向用户提问 一次最多 3 个]
+    Q --> B
+    R -- 是 --> C{是否提供模板?}
     C -- 是 --> D[阶段 2: 模板深度逆向解构 AST/Slots/Assets]
     C -- 否 --> E[阶段 2: 匹配内置设计规范 modern_bento / consulting_minimalist / tech_keynote / enterprise_architecture]
     D --> F[阶段 3: 编排 15 大图元 blueprint.json & 审计自愈]
@@ -140,12 +143,30 @@ graph TD
 ```
 
 ### 阶段 1 · 认知契约探针 (Cognitive Contract Probe)
-探寻四大认知基座（以顾问视角提问，不生硬审讯）：
-1. **Q1 核心主旨**：抛开所有枝节，最想传达的一个核心论点是什么？
-2. **Q2 演讲受众**：汇报对象是谁？其立场与核心顾虑是什么？
-3. **Q3 认知差与痛点**：听众已知什么？未知但关键的痛点/盲区是什么？
-4. **Q4 终局行动目标**：演示结束后，受众必须做出的具体动作/决策是什么？
-5. **场景原型**：属于战略规划、技术架构、产品路演、个人履历、教育教学还是通用汇报？
+
+**铁律：信息不足，不生成。** 审计分数只看蓝图结构，对"垃圾进"毫无感觉（一句"帮我做一份关于 AI 的汇报"也能拿到 90 分的套话提纲）。所以必须在写任何一页之前先确认信息够不够。
+
+**第一步：跑探针。**
+```bash
+python3 "<SKILL_ROOT>/cli.py" probe --prompt "<用户原话>" [--input-doc <file.md>] --json
+```
+返回场景、完备度、每个槽位是否已知，以及按优先级排好的追问清单。
+
+| 探针结果 | 你该做什么 |
+|---|---|
+| `ready: false` | **先问，不要生成。** 从 `questions` 里挑最重要的 2~3 个（阻塞项 `blocking` 在前），用顾问的口吻问，不要审讯式一次问完 |
+| `ready: true` | 进入阶段 3，写提纲 |
+| 用户说"你先做个初稿" | 可以做，但**明说**哪些数据是占位、哪些页因信息不足而省略，并在蓝图里把没有依据的数字留空，不要编造 |
+
+**四大认知基座（Q1~Q4，所有场景通用）**：
+1. **Q1 核心主旨**：抛开枝节，最想让对方记住的一句**判断**是什么？（不是主题）
+2. **Q2 受众与立场**：汇报对象是谁？立场和最担心的事是什么？
+3. **Q3 认知差与痛点**：对方已知什么？未知但关键的痛点/盲区是什么？
+4. **Q4 终局行动**：讲完后对方必须做出的具体决定或动作是什么？
+
+**场景专属追问**：探针会按场景追加（立项问预算与备选方案，QBR 问偏差与归因，RFC 问回滚方案，故障复盘问时间线，晋升问净增量……）。12 个场景各自的"听众闸门、必须拍板的事、每页必备血肉"见 [scenario_outlines.md](docs/scenario_outlines.md)。
+
+**提问原则**：一次最多问 3 个；每个问题给一个例子，降低回答成本；用户答不上来的，帮他把问题改成他能回答的形式（"没有精确数字的话，量级大概是多少？"）。
 
 ### 阶段 2 · 模板解析提取 (Template Deconstruction)
 若用户提供了模板文件：
@@ -154,13 +175,17 @@ python3 "<SKILL_ROOT>/cli.py" undo --template /path/to/template.pptx --out .undo
 ```
 
 ### 阶段 3 · 蓝图编排与质量审计 (Plan & Audit)
-方式 A（CLI 自主规划）：
+**先对照 [scenario_outlines.md](docs/scenario_outlines.md) 确定每页的"必备血肉"：用户给了才写这一页，没给就回去问，或合并/删除这一页。页数服从证据，不是证据服从页数。**
+
+方式 A（CLI 自主规划，**仅作兜底**）：规则引擎生成的提纲是通用骨架，没有真实洞察；它适合快速出初稿或 Agent 不可用时，不应替代你对用户材料的归纳。
 ```bash
 python3 "<SKILL_ROOT>/cli.py" plan --prompt "<提示词>" [--input-doc <file.md>] [--out .undoppt/blueprint.json]
 ```
-方式 B（Agent 智能编排）：Agent 直接依据上述 15 大图元规约构造 `.undoppt/blueprint.json`。
+方式 B（**推荐**，Agent 智能编排）：Agent 依据用户材料与上述 15 大图元规约，直接构造 `.undoppt/blueprint.json`。
 
-运行 10 维认知质量与深度语义审计：
+字段名以第 2 节规约为准；`content_columns` 的 `points`/`tag`、`cross_mapping` 的 `layer/current/target/action` 等文档字段，引擎会自动映射到渲染卡片（`core/blueprint_compat.py`），无需手工换名。
+
+运行 10 维认知质量与深度语义审计（v3.6 新增 `THIN_CONTENT`：正文撑不起版式；`EVIDENCE_BUDGET`：指标页缺数值——这两项都是"血肉不足"的信号，应回去补材料，而不是调版式）：
 ```bash
 python3 "<SKILL_ROOT>/cli.py" audit --blueprint .undoppt/blueprint.json --tokens .undoppt/design_tokens.json
 ```
@@ -195,7 +220,10 @@ python3 "<SKILL_ROOT>/cli.py" sync --target output/presentation.pptx
 ## 4. CLI 快速调用参考
 
 ```bash
-# 1. 自主认知规划器 (6 大场景自适应)
+# 0. 认知契约探针：信息够不够？（先问再做）
+python3 "<SKILL_ROOT>/cli.py" probe --prompt "<提示词>" [--input-doc <file.md>] [--json]
+
+# 1. 自主认知规划器 (6 大场景自适应；兜底用)
 python3 "<SKILL_ROOT>/cli.py" plan --prompt "<提示词>" [--input-doc <file.md>] [--out blueprint.json]
 
 # 2. 一键全流程极速生成 (规划 -> 场景装配 -> 审计 -> 双端构建)

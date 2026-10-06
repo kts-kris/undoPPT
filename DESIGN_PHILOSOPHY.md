@@ -6,7 +6,7 @@
 
 </div>
 
-> **Version**: v3.5.0  
+> **Version**: v3.6.0  
 > **Positioning**: Next-generation Presentation Deconstruction & Re-engineering Super Agent (undoPPT Super Skill) Core Architectural Standard.  
 > **Core Manifesto**: *“A presentation is not an art album, but an audience-centric cognitive reshaping and decision intervention project.”*
 

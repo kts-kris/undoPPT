@@ -1,6 +1,6 @@
 # undoPPT CLI Reference Manual
 
-This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.5.0).
+This manual documents the unified command-line interface (`cli.py`) for the `undoPPT` Super Skill and automation engine (v3.6.0).
 
 ---
 
@@ -20,6 +20,7 @@ python3 cli.py <command> [arguments...]
 | `undo` | Master template deconstruction & token extraction | Enterprise `.pptx` | `.undoppt/design_tokens.json`, assets |
 | `build` | Dual-format vector presentation rendering | Blueprint, Design Tokens | `presentation.pptx`, `presentation.html` |
 | `sync` | Detect external manual edits by human presenter | Target `.pptx` file | Semantic AST diff summary |
+| `probe` | Check whether a request has enough information before authoring | Prompt, optional Reference Doc | Readiness, missing facts, questions to ask |
 | `render-check` | Verify the layout of built deliverables | `.pptx`, `.html` | Findings report, rendered PNGs |
 | `demo` | Run full showcase demonstration pipeline | *None* | Complete audited demo presentations |
 
@@ -217,7 +218,29 @@ python3 cli.py sync --target output/presentation.pptx
 
 ---
 
-## 7. `render-check` (Layout Verification, v3.5)
+## 7. `probe` (Cognitive Contract Readiness, v3.6)
+
+The audit scores a blueprint's structure and cannot tell a deck built from real material from one built from nothing: a request as thin as "帮我做一份关于 AI 的汇报" still scores 90+. `probe` runs *before* authoring and reports what is still unknown.
+
+It classifies the scenario (one of the 12 enterprise scenarios or a generic archetype), then checks four universal slots (Q1 thesis, Q2 audience, Q3 knowledge gap, Q4 decision) plus three or four scenario-specific facts (a QBR needs the variance, an RFC needs the rollback plan, a post-mortem needs the timeline). Q2 and Q4 are *blocking*: without knowing who decides and what they must decide, do not generate.
+
+```bash
+python3 cli.py probe --prompt "智能客服业务立项答辩，申请首期预算，预期人效提升 40%"
+python3 cli.py probe --prompt "..." --input-doc notes.md --json
+```
+
+| Flag | Description |
+| :--- | :--- |
+| `--prompt` | The user's request, verbatim. |
+| `--input-doc` | Reference document; its text counts as evidence. |
+| `--context` | Extra context text. |
+| `--json` | Machine-readable output (`ready`, `readiness`, `blocking`, `slots`, `questions`). |
+
+`ready` is true when at least 70% of the slots are known and no blocking slot is missing. `questions` lists what to ask, blocking questions first. The check is a heuristic: it detects whether a fact is *mentioned*, not whether it is right. `plan` and `generate` print the same hint when readiness is low but never stop.
+
+---
+
+## 8. `render-check` (Layout Verification, v3.5)
 
 The audit scores a blueprint; it cannot see the rendered result. `render-check` closes that gap in two layers:
 
@@ -267,7 +290,7 @@ PowerPoint is sandboxed and can only write to folders the user has granted, so t
 
 ---
 
-## 8. `demo` (Showcase Pipeline)
+## 9. `demo` (Showcase Pipeline)
 
 Runs a comprehensive demonstration that highlights the complete cognitive pipeline, compiles all 15 layout primitives, renders native vector charts and tables, injects speaker notes, and generates the standalone HTML drawer.
 

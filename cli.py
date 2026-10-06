@@ -17,6 +17,7 @@ import sys
 
 from core.cognitive_planner import CognitivePlanner
 from core.content_auditor import ContentAuditor
+from core.contract_probe import probe as probe_contract
 from core.html_builder import build_standalone_html
 from core.layout_lint import lint_pptx
 from core.pptx_builder import build_presentation
@@ -331,12 +332,49 @@ def cmd_build(args):
         print(f"[✓] Standalone HTML generated successfully: {html_out}")
 
 
+def _print_readiness_hint(prompt, doc_path=None, context=None):
+    """Non-blocking v3.6 hint: warn when the request is too thin for a good deck."""
+    try:
+        r = probe_contract(prompt, context=context, doc_path=doc_path)
+    except Exception:
+        return
+    if r["ready"]:
+        return
+    print(f"[!] 认知契约完备度 {r['readiness']:.0%}（{r['scenario_label']}）。信息不足时生成的 PPT 会靠套话填充。")
+    print("    建议先向用户确认：")
+    for q in r["questions"][:4]:
+        print(f"      - {q}")
+    print("    （详见 `cli.py probe`；本命令不会因此中止。）")
+
+
+def cmd_probe(args):
+    """Cognitive Contract readiness probe: what is still unknown before slides are written."""
+    r = probe_contract(args.prompt, context=args.context, doc_path=getattr(args, "input_doc", None))
+    if args.json:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        return
+    print("================================================================")
+    print("  undoPPT Cognitive Contract Probe (v3.6)")
+    print("================================================================")
+    print(f"  场景:     {r['scenario_label']} ({r['scenario']})")
+    print(f"  完备度:   {r['readiness']:.0%}  ->  {'可以开始写提纲' if r['ready'] else '信息不足，请先提问'}")
+    for slot in r["slots"]:
+        mark = "[✓]" if slot["satisfied"] else "[ ]"
+        print(f"  {mark} {slot['key']:<14s}{slot['name'] if slot['kind'] == 'contract' else ''}")
+    if r["questions"]:
+        print("  待确认的问题（阻塞项在前）:")
+        for i, q in enumerate(r["questions"], 1):
+            print(f"    {i}. {q}")
+    print(f"  注：{r['note']}")
+
+
 def cmd_plan(args):
     """Autonomous Cognitive Planner: transform natural language prompt into audited blueprint."""
     print(f"[*] Planning presentation for prompt: {args.prompt}")
     doc_path = getattr(args, "input_doc", None)
     if doc_path:
         print(f"    Grounded document: {doc_path}")
+    _print_readiness_hint(args.prompt, doc_path=doc_path, context=args.context)
     planner = CognitivePlanner()
     blueprint = planner.plan(prompt=args.prompt, context=args.context, doc_path=doc_path)
 
@@ -364,6 +402,7 @@ def cmd_generate(args):
     doc_path = getattr(args, "input_doc", None)
     if doc_path:
         print(f"[*] Input Grounding Document: {doc_path}")
+    _print_readiness_hint(args.prompt, doc_path=doc_path, context=getattr(args, "context", None))
 
     # 1. Deconstruct or pick tokens
     tokens = {}
@@ -592,7 +631,7 @@ def cmd_demo(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.5.0)")
+    parser = argparse.ArgumentParser(description="undoPPT Super Skill Engine CLI (v3.6.0)")
     subparsers = parser.add_subparsers(dest="command")
 
     # plan
@@ -635,6 +674,13 @@ def main():
     p_sync = subparsers.add_parser("sync", help="Check for external user edits")
     p_sync.add_argument("--target", default="output/presentation.pptx", help="Target file path to check")
 
+    # probe
+    p_probe = subparsers.add_parser("probe", help="Check whether a request has enough information to write a good deck")
+    p_probe.add_argument("--prompt", required=True, help="The user's request, verbatim")
+    p_probe.add_argument("--context", default=None, help="Extra context text")
+    p_probe.add_argument("--input-doc", default=None, help="Reference document (.md/.txt)")
+    p_probe.add_argument("--json", action="store_true", help="Emit machine-readable JSON")
+
     # render-check
     p_rc = subparsers.add_parser("render-check", help="Verify layout of built PPTX/HTML (static lint + real renders)")
     p_rc.add_argument("--pptx", help="Path to presentation.pptx")
@@ -665,6 +711,8 @@ def main():
         cmd_audit(args)
     elif args.command == "sync":
         cmd_sync(args)
+    elif args.command == "probe":
+        cmd_probe(args)
     elif args.command == "render-check":
         cmd_render_check(args)
     elif args.command == "demo":

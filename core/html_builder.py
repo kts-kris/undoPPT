@@ -16,6 +16,8 @@ import re
 import warnings
 from typing import Any, Dict, List
 
+from core.blueprint_compat import normalize_slide as normalize_blueprint_slide
+
 _TAILWIND_RUNTIME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor", "tailwindcss-play-3.4.17.js")
 
 
@@ -1065,6 +1067,7 @@ def build_standalone_html(blueprint: Any, tokens: Dict[str, Any], output_path: s
     }
 
     for idx, slide_data in enumerate(slides):
+        slide_data = normalize_blueprint_slide(slide_data)
         l_type = slide_data.get("layout_type", "bento_cards")
         renderer = HTML_RENDERERS.get(l_type)
         if renderer is None:

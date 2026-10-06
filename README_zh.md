@@ -4,7 +4,7 @@
 
 **面向现代 AI Agent 的新一代演示文稿认知规划、母版解构与双端高保真渲染超级工程引擎**
 
-[![Version](https://img.shields.io/badge/version-3.5.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.6.0-blue.svg)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Super%20Skill-orange.svg)](SKILL.md)
@@ -18,6 +18,19 @@
 > 📋 **PRD 需求文档**：[《undoPPT v3.4.0 企业 12 大场景专项提升与决策闭环 PRD》](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [《v3.3.0 动效与决策沙盒 PRD》](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [《场景避坑红线手册》](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` 是为 **Cursor、Claude Code、OpenAI Codex、Windsurf、腾讯 WorkBuddy、Trae、Google Antigravity、OpenCode** 等现代办公与开发领域领先的 AI Agent 打造的新一代演示文稿超级 Skill 与自动化工程引擎。彻底终结传统 AI 生成 PPT **“通篇堆字、版面混乱、无法吸收企业母版、生成物不可二次编辑、逻辑因果断裂、人机交互单向割裂、企业汇报缺乏决策闭环与深度”** 的核心痛点。
+
+---
+
+## 🦴 v3.6.0 新增：先问清楚，再动笔
+
+审计分数分不清"用真材料做的 PPT"和"凭空做的 PPT"：一句"帮我做一份关于 AI 的汇报"照样能拿 90 多分。v3.6 把质量闸门前移。
+
+- 🧭 **`cli.py probe`**：写任何一页之前，先检查四个契约槽位（主旨、受众、认知差、决策）和场景专属事实，返回该问用户的问题。信息不足，不生成。
+- 📚 **12 个场景的优秀提纲样例**（[docs/scenario_outlines.md](docs/scenario_outlines.md)）：每个场景的听众闸门、必须拍板的事，以及每一页需要的证据。没有证据，就不该有这一页。
+- 🧱 **血肉预算**：`THIN_CONTENT` 与 `EVIDENCE_BUDGET` 标出内容撑不起版式的页面。
+- 🐛 **修复静默丢字**：五种图元在规格书与渲染器里用了不同的字段名，`cross_mapping` 页丢掉 90% 的文字，`content_columns` 丢掉全部要点。现在蓝图里的每一个字符串都会进入 PPTX 与 HTML。
+
+详见 [v3.6 PRD](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md)。
 
 ---
 
@@ -167,6 +180,8 @@ undoPPT/
 │   ├── vision_extractor.py         # 视觉启发式解析器
 │   ├── pptx_builder.py             # 15 大图元原生矢量 PPTX 构建器 (含原生图表与 Speaker Notes)
 │   ├── html_builder.py             # 15 大图元单文件自包含 HTML 演示编译器 (含 N 键认知抽屉，可离线)
+│   ├── contract_probe.py           # 认知契约探针（动笔前还缺哪些信息）
+│   ├── blueprint_compat.py         # 文档字段 -> 渲染器字段映射（杜绝静默丢字）
 │   ├── layout_fit.py               # 内容自适应版面（标题适配、卡片收缩、字号地板、居中）
 │   ├── layout_lint.py              # PPTX 静态几何 lint（溢出、重叠、标题折行）
 │   ├── render_check.py             # 基于 PowerPoint/LibreOffice 与无头 Chrome 的真实渲染验证
@@ -183,9 +198,10 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归与版面测试套件 (44 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (68 passing)
 │   ├── test_engine.py
-│   └── test_layout.py
+│   ├── test_layout.py
+│   └── test_contract.py
 ├── output/                         # 生成的交付物（已加入 .gitignore，可用 `cli.py demo` 重建）
 ├── .undoppt/                       # 内部元数据缓存 (tokens, blueprint, sync, assets)
 ├── cli.py                          # 统一命令行交互入口 (plan / generate / undo / build / audit / sync / demo)
@@ -240,7 +256,13 @@ python3 cli.py build --blueprint .undoppt/blueprint.json --tokens .undoppt/desig
 python3 cli.py sync --target output/presentation.pptx
 ```
 
-### 7. 版面验证 (Render Check)
+### 7. 动笔前检查需求 (Probe)
+```bash
+python3 cli.py probe --prompt "智能客服业务立项答辩，申请首期预算，预期人效提升 40%"
+```
+报告哪些契约槽位和场景事实还不知道，以及应先问的问题。完备度低时，`plan`/`generate` 也会打印同样的提示。
+
+### 8. 版面验证 (Render Check)
 ```bash
 python3 cli.py render-check --pptx output/presentation.pptx                       # 静态 lint，无需渲染器
 python3 cli.py render-check --pptx output/presentation.pptx --html output/presentation.html --render
