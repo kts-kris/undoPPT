@@ -1,6 +1,8 @@
 # undoPPT v3.8.0 产品需求文档 (PRD)
 ## 皮囊与身姿：读懂真实模板、对比度有保证、动画名副其实 (Skin & Poise)
 
+> [English](en/prd/PRD_v3.8_SKIN_AND_POISE.md) | 简体中文
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

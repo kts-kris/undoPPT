@@ -180,6 +180,41 @@ class TestBilingualParity(unittest.TestCase):
                 self.assertNotIn("/en/", target, f"docs/zh/{name}.md links to an English document: {target}")
 
 
+class TestPrdBilingualParity(unittest.TestCase):
+    """Every PRD has an English counterpart in docs/en/prd/ with the same structure, linked both ways."""
+
+    PRDS = sorted(os.path.basename(p) for p in glob.glob(os.path.join(ROOT, "docs", "PRD_*.md")))
+
+    def test_there_are_prds_to_check(self):
+        self.assertGreaterEqual(len(self.PRDS), 7)
+
+    def test_every_prd_has_an_english_version_that_links_back(self):
+        for name in self.PRDS:
+            en = f"docs/en/prd/{name}"
+            self.assertTrue(os.path.exists(os.path.join(ROOT, en)), en)
+            self.assertIn(f"](en/prd/{name})", read(f"docs/{name}"), f"docs/{name} has no link to its English version")
+            self.assertIn(f"[简体中文](../../{name})", read(en), f"{en} has no link to its Chinese version")
+
+    def test_no_english_prd_without_a_chinese_original(self):
+        names = {os.path.basename(p) for p in glob.glob(os.path.join(ROOT, "docs", "en", "prd", "*.md"))}
+        self.assertEqual(names, set(self.PRDS))
+
+    def test_prd_versions_have_the_same_structure(self):
+        for name in self.PRDS:
+            zh, en = read(f"docs/{name}"), read(f"docs/en/prd/{name}")
+            shape = lambda t: (len(re.findall(r"^## ", t, re.M)), len(re.findall(r"^### ", t, re.M)),
+                               len(re.findall(r"^#### ", t, re.M)), t.count("```"), len(re.findall(r"^> \*\*", t, re.M)))
+            self.assertEqual(shape(zh), shape(en), f"{name}: headings, code fences or correction notes differ")
+
+    def test_english_prds_link_only_inside_english_docs_or_up_to_the_originals(self):
+        for name in self.PRDS:
+            for target in re.findall(r"\]\(([^)#\s]+\.md)", read(f"docs/en/prd/{name}")):
+                if target.startswith("http"):
+                    continue
+                self.assertFalse(target.startswith("../zh/") or target.startswith("../../zh/"),
+                                 f"docs/en/prd/{name} links to a Chinese guide: {target}")
+
+
 class TestNoKnownStaleClaims(unittest.TestCase):
     """Claims that were once true and are not. Each corresponds to a defect found in v3.5-v3.8."""
 

@@ -1,6 +1,10 @@
 # undoPPT v3.6.0 产品需求文档 (PRD)
 ## 骨架：先问清楚，再动笔；有证据，才有这一页 (Skeleton: Ask First, Evidence Before Pages)
 
+> [English](en/prd/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md) | 简体中文
+
+> **后续变化**：§6 中 v3.7 的数据出处工作已按计划交付；v3.8 计划的"Keynote"验证未能达成，见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md)。
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

@@ -1,6 +1,10 @@
 # undoPPT v3.5.0 产品需求文档 (PRD)
 ## 皮囊底线与渲染验证闭环 (Skin Floor & Render Check Loop)
 
+> [English](en/prd/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md) | 简体中文
+
+> **后续变化**：R3 的字号地板在 v3.7 收窄（只抬高小于 12pt 的文字，不动标题，短标签不得折行），见 [v3.7 PRD](PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)。§6 中 v3.8 计划的"Keynote"验证未能达成，见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md)。
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

@@ -232,7 +232,7 @@ undoPPT/
 │   ├── consulting_minimalist.json  # 顶级战略咨询高密度极简
 │   ├── tech_keynote.json           # 科技暗黑大屏展演
 │   └── enterprise_architecture.json# 架构工程实战容器
-├── tests/                          # 自动化单元、回归、版面与契约测试套件 (165 passing)
+├── tests/                          # 自动化单元、回归、版面与契约测试套件 (170 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
@@ -352,7 +352,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest tests -q              # 或：python3 -m unittest discover -s tests
 ```
 
-165 个测试通过（另有 1 个需要 macOS 上的 PowerPoint：`UNDOPPT_TEST_POWERPOINT=1`）。已在 Python 3.12 与 3.14 上验证；代码声明支持 3.10+，但 3.10、3.11、3.13 尚未实际运行。
+170 个测试通过（另有 1 个需要 macOS 上的 PowerPoint：`UNDOPPT_TEST_POWERPOINT=1`）。已在 Python 3.12 与 3.14 上验证；代码声明支持 3.10+，但 3.10、3.11、3.13 尚未实际运行。
 
 ---
 
@@ -369,7 +369,7 @@ python3 -m pytest tests -q              # 或：python3 -m unittest discover -s 
 - 🚫 [场景避坑红线](docs/zh/scenario_anti_patterns.md)
 - 🏗️ [引擎架构详解](docs/zh/architecture.md)
 - 🔌 [AI Agent 集成指南](docs/zh/agent_integration.md)
-- 🧾 [更新日志](CHANGELOG.md) 与各版 PRD：[v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)、[v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md)、[v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md)、[v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md)、[v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md)、[v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)、[v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)
+- 🧾 [更新日志](CHANGELOG.md) 与各版 PRD：[v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md)、[v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md)、[v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md)、[v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md)、[v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md)、[v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md)、[v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)（均有[英文版](docs/en/prd/PRD_v3.8_SKIN_AND_POISE.md)，位于 `docs/en/prd/`）
 - 🤝 [贡献指南](CONTRIBUTING.md)
 
 ---

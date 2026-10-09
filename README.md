@@ -15,7 +15,7 @@
 
 > **“Cognitive Contract • Master Decompilation • Graphic Reconstruction • Zero-Friction Delivery • Always-in-Sync”**  
 > 📖 **Deep Dive**: [undoPPT Design Philosophy & Architecture Synergy Whitepaper](DESIGN_PHILOSOPHY.md) ([简体中文](DESIGN_PHILOSOPHY_zh.md)) — Formalizing the collaboration boundaries between the AI Agent brain and the Skill execution engine through a 5-layer quality assurance closed-loop.  
-> 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
+> 📋 **PRD Specification**: [undoPPT v3.4.0 Enterprise 12 Scenarios & Decision Rigor PRD](docs/en/prd/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | [v3.3.0 Kinetic Dynamics PRD](docs/en/prd/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | [Scenario Anti-Patterns Handbook](docs/en/scenario_anti_patterns.md)
 
 `undoPPT` is a next-generation presentation Super Skill and automation engineering engine tailored for modern AI Agents (**Cursor, Claude Code, OpenAI Codex, Windsurf, Tencent WorkBuddy, Trae, Google Antigravity, OpenCode**, etc.). It eliminates the chronic flaws of legacy AI slide generators: **wall-of-text slides, chaotic layouts, inability to adopt corporate master templates, non-editable raster image exports, broken causal narratives, one-way generation without feedback loops, and lack of enterprise decision closure.**
 
@@ -29,7 +29,7 @@ Tested against real PowerPoint output, three things the README used to promise t
 - 🌗 **Contrast is a guarantee.** Text below WCAG 4.5:1 (3:1 for large text) is repaired against the fill behind it, keeping its hue; brand-colour fills are never touched. The dark preset's decision page, previously unreadable, now works. `design_check` validates tokens (contrast, minimum sizes, hierarchy).
 - 🎬 **Motion that PowerPoint actually plays.** The animation XML written since v3.3 was recognised by PowerPoint as **0** animations. The new tree is recognised on every slide, and `render-check` asks PowerPoint to confirm. Animation is now **off by default**, with three narrative types: `reveal`, `contrast`, `build`.
 
-See the [v3.8 PRD](docs/PRD_v3.8_SKIN_AND_POISE.md) and the [design system](docs/en/design_system.md). Limits: a template's masters, artwork and logos are not placed on generated slides; Keynote could not be verified.
+See the [v3.8 PRD](docs/en/prd/PRD_v3.8_SKIN_AND_POISE.md) and the [design system](docs/en/design_system.md). Limits: a template's masters, artwork and logos are not placed on generated slides; Keynote could not be verified.
 
 ---
 
@@ -43,7 +43,7 @@ A number with no origin reads like evidence and cannot be checked. v3.7 makes pr
 - 🧪 **The demo now follows its own rules**: it ends on a decision-ready page, uses no banned words, and labels its invented figures as 示例数据. It audits at 100/100 with no warnings (v3.6: 8 findings).
 - ✍️ **Buzzword fixes**: each flagged word comes with how to rewrite it.
 
-See the [v3.7 PRD](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md).
+See the [v3.7 PRD](docs/en/prd/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md).
 
 ---
 
@@ -56,7 +56,7 @@ An audit score cannot tell a deck built from real material from one built from n
 - 🧱 **Evidence budget**: `THIN_CONTENT` and `EVIDENCE_BUDGET` flag slides whose content cannot carry their layout.
 - 🐛 **Fixed silent data loss**: five layouts used different field names in the spec and in the renderers, so a `cross_mapping` slide lost 90% of its text and `content_columns` lost every bullet. Every blueprint string now reaches the PPTX and the HTML.
 
-See the [v3.6 PRD](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md).
+See the [v3.6 PRD](docs/en/prd/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md).
 
 ---
 
@@ -70,7 +70,7 @@ A deck that scores 94/100 can still look broken. v3.5 renders every deliverable 
 - 🔍 **`cli.py render-check`**: static layout lint (no renderer needed) plus real renders through PowerPoint/LibreOffice and headless Chrome. `build` runs the lint automatically.
 - 🐛 **Fixed**: the planner emitted a `kpi_dashboard` layout that no builder knew, so QBR/OKR/headcount decks got an empty slide.
 
-See the [v3.5 PRD](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md) and the [roadmap](CHANGELOG.md).
+See the [v3.5 PRD](docs/en/prd/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md) and the [roadmap](CHANGELOG.md).
 
 ---
 
@@ -235,7 +235,7 @@ undoPPT/
 │   ├── consulting_minimalist.json  # High-density management consulting
 │   ├── tech_keynote.json           # Dark mode tech conference keynote
 │   └── enterprise_architecture.json# Systems architecture & engineering container
-├── tests/                          # Automated unit, regression, layout and contract tests (165 passing)
+├── tests/                          # Automated unit, regression, layout and contract tests (170 passing)
 │   ├── test_engine.py
 │   ├── test_layout.py
 │   ├── test_contract.py
@@ -367,7 +367,7 @@ The skill executes the **Rhythm A Deep Guided SOP**:
 - 🚫 [Scenario Anti-Patterns](docs/en/scenario_anti_patterns.md)
 - 🏗️ [Engine Architecture Deep Dive](docs/en/architecture.md)
 - 🔌 [AI Agent Integration Guide](docs/en/agent_integration.md)
-- 🧾 [Changelog](CHANGELOG.md) and the PRDs: [v3.2](docs/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md), [v3.3](docs/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md), [v3.4](docs/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md), [v3.5](docs/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md), [v3.6](docs/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md), [v3.7](docs/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md), [v3.8](docs/PRD_v3.8_SKIN_AND_POISE.md)
+- 🧾 [Changelog](CHANGELOG.md) and the PRDs: [v3.2](docs/en/prd/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md), [v3.3](docs/en/prd/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md), [v3.4](docs/en/prd/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md), [v3.5](docs/en/prd/PRD_v3.5_SKIN_FLOOR_AND_RENDER_CHECK.md), [v3.6](docs/en/prd/PRD_v3.6_SKELETON_CONTRACT_AND_EVIDENCE.md), [v3.7](docs/en/prd/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md), [v3.8](docs/en/prd/PRD_v3.8_SKIN_AND_POISE.md)
 - 🤝 [Contributing Guide](CONTRIBUTING.md)
 
 ---
@@ -380,7 +380,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest tests -q              # or: python3 -m unittest discover -s tests
 ```
 
-165 tests pass (plus 1 that needs a macOS PowerPoint: `UNDOPPT_TEST_POWERPOINT=1`). Verified on Python 3.12 and 3.14; the code declares 3.10+ but 3.10, 3.11 and 3.13 have not been run.
+170 tests pass (plus 1 that needs a macOS PowerPoint: `UNDOPPT_TEST_POWERPOINT=1`). Verified on Python 3.12 and 3.14; the code declares 3.10+ but 3.10, 3.11 and 3.13 have not been run.
 
 ---
 

@@ -1,6 +1,10 @@
 # undoPPT v3.7.0 产品需求文档 (PRD)
 ## 血肉：每个数字都说清楚从哪来 (Flesh: Provenance & Ingest)
 
+> [English](en/prd/PRD_v3.7_FLESH_PROVENANCE_AND_INGEST.md) | 简体中文
+
+> **后续变化**：§6 中 v3.8 计划的"Keynote"验证未能达成，见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md)。
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

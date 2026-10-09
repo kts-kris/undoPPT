@@ -1,6 +1,10 @@
 # undoPPT v3.4.0 产品需求文档 (PRD)
 ## 企业12大核心场景认知进阶、决策闭环与外部对标深度规约 (Enterprise 12 Scenarios & Decision-Ready Rigor)
 
+> [English](en/prd/PRD_v3.4_ENTERPRISE_12_SCENARIOS_AND_DECISION_RIGOR.md) | 简体中文
+
+> **更正说明（2026-10-09，对照 v3.8.0 代码核实）**：本文是历史需求文档，保持原样。其中有三处夸大了审计的实际强制力。(1) `BENCHMARK_UNBALANCED` 是关键词检查：对标题含 对比/选型/竞品/对标/benchmark/rfc 且至少两行的对比表，若全表没有出现任何权衡词（成本、摩擦、门槛、劣势、局限、适用边界等）才触发；它不识别"我方全绿、竞品全红"，§4.2 的三维参照系与适用边界声明是写作指引，代码并不检查。(2) `PROMOTION_LAUNDRY_LIST` 仅在 `content_columns` / `bento_cards` 页含有少数流水账用语（参与了、协助完成、日常维护等）**且**没有量化数字时触发，不检查 STAR 结构。(3) `DECISION_ASK_MISSING` 在代码中还适用于 `cross_team_alignment` 与 `strategic_planning`；按页规则的真实代码带页码后缀（`BENCHMARK_UNBALANCED_P<n>`、`PROMOTION_LAUNDRY_LIST_P<n>`），见[审计代码](zh/audit_codes.md)。另外 §4.1.2 的 HTML 勾选框默认是**已勾选**状态，并非待现场勾选。§7 的测试数为发布当时的数字。
+
 ---
 
 ## 1. 文档基本信息 (Document Metadata)

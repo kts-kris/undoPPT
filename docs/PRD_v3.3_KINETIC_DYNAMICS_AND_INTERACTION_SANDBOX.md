@@ -1,7 +1,16 @@
 # undoPPT v3.3.0 产品需求文档 (PRD)
 ## 动效全能进化与活动决策沙盒 (Kinetic Dynamics & Interactive Decision Sandbox)
 
+> [English](en/prd/PRD_v3.3_KINETIC_DYNAMICS_AND_INTERACTION_SANDBOX.md) | 简体中文
+
 > **更正说明（2026-10-06，v3.8.0）**：本文是历史需求文档，保持原样。其中关于"原生 `<p:timing>` 点击步进动画"在 Office / Keynote / WPS 中生效的描述**不成立**：本文所述的动画 XML，PowerPoint 实测识别出的动画对象数为 0。v3.8.0 已重写，并改为默认关闭、仅保留三种叙事动画，详见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md) 与 [CHANGELOG](../CHANGELOG.md)。
+
+> **补充更正（2026-10-09，对照 v3.8.0 代码核实）**：
+> 1. **按所述实现**：`P` 键演播 HUD（认知罗盘、因果提词器、质疑应对）、HTML 情景切换（保守/基准/激进）、架构下钻弹窗、`SyncWatcher.analyze_intent_diff`。
+> 2. **未实现**：敏感性调节滑块（§4.2.2 第 2 项）在代码中不存在。
+> 3. **未实现**：§4.1.2 的各图元语义动力学（自下而上重力落锁、流光与波纹）与 §4.1.3 的叙事弧线节拍时钟（200~250ms / 400ms / 600ms）；`narrative_arc` 目前只作为标签显示。现有的只有 HTML 的数字跑表与流光，且仅在叙事动画模式下运行（v3.8）。
+> 4. 沙盒的 `scenarios` 在蓝图给出时使用；未给出时由切换器自行推算三种情景，除非作者提供真实数字，否则只是示意。
+> 5. `presentation_config.motion_pace` 仅作为 `narrative` 的别名；§5 中的 `kinetic_style` 与 `enable_sandbox` 不被代码读取。
 
 ---
 

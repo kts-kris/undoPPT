@@ -1,7 +1,16 @@
 # undoPPT v3.2.0 产品需求文档 (PRD)
 ## 场景避坑红线体系与动效认知呈现架构 (Scenario Anti-Patterns & Motion Architecture)
 
+> [English](en/prd/PRD_v3.2_SCENARIO_REDLINES_AND_ANIMATION.md) | 简体中文
+
 > **更正说明（2026-10-06，v3.8.0）**：本文是历史需求文档，保持原样。其中关于"原生 `<p:timing>` 点击步进动画"在 Office / Keynote / WPS 中生效的描述**不成立**：本文所述的动画 XML，PowerPoint 实测识别出的动画对象数为 0。v3.8.0 已重写，并改为默认关闭、仅保留三种叙事动画，详见 [v3.8 PRD](PRD_v3.8_SKIN_AND_POISE.md) 与 [CHANGELOG](../CHANGELOG.md)。
+
+> **补充更正（2026-10-09，对照 v3.8.0 代码与 PowerPoint 核实）**：
+> 1. `--motion staged`（§4.2.3 的幻灯片切片）从未实现。现在 `--motion` 只接受 `off` / `narrative`；`motion_pace: "staged"` 仅保留为 `narrative` 的别名。
+> 2. §4.2.3 表中的八种节奏名（`stagger`、`bottom_up`、`sequential`、`quadrant_reveal`、`step_climb`、`horizon_unfold`、`count_spotlight`、`row_by_row`）在代码中不存在；v3.8 把动画收敛为 `reveal` / `contrast` / `build`。
+> 3. §6.1 第 3 条"`[待实测]` / `[设计预估]` 标记给予诚信加分"未实现；v3.7 以 `source` / `status` 出处模型取代（无出处的数字标"待核"）。
+> 4. HTML 子步进展开存在，但**默认关闭**：按 `S` 键切到"Step: ON"后空格才逐个显现；关闭时空格直接翻页。
+> 5. 切页过渡（§4.2.2）已核实：PowerPoint 报告 demo 的 8 页入场效果均为淡入。Keynote 与 WPS 的播放未验证。
 
 ---
 
